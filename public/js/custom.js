@@ -209,7 +209,7 @@ $(document).ready(function(){
 
 
         /********************************************************************************************* */
-        if(!data || !equipamento || !litros || !combustivel || !origem){
+        if(!data || !equipamento || !km || !horas || !litros || !combustivel || !origem ){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
                 type: 'error',
@@ -272,6 +272,236 @@ $(document).ready(function(){
         grava(dados,route,type,origem);
         }
     })
+
+    /**********************gravar arrasto **************************************************/
+    $(document).on('submit', 'form#cadastro-arrasto', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var arrasto             = $(this).find('input#arrasto').val();
+
+
+        /********************************************************************************************* */
+        if(!arrasto ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'arrasto'             : arrasto
+
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+
+    /**********************gravar baldeio **************************************************/
+    $(document).on('submit', 'form#cadastro-baldeio', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var baldeio             = $(this).find('input#baldeio').val();
+
+
+        /********************************************************************************************* */
+        if(!baldeio ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'baldeio'             : baldeio
+
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+
+       /**********************gravar colaborador **************************************************/
+    $(document).on('submit', 'form#cadastro-colaborador', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var colaborador         = $(this).find('input#colaborador').val();
+        var uf                  = $(this).find('select#uf').val();
+        var ativo               = $(this).find('select#ativo').val();
+        var cod                 = $(this).find('input#cod').val();
+        var empresa             = $(this).find('select#empresa').val();
+
+        /********************************************************************************************* */
+        if(!colaborador ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'colaborador'      : colaborador
+                ,'uf'              : uf
+                ,'ativo'           : ativo
+                ,'cod'             : cod
+                ,'empresa'         : empresa
+
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+      /**********************gravar comboio **************************************************/
+    $(document).on('submit', 'form#cadastro-comboio', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var tanque             = $(this).find('input#tanque').val();
+        var capacidade         = $(this).find('input#capacidade').val();
+        var fazenda            = $(this).find('select#fazenda').val();
+        var uf                 = $(this).find('select#uf').val();
+        var obs                = $(this).find('input#obs').val();
+
+        /********************************************************************************************* */
+        if(!tanque ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'tanque'            : tanque
+                ,'capacidade'       : capacidade
+                ,'fazenda'          : fazenda
+                ,'uf'               : uf
+                ,'obs'              : obs
+
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+         /**********************gravar fazenda **************************************************/
+    $(document).on('submit', 'form#cadastro-fazenda', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var fazenda             = $(this).find('input#fazenda').val();
+        var uf                  = $(this).find('select#uf').val();
+        var apontador           = $(this).find('select#apontador').val();
+        var ativa               = $(this).find('select#ativa').val();
+
+        /********************************************************************************************* */
+        if(!fazenda ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'fazenda'             : fazenda
+                ,'uf'                 : uf
+                ,'apontador'          : apontador
+                ,'ativa'              : ativa
+
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+    /**********************gravar corte **************************************************/
+    $(document).on('submit', 'form#cadastro-corte', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var corte             = $(this).find('input#corte').val();
+
+
+        /********************************************************************************************* */
+        if(!corte ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'corte'             : corte
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+
+     /**********************gravar comprimento_madeira **************************************************/
+    $(document).on('submit', 'form#cadastro-comprimento_madeira', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var comprimento             = $(this).find('input#comprimento').val();
+
+
+        /********************************************************************************************* */
+        if(!comprimento ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'comprimento'             : comprimento
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+    /**********************gravar fornecedor **************************************************/
+    $(document).on('submit', 'form#cadastro-fornecedor', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var fornecedor            = $(this).find('input#fornecedor').val();
+        var cod_cargo             = $(this).find('input#cod_cargo').val();
+
+
+        /********************************************************************************************* */
+        if(!fornecedor ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'fornecedor'             : fornecedor
+                ,'cod_cargo'             : cod_cargo
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
 
     /************************checa km ***********************************************************/
     $(document).on('change','select#placa',function(event){

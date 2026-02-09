@@ -11,8 +11,18 @@ class equipamento extends Model
     // public $timestamps = false;
     protected $fillable= [
         'id'
-        , 'placa'
         , 'equipamento'
+        , 'ano'
+        , 'ativo'
+        , 'uf'
+        , 'data_partida'
+        , 'tipo'
+        , 'atividade'
+        , 'cilindros'
+        , 'operacao'
+        , 'consumo_minimo'
+        , 'consumo_maximo'
+        , 'placa'
 
 
     ];

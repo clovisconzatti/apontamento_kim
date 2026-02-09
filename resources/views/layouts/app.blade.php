@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Frigorifico Guinther</title>
+    <title>Kim</title>
     <link rel="shortcut icon" href=" {{ asset('img/icone.png') }} ">
 
     <!-- Scripts -->

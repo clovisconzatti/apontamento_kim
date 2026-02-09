@@ -69,11 +69,12 @@
                 </select>
             </div>
             <div class="form-group col-md-4">
-                Origem:
+                Comboio:
                 <select class="form-control limpar" type="text" name="origemAbastecimento" id="origemAbastecimento" >
                     <option value="">Selecione</option>
-                    <option value="Interno">Interno/Frigorifico</option>
-                    <option value="Externo">Externo/Posto</option>
+                    <option value="Principal">Principal</option>
+                    <option value="Comb.01">Comb.01</option>
+                    <option value="Comb.02">Comb.02</option>
                 </select>
             </div>
             <div class="form-group col-md-9">
