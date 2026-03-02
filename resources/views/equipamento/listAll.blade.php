@@ -21,19 +21,35 @@
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
-                <th width="5%" data-field="name">Cadastro</th>
-                <th width="10%" data-field="name">Placa</th>
-                <th width="50%" data-field="name">Equipamento</th>
-                <th width="5%" data-field="">Ação</th>
+                <th width="15%" data-field="name">Placa</th>
+                <th width="25%" data-field="name">Equipamento</th>
+                <th width="5%" data-field="name">Ano</th>
+                <th width="5%" data-field="name">Ativo</th>
+                <th width="10%" data-field="name">Data Partida</th>
+                <th width="10%" data-field="name">Tipo</th>
+                <th width="10%" data-field="name">Atividade</th>
+                <th width="5%" data-field="name">Cilindros</th>
+                <th width="10%" data-field="name">Operação</th>
+                <th width="5%" data-field="name">Cons. Minimo</th>
+                <th width="5%" data-field="name">Cons. Máximo</th>
+                <th width="2%" data-field="">Ação</th>
             </tr>
         </thead>
         <tbody>
             {{-- {{ dd($equipamentos) }} --}}
             @foreach ($equipamentos as $equipamento)
                 <tr>
-                    <td>{{ $equipamento->id }} </td>
                     <td>{{ $equipamento->placa }} </td>
                     <td align="">{{ $equipamento->equipamento }}  </td>
+                    <td>{{ $equipamento->ano }} </td>
+                    <td>{{ $equipamento->ativo }} </td>
+                    <td align="center"> {{ date('d/m/Y',strtotime($equipamento->data_partida)) }} </td>
+                    <td>{{ $equipamento->tipo }} </td>
+                    <td>{{ $equipamento->atividade }} </td>
+                    <td>{{ $equipamento->cilindros }} </td>
+                    <td>{{ $equipamento->operacao }} </td>
+                     <td align="right"> {{ number_format($equipamento->consumo_minimo,2,',','.') }} </td>
+                     <td align="right"> {{ number_format($equipamento->consumo_maximo,2,',','.') }} </td>
 
                     <td align="center">
                         <div class="btn-group-vertical">

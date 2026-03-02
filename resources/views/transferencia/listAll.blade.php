@@ -4,7 +4,8 @@
         <tr>
             <td width="80%">
                 <h3>
-                    <i class="fas fa-truck"></i> Transferencia
+                    <i class="fas fa-gas-pump"></i>
+                    <i class="fas fa-arrow-right-arrow-left"></i> Transferência entre Reservatórios/Comboios
                 </h3>
             </td>
             <td width="50%" align="center">
@@ -21,11 +22,19 @@
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
+                <th width="10%" data-field="name">Data</th>
                 <th width="10%" data-field="name">Origem</th>
                 <th width="10%" data-field="name">Destino</th>
                 <th width="5%" data-field="name">Litros</th>
-                <th width="30%" data-field="name">Fornecedor</th>
                 <th width="10%" data-field="name">Documento</th>
+                <th width="10%" data-field="name">Combustivel</th>
+                <th width="10%" data-field="name">Horimetro</th>
+                <th width="10%" data-field="name">Operador</th>
+                <th width="10%" data-field="name">Fazenda</th>
+                <th width="10%" data-field="name">Hori.Inicial</th>
+                <th width="10%" data-field="name">Hori.Final</th>
+                <th width="10%" data-field="name">Tanque</th>
+                <th width="10%" data-field="name">Obs</th>
                 <th width="5%" data-field="">Ação</th>
             </tr>
         </thead>
@@ -33,11 +42,19 @@
 
             @foreach ($transferencias as $transferencia)
                 <tr>
+                    <td align="center"> {{ date('d/m/Y',strtotime($transferencia->data)) }} </td>
                     <td>{{ $transferencia->origem }} </td>
                     <td>{{ $transferencia->destino }} </td>
                     <td align="right"> {{ number_format($transferencia->litros,2,',','.') }} </td>
-                    <td>{{ $transferencia->fornecedor }} </td>
                     <td>{{ $transferencia->nr_doc }} </td>
+                    <td>{{ $transferencia->combustivel }} </td>
+                    <td align="right"> {{ number_format($transferencia->horimetro,2,',','.') }} </td>
+                    <td>{{ $transferencia->operador }} </td>
+                    <td>{{ $transferencia->fazenda }} </td>
+                    <td align="right"> {{ number_format($transferencia->horimetro_inicial,2,',','.') }} </td>
+                    <td align="right"> {{ number_format($transferencia->horimetro_final,2,',','.') }} </td>
+                    <td>{{ $transferencia->tanque }} </td>
+                    <td>{{ $transferencia->obs }} </td>
                     <td align="center">
                         <div class="btn-group-vertical">
                             <div class="btn-group">

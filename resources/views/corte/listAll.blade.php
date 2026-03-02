@@ -4,8 +4,7 @@
         <tr>
             <td width="80%">
                 <h3>
-                    <i class="fas fa-tractor"></i>
-                    <i class="fas fa-arrow-right-arrow-left"></i> Corte
+                    <i class="fas fa-tree"></i> Corte
                 </h3>
             </td>
             <td width="50%" align="center">

@@ -22,6 +22,7 @@ class manutencao extends Model
         , 'custo'
         , 'manutencao_diaria'
         , 'situacao'
+        , 'obs'
 
     ];
     protected $primaryKey = 'id';

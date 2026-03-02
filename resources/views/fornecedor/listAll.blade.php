@@ -4,7 +4,7 @@
         <tr>
             <td width="80%">
                 <h3>
-                    <i class="fas fa-gas-pump"></i></i> Cadastro de Fornecedores
+                    <i class="far fa-address-card"></i></i> Cadastro de Fornecedores
                 </h3>
             </td>
             <td width="50%" align="center">

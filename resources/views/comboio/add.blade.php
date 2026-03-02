@@ -35,7 +35,7 @@
                 Capacidade em Litros:
                 <input class="form-control" type="text" name="capacidade" id="capacidade"  value="" >
             </div>
-                <div class="form-group col-md-4">
+            <div class="form-group col-md-4">
                 Fazenda:
                 <select class="form-control limpar" type="text" name="fazenda" id="fazenda">
                     <option value="%">Todas</option>

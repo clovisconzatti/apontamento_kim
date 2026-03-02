@@ -18,6 +18,11 @@ class UserSeeder extends Seeder
             'email' => 'clovis@plannersolucoes.com.br',
             'password' => bcrypt('Cczt4752')
         ]);
+        User::create([
+            'name' => 'Emily',
+            'email' => 'kimlogistica@outlook.com',
+            'password' => bcrypt('12345678')
+        ]);
 
     }
 }

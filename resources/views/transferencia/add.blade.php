@@ -18,7 +18,10 @@
         </div>
         <br/>
     @endif
-    <h3 class=""><i class="fas fa-truck"></i> transferencia</h3>
+    <h3>
+                    <i class="fas fa-gas-pump"></i>
+                    <i class="fas fa-arrow-right-arrow-left"></i> Transferência entre Reservatórios/Comboios
+                </h3>
     <form action="" id="cadastro-transferencia" nome="cadastro-transferencia" method="post">
         @csrf
         @method('patch')
@@ -32,43 +35,82 @@
                 <input class="form-control" type="date" name="data" id="data"  value="" >
             </div>
             <div class="form-group col-md-3">
-            Combustivel:
-                <select class="form-control limpar" type="text" name="combustivel" id="combustivel" >
-                    <option value="">Selecione</option>
-                    <option value="Diesel-S10">Diesel-S10</option>
-                    <option value="Diesel-S500">Diesel-S500</option>
-                    <option value="Arla">Arla</option>
-                </select>
-            </div>
-            <div class="form-group col-md-3">
                 Origem:
-                <select class="form-control limpar" type="text" name="origem" id="origem" >
-                    <option value="">Selecione</option>
-                    <option value="Externo">Externo</option>
-                    <option value="Principal">Tanque Principal</option>
-                    <option value="Secundario">Tanque Secundario</option>
+                <select class="form-control limpar" type="text" name="origem" id="origem">
+                    <option value="%">Todas</option>
+                    @foreach ($comboios as $comboio )
+                        <option value="{{ $comboio->id }}">{{ $comboio->tanque }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="form-group col-md-3">
                 Destino:
                 <select class="form-control limpar" type="text" name="destino" id="destino" >
-                    <option value="">Selecione</option>
-                    <option value="Extorno">Externo</option>
-                    <option value="Principal">Tanque Principal</option>
-                    <option value="Secundario">Tanque Secundario</option>
+                    <option value="%">Todas</option>
+                    @foreach ($equipamentos as $equipamento )
+                        <option value="{{ $equipamento->id }}">{{ $equipamento->equipamento }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="form-group col-md-2">
                 Total de Litros:
                 <input class="form-control limpar" type="number" step="any" name="litros" id="litros"  value="" >
             </div>
-            <div class="form-group col-md-6">
-                Fornecedor:
-                <input class="form-control" type="text" name="fornecedor" id="fornecedor"  value="" >
-            </div>
             <div class="form-group col-md-2">
                 Nr Documento:
                 <input class="form-control limpar" type="number" step="any" name="nr_doc" id="nr_doc"  value="" >
+            </div>
+            <div class="form-group col-md-3">
+            Combustivel:
+                <select class="form-control limpar" type="text" name="combustivel" id="combustivel" >
+                    <option value="%">Todas</option>
+                    @foreach ($tipo_combustiveis as $tipo_combustivel )
+                        <option value="{{ $tipo_combustivel->id }}">{{ $tipo_combustivel->combustivel }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                Horimetro Equipamento:
+                <input class="form-control limpar" type="number" step="any" name="horimetro" id="horimetro"  value="" >
+            </div>
+            <div class="form-group col-md-3">
+            Operador:
+                <select class="form-control limpar" type="text" name="operador" id="operador" >
+                    <option value="%">Todas</option>
+                    @foreach ($colaboradores as $colaborador )
+                        <option value="{{ $colaborador->id }}">{{ $colaborador->colaborador }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+            Fazenda:
+                <select class="form-control limpar" type="text" name="fazenda" id="fazenda" >
+                    <option value="%">Todas</option>
+                    @foreach ($fazendas as $fazenda )
+                        <option value="{{ $fazenda->id }}">{{ $fazenda->fazenda }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                Horimetro Inicial:
+                <input class="form-control limpar" type="number" step="any" name="horimetro_inicial" id="horimetro_inicial"  value="" >
+            </div>
+            <div class="form-group col-md-3">
+                Horimetro Final:
+                <input class="form-control limpar" type="number" step="any" name="horimetro_final" id="horimetro_final"  value="" >
+            </div>
+            <div class="form-group col-md-2">
+                Tanque:
+                <select class="form-control limpar" type="text" name="tanque" id="tanque" >
+                    <option value="%">Todas</option>
+                    @foreach ($comboios as $comboio )
+                        <option value="{{ $comboio->id }}">{{ $comboio->tanque }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-11">
+                Obs:
+                <input class="form-control limpar" type="text" name="obs" id="obs"  value="" >
             </div>
         </div>
         <div class="row">

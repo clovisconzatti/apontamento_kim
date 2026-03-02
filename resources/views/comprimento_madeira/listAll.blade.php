@@ -4,8 +4,7 @@
         <tr>
             <td width="80%">
                 <h3>
-                    <i class="fas fa-tractor"></i>
-                    <i class="fas fa-arrow-right-arrow-left"></i> Comprimento da Madeira
+                    <i class="fas fa-ruler-horizontal"></i> Comprimento da Madeira
                 </h3>
             </td>
             <td width="50%" align="center">

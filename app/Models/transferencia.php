@@ -11,13 +11,19 @@ class transferencia extends Model
     // public $timestamps = false;
     protected $fillable= [
         'id'
-        , 'origem'
-        , 'destino'
-        , 'litros'
-        , 'nr_doc'
-        , 'data'
+        ,'data'
+        ,'origem'
+        ,'destino'
+        ,'litros'
+        ,'nr_doc'
         ,'combustivel'
-        ,'fornecedor'
+        ,'horimetro'
+        ,'operador'
+        ,'fazenda'
+        ,'horimetro_inicial'
+        ,'horimetro_final'
+        ,'tanque'
+        ,'obs'
 
     ];
     protected $primaryKey = 'id';

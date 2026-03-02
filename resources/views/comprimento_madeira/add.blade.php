@@ -18,7 +18,7 @@
         </div>
         <br/>
     @endif
-    <h3 class=""><i class="fas fa-tractor"></i>
+    <h3 class=""><i class="fas fa-ruler-horizontal"></i>
                  <i class="fas fa-arrow-right-arrow-left"></i> Comprimento da Madeira</h3>
     <form action="" id="cadastro-comprimento_madeira" nome="cadastro-comprimento_madeira" method="post">
         @csrf

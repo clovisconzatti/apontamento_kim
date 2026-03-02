@@ -31,9 +31,73 @@
                 Placa:
                 <input class="form-control" type="text" name="placa" id="placa"  value="{{$equipamento->placa}}" >
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-5">
                 Equipamento:
                 <input class="form-control" type="text" name="equipamento" id="equipamento" value="{{$equipamento->equipamento}}" >
+            </div>
+            <div class="form-group col-md-1">
+                Ano:
+                <input class="form-control" type="text" name="ano" id="ano" value="{{$equipamento->ano}}" >
+            </div>
+            <div class="form-group col-md-2">
+                 Ativo:
+                 <select class="form-control limpar" type="text" name="ativo" id="ativo" value="{{ $equipamento->ativo }}" >
+                    <option value="">Selecione</option>
+                    <option value="Sim" {{ $equipamento->ativo == 'Sim' ? 'selected' : '' }}>Sim</option>
+                    <option value="Nao" {{ $equipamento->ativo == 'Nao' ? 'selected' : '' }}>Não</option>
+                </select>
+            </div>
+            <div class="form-group col-md-1">
+                Estado:
+                <select class="form-control limpar" name="uf" id="uf">
+                    <option value="">Selecione</option>
+                    <option value="SC" {{ $equipamento->uf == 'SC' ? 'selected' : '' }}>SC</option>
+                    <option value="RS" {{ $equipamento->uf == 'RS' ? 'selected' : '' }}>RS</option>
+                    <option value="PR" {{ $equipamento->uf == 'PR' ? 'selected' : '' }}>PR</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                Data Partida:
+                <input class="form-control" type="date" name="data_partida" id="data_partida"  value="{{date('Y-m-d', strtotime($equipamento->data_partida))}}" >
+            </div>
+            <div class="form-group col-md-3">
+                Tipo:
+                <select class="form-control limpar" type="text" name="tipo" id="tipo">
+                    <option value="%">Todas</option>
+                    @foreach ($tipos as $tipo )
+                        <option value="{{ $tipo->id }}" {{ $tipo->id == $equipamento->tipo ? 'selected' : '' }}>{{ $tipo->tipo }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                Atividade:
+                <select class="form-control limpar" type="text" name="atividade" id="atividade">
+                    <option value="%">Todas</option>
+                    @foreach ($atividades as $atividade )
+                        <option value="{{ $atividade->id }}" {{ $atividade->id == $equipamento->atividade ? 'selected' : '' }}>{{ $atividade->atividade }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                Cilindros:
+                <input class="form-control" type="text" name="cilindros" id="cilindros" value="{{$equipamento->cilindros}}" >
+            </div>
+            <div class="form-group col-md-4">
+                Operação:
+                <select class="form-control limpar" type="text" name="operacao" id="operacao">
+                    <option value="%">Todas</option>
+                    @foreach ($operacoes as $operacao )
+                        <option value="{{ $operacao->id }}" {{ $operacao->id == $equipamento->operacao ? 'selected' : '' }}>{{ $operacao->operacao }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                Consumo Minimo:
+                <input class="form-control" type="number" step="any" name="consumo_minimo" id="consumo_minimo" value="{{$equipamento->consumo_minimo}}" >
+            </div>
+            <div class="form-group col-md-2">
+                Consumo Máximo:
+                <input class="form-control" type="number" step="any" name="consumo_maximo" id="consumo_maximo" value="{{$equipamento->consumo_maximo}}" >
             </div>
         </div>
 

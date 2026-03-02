@@ -169,12 +169,22 @@ $(document).ready(function(){
         var type = $(this).find('input#type').val();
         var origem = $(this).find('#origem').val();
 
-        var placa              = $(this).find('input#placa').val();
-        var equipamento        = $(this).find('input#equipamento').val();
+        var placa               = $(this).find('input#placa').val();
+        var equipamento         = $(this).find('input#equipamento').val();
+        var ano                 = $(this).find('input#ano').val();
+        var ativo               = $(this).find('select#ativo').val();
+        var uf                  = $(this).find('select#uf').val();
+        var data_partida        = $(this).find('input#data_partida').val();
+        var tipo                = $(this).find('select#tipo').val();
+        var atividade           = $(this).find('select#atividade').val();
+        var cilindros           = $(this).find('input#cilindros').val();
+        var operacao            = $(this).find('select#operacao').val();
+        var consumo_minimo      = $(this).find('input#consumo_minimo').val();
+        var consumo_maximo      = $(this).find('input#consumo_maximo').val();
 
 
         /********************************************************************************************* */
-        if(!placa){
+        if(!placa || !equipamento || !ativo || !data_partida ){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
                 type: 'error',
@@ -182,9 +192,20 @@ $(document).ready(function(){
             })
         }else{
             var dados= {
-                'placa'            : placa
-                ,'equipamento'     : equipamento
+                'placa'             : placa
+                ,'equipamento'      : equipamento
+                ,'ano'              : ano
+                ,'ativo'            : ativo
+                ,'uf'               : uf
+                ,'data_partida'     : data_partida
+                ,'tipo'             : tipo
+                ,'atividade'        : atividade
+                ,'cilindros'        : cilindros
+                ,'operacao'         : operacao
+                ,'consumo_minimo'   : consumo_minimo
+                ,'consumo_maximo'   : consumo_maximo
             }
+            // console.log(dados,route,type,origem);
             grava(dados,route,type,origem);
         }
     })
@@ -241,12 +262,18 @@ $(document).ready(function(){
         var origem = $(this).find('#origem').val();
 
         var data                = $(this).find('input#data').val();
-        var combustivel         = $(this).find('select#combustivel').val();
         var origem              = $(this).find('select#origem').val();
         var destino             = $(this).find('select#destino').val();
         var litros              = $(this).find('input#litros').val();
-        var fornecedor          = $(this).find('input#fornecedor').val();
         var nr_doc              = $(this).find('input#nr_doc').val();
+        var combustivel         = $(this).find('select#combustivel').val();
+        var horimetro           = $(this).find('input#horimetro').val();
+        var operador            = $(this).find('select#operador').val();
+        var fazenda             = $(this).find('select#fazenda').val();
+        var horimetro_inicial   = $(this).find('input#horimetro_inicial').val();
+        var horimetro_final     = $(this).find('input#horimetro_final').val();
+        var tanque              = $(this).find('select#tanque').val();
+        var obs                 = $(this).find('input#obs').val();
 
 
 
@@ -260,13 +287,19 @@ $(document).ready(function(){
             })
         }else{
             var dados= {
-                'data'                : data
-                ,'combustivel'        : combustivel
-                ,'origem'             : origem
-                ,'destino'            : destino
-                ,'litros'             : litros
-                ,'fornecedor'         : fornecedor
-                ,'nr_doc'             : nr_doc
+                'data'                  : data
+                ,'origem'               : origem
+                ,'destino'              : destino
+                ,'litros'               : litros
+                ,'nr_doc'               : nr_doc
+                ,'combustivel'          : combustivel
+                ,'horimetro'            : horimetro
+                ,'operador'             : operador
+                ,'fazenda'              : fazenda
+                ,'horimetro_inicial'    : horimetro_inicial
+                ,'horimetro_final'      : horimetro_final
+                ,'tanque'               : tanque
+                ,'obs'                  : obs
 
             }
         grava(dados,route,type,origem);
@@ -423,8 +456,7 @@ $(document).ready(function(){
         grava(dados,route,type,origem);
         }
     })
-
-    /**********************gravar corte **************************************************/
+/**********************gravar corte **************************************************/
     $(document).on('submit', 'form#cadastro-corte', function(event){
         event.preventDefault()
         var route = $(this).find('input#route').val();
@@ -434,7 +466,7 @@ $(document).ready(function(){
         var corte             = $(this).find('input#corte').val();
 
 
-        /********************************************************************************************* */
+/********************************************************************************************* */
         if(!corte ){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
@@ -449,8 +481,7 @@ $(document).ready(function(){
         }
     })
 
-
-     /**********************gravar comprimento_madeira **************************************************/
+ /**********************gravar comprimento_madeira **************************************************/
     $(document).on('submit', 'form#cadastro-comprimento_madeira', function(event){
         event.preventDefault()
         var route = $(this).find('input#route').val();
@@ -460,7 +491,7 @@ $(document).ready(function(){
         var comprimento             = $(this).find('input#comprimento').val();
 
 
-        /********************************************************************************************* */
+/********************************************************************************************* */
         if(!comprimento ){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
@@ -475,7 +506,7 @@ $(document).ready(function(){
         }
     })
 
-    /**********************gravar fornecedor **************************************************/
+/**********************gravar fornecedor **************************************************/
     $(document).on('submit', 'form#cadastro-fornecedor', function(event){
         event.preventDefault()
         var route = $(this).find('input#route').val();
@@ -486,7 +517,7 @@ $(document).ready(function(){
         var cod_cargo             = $(this).find('input#cod_cargo').val();
 
 
-        /********************************************************************************************* */
+/********************************************************************************************* */
         if(!fornecedor ){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
@@ -501,9 +532,396 @@ $(document).ready(function(){
         grava(dados,route,type,origem);
         }
     })
+/**********************gravar lubrificante **************************************************/
+    $(document).on('submit', 'form#cadastro-lubrificante', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var lubrificante             = $(this).find('input#lubrificante').val();
 
 
-    /************************checa km ***********************************************************/
+/********************************************************************************************* */
+        if(!lubrificante ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'lubrificante'             : lubrificante
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar peca **************************************************/
+    $(document).on('submit', 'form#cadastro-peca', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var peca             = $(this).find('input#peca').val();
+        var cod_cargo             = $(this).find('input#cod_cargo').val();
+
+
+/********************************************************************************************* */
+        if(!peca ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'peca'             : peca
+                ,'cod_cargo'             : cod_cargo
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar situacao_manutencao **************************************************/
+    $(document).on('submit', 'form#cadastro-situacao_manutencao', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var situacao             = $(this).find('input#situacao').val();
+
+
+/********************************************************************************************* */
+        if(!situacao){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'situacao'             : situacao
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar tipo_manutencao **************************************************/
+    $(document).on('submit', 'form#cadastro-tipo_manutencao', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var tipo             = $(this).find('input#tipo').val();
+
+
+/********************************************************************************************* */
+        if(!tipo ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'tipo'             : tipo
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar operacao **************************************************/
+    $(document).on('submit', 'form#cadastro-operacao', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var operacao             = $(this).find('input#operacao').val();
+
+
+/********************************************************************************************* */
+        if(!operacao ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'operacao'             : operacao
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar tipo **************************************************/
+    $(document).on('submit', 'form#cadastro-tipo', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var tipo             = $(this).find('input#tipo').val();
+
+
+/********************************************************************************************* */
+        if(!tipo ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'tipo'             : tipo
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+/**********************gravar atividade **************************************************/
+    $(document).on('submit', 'form#cadastro-atividade', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var atividade             = $(this).find('input#atividade').val();
+
+
+/********************************************************************************************* */
+        if(!atividade ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'atividade'             : atividade
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+    /**********************gravar clima **************************************************/
+    $(document).on('submit', 'form#cadastro-clima', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var combustivel         = $(this).find('input#combustivel').val();
+        var unidade             = $(this).find('input#unidade').val();
+
+
+/********************************************************************************************* */
+        if(!combustivel ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'combustivel'          : combustivel
+                ,'unidade'             : unidade
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar clima **************************************************/
+    $(document).on('submit', 'form#cadastro-clima', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var clima         = $(this).find('input#clima').val();
+
+/********************************************************************************************* */
+        if(!clima ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'clima'          : clima
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+/**********************gravar terreno **************************************************/
+    $(document).on('submit', 'form#cadastro-terreno', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var terreno         = $(this).find('input#terreno').val();
+
+/********************************************************************************************* */
+        if(!terreno ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'terreno'          : terreno
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar informacao de manutencao **************************************************/
+    $(document).on('submit', 'form#cadastro-manutencao', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var data                = $(this).find('input#data').val();
+        var ord_servico         = $(this).find('input#ord_servico').val();
+        var fazenda             = $(this).find('select#fazenda').val();
+        var maquina             = $(this).find('select#maquina').val();
+        var maquina             = $(this).find('select#maquina').val();
+        var hora_inicial        = $(this).find('input#hora_inicial').val();
+        var hora_final          = $(this).find('input#hora_final').val();
+        var horimetro           = $(this).find('input#horimetro').val();
+        var tipo_manutencao     = $(this).find('select#tipo_manutencao').val();
+        var custo               = $(this).find('input#custo').val();
+        var manutencao_diaria   = $(this).find('input#manutencao_diaria').val();
+        var situacao            = $(this).find('select#situacao').val();
+        var obs                 = $(this).find('input#obs').val();
+
+
+/********************************************************************************************* */
+        if(!data ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'data'                  : data
+                ,'ord_servico'          : ord_servico
+                ,'fazenda'              : fazenda
+                ,'maquina'              : maquina
+                ,'operador'             : operador
+                ,'hora_inicial'         : hora_inicial
+                ,'hora_final'           : hora_final
+                ,'horimetro'            : horimetro
+                ,'tipo_manutencao'      : tipo_manutencao
+                ,'custo'                : custo
+                ,'manutencao_diaria'    : manutencao_diaria
+                ,'situacao'             : situacao
+                ,'obs'                  : obs
+
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+/**********************gravar informacao diária **************************************************/
+    $(document).on('submit', 'form#cadastro-informacao', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var data                = $(this).find('input#data').val();
+        var fazenda         = $(this).find('input#fazenda').val();
+        var equipamento             = $(this).find('select#equipamento').val();
+        var atividade             = $(this).find('select#atividade').val();
+        var colaborador             = $(this).find('select#colaborador').val();
+        var hora_inicial        = $(this).find('input#hora_inicial').val();
+        var hora_final          = $(this).find('input#hora_final').val();
+        var horimetro_inicial           = $(this).find('input#horimetro_inicial').val();
+        var horimetro_final     = $(this).find('select#horimetro_final').val();
+        var corte               = $(this).find('input#corte').val();
+        var fat_m   = $(this).find('input#fat_m').val();
+        var origem_abastecimento            = $(this).find('select#origem_abastecimento').val();
+        var nr_nf                 = $(this).find('input#nr_nf').val();
+        var qnt_diesel                 = $(this).find('input#qnt_diesel').val();
+        var horimetro_abastecimento                 = $(this).find('input#horimetro_abastecimento').val();
+        var relogio_tanque_inicial                 = $(this).find('input#relogio_tanque_inicial').val();
+        var relogio_tanque_final                 = $(this).find('input#relogio_tanque_final').val();
+        var qnt_lubrificante                 = $(this).find('input#qnt_lubrificante').val();
+        var tipo_lubrificante                 = $(this).find('input#tipo_lubrificante').val();
+        var carregamento                 = $(this).find('input#carregamento').val();
+        var veiculo_carregado                 = $(this).find('input#veiculo_carregado').val();
+        var descarregamento                 = $(this).find('input#descarregamento').val();
+        var veiculo_descarregado                 = $(this).find('input#veiculo_descarregado').val();
+        var producao_terceiros                 = $(this).find('input#producao_terceiros').val();
+        var comprimento_madeira                 = $(this).find('input#comprimento_madeira').val();
+        var baldeio_curto                 = $(this).find('input#baldeio_curto').val();
+        var baldeio_medio                 = $(this).find('input#baldeio_medio').val();
+        var baldeio_longo                 = $(this).find('input#baldeio_longo').val();
+        var arrasto_curto                 = $(this).find('input#arrasto_curto').val();
+        var arrasto_medio                 = $(this).find('input#arrasto_medio').val();
+        var arrasto_longo                 = $(this).find('input#arrasto_longo').val();
+        var clima                 = $(this).find('input#clima').val();
+        var terreno                 = $(this).find('input#terreno').val();
+
+
+/********************************************************************************************* */
+        if(!data ){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'data'                  : data
+                ,'fazenda'          : fazenda
+                ,'equipamento'              : equipamento
+                ,'atividade'              : atividade
+                ,'colaborador'             : colaborador
+                ,'hora_inicial'         : hora_inicial
+                ,'hora_final'           : hora_final
+                ,'horimetro_inicial'            : horimetro_inicial
+                ,'horimetro_final'      : horimetro_final
+                ,'corte'                : corte
+                ,'fat_m'    : fat_m
+                ,'origem_abastecimento'             : origem_abastecimento
+                ,'nr_nf'                  : nr_nf
+                ,'qnt_diesel'                  : qnt_diesel
+                ,'horimetro_abastecimento'                  : horimetro_abastecimento
+                ,'relogio_tanque_inicial'                  : relogio_tanque_inicial
+                ,'relogio_tanque_final'                  : relogio_tanque_final
+                ,'qnt_lubrificante'                  : qnt_lubrificante
+                ,'tipo_lubrificante'                  : tipo_lubrificante
+                ,'carregamento'                  : carregamento
+                ,'veiculo_carregado'                  : veiculo_carregado
+                ,'descarregamento'                  : descarregamento
+                ,'veiculo_descarregado'                  : veiculo_descarregado
+                ,'producao_terceiros'                  : producao_terceiros
+                ,'comprimento_madeira'                  : comprimento_madeira
+                ,'baldeio_curto'                  : baldeio_curto
+                ,'baldeio_medio'                  : baldeio_medio
+                ,'baldeio_longo'                  : baldeio_longo
+                ,'arrasto_curto'                  : arrasto_curto
+                ,'arrasto_medio'                  : arrasto_medio
+                ,'arrasto_longo'                  : arrasto_longo
+                ,'clima'                  : clima
+                ,'terreno'                  : terreno
+
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/************************checa km ***********************************************************/
     $(document).on('change','select#placa',function(event){
         var equipamento = $(this).val();
         checaKm(equipamento);

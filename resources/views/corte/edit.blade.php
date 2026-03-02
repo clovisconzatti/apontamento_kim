@@ -18,7 +18,7 @@
         </div>
         <br/>
     @endif
-    <h3 class=""><i class="fas fa-tractor"></i>
+    <h3 class=""><i class="fas fa-tree"></i>
                  <i class="fas fa-arrow-right-arrow-left"></i> Tipo de Cortes</h3>
     <form action="" id="cadastro-corte" nome="cadastro-corte" method="post">
         @csrf

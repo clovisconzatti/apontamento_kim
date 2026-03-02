@@ -18,7 +18,7 @@
         </div>
         <br/>
     @endif
-    <h3 class=""><i class="fas fa-gas-pump"></i></i> Cadastro de Fornecedores</h3>
+    <h3 class=""><i class="far fa-address-card"></i></i> Cadastro de Fornecedores</h3>
     <form action="" id="cadastro-fornecedor" nome="cadastro-fornecedor" method="post">
         @csrf
         @method('patch')
