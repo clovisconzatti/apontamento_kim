@@ -184,6 +184,13 @@ class MenuSeeder extends Seeder
                 , 'rota'        =>'transferencia.listAll'
                 , 'icone'       =>'fas fa-arrow-right-arrow-left'
             ],
+             [
+                'ordem'         =>'03.003'
+                , 'descricao'   =>'Manutenção'
+                , 'tipo'        =>'Link'
+                , 'rota'        =>'manutencao.listAll'
+                , 'icone'       =>'fas fa-tools'
+            ],
         ];
         menu::insert($menus);
     }

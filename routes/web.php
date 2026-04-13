@@ -268,7 +268,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('informacao',[informacaoController::class,'listAll'])->name('informacao.listAll');
         Route::get('informacao/novo',[informacaoController::class,'formAdd'])->name('informacao.formAdd');
         Route::get('informacao/editar/{informacao}',[informacaoController::class,'formEdit'])->name('informacao.formEdit');
-        Route::post('informacao/store',[informacaoController::class,'strore'])->name('informacao.store');
+        Route::post('informacao/store',[informacaoController::class,'store'])->name('informacao.store');
         Route::patch('informacao/edit/{informacao}',[informacaoController::class,'edit'])->name('informacao.edit');
         Route::delete('informacao/destroy/{informacao}',[informacaoController::class,'destroy'])->name('informacao.destroy');
     });

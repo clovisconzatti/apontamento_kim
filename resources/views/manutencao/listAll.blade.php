@@ -4,12 +4,12 @@
         <tr>
             <td width="80%">
                 <h3>
-                    <i class="fas fa-tree"></i> Informações Diárias
+                    <i class="fas fa-tree"></i> Informações de Manutencões
                 </h3>
             </td>
             <td width="50%" align="center">
                 <h3>
-                    <a class="cor-digiliza" href="{{route('informacao.formAdd')}}">
+                    <a class="cor-digiliza" href="{{route('manutencao.formAdd')}}">
                         <i class="fas fa-plus-circle"></i>&nbsp;&nbsp;&nbsp;
                         <span>Novo</span>
                     </a>
@@ -30,12 +30,12 @@
         </thead>
         <tbody>
             {{-- {{ dd($informacoes) }} --}}
-            @foreach ($informacoes as $informacao)
+            @foreach ($manutencoes as $manutencao)
                 <tr>
-                    <td align="center"> {{ date('d/m/Y',strtotime($informacao->data)) }} </td>
-                    <td align="">{{ $informacao->equipamento }} </td>
-                    <td align="">{{ $informacao->fazenda }}  </td>
-                    <td align="">{{ $informacao->colaborador }}  </td>
+                    <td align="center"> {{ date('d/m/Y',strtotime($manutencao->data)) }} </td>
+                    <td align="">{{ $manutencao->equipamento }} </td>
+                    <td align="">{{ $manutencao->fazenda }}  </td>
+                    <td align="">{{ $manutencao->colaborador }}  </td>
                     <td align="center">
                         <div class="btn-group-vertical">
                             <div class="btn-group">
@@ -44,7 +44,7 @@
                                 <span>Ação</span>
                             </button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{{route('informacao.formEdit', $informacao->id)}}">
+                                <a class="dropdown-item" href="{{route('manutencao.formEdit', $manutencao->id)}}">
                                     <i class="far fa-edit"></i>&nbsp;&nbsp;&nbsp;
                                     <span>Editar</span>
                                 </a>

@@ -29,7 +29,7 @@
         <div class="row">
             <div class="form-group col-md-3">
                 Data
-                <input class="form-control" type="date" name="data" id="data"  value="" >
+                <input class="form-control" type="date" name="data" id="data"  value="{{ date('Y-m-d') }}">
             </div>
             <div class="form-group col-md-3">
                 Veiculo/Equipamento
@@ -51,7 +51,7 @@
             </div>
             <div class="form-group col-md-3">
                 Colaborador
-                <select class="form-control limpar" type="text" name="fazenda" id="fazenda">
+                <select class="form-control limpar" type="text" name="colaborador" id="colaborador">
                     <option value="%">Todas</option>
                     @foreach ($colaboradores as $colaborador )
                         <option value="{{ $colaborador->id }}">{{ $colaborador->colaborador }}</option>
@@ -62,7 +62,7 @@
         <div class="row">
             <div class="form-group col-md-4">
                 Atividade
-                <select class="form-control limpar" type="text" name="fazenda" id="fazenda">
+                <select class="form-control limpar" type="text" name="atividade" id="atividade">
                     <option value="%">Todas</option>
                     @foreach ($atividades as $atividade )
                         <option value="{{ $atividade->id }}">{{ $atividade->atividade }}</option>
@@ -202,7 +202,7 @@
         <div class="row">
             <div class="form-group col-md-12">
                 Observação
-                <input class="form-control" type="text" name="arrasto_curto" id="arrasto_curto"  value="" >
+                <input class="form-control" type="text" name="obs" id="obs"  value="" >
             </div>
         </div>
         <div class="row">

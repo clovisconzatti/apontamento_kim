@@ -29,10 +29,6 @@ class CreateInformacaosTable extends Migration
             $table->double('relogio_tanque_final')->nullable();
             $table->double('qnt_lubrificante')->nullable();
             $table->integer('tipo_lubrificante')->nullable();
-            $table->string('carregamento',50)->nullable();
-            $table->integer('veiculo_carregado')->nullable();
-            $table->string('descarregamento',50)->nullable();
-            $table->integer('veiculo_descarregado')->nullable();
             $table->integer('producao_terceiros')->nullable();
             $table->double( 'comprimento_madeira')->nullable();
             $table->integer('baldeio_curto')->nullable();

@@ -13,7 +13,6 @@ use App\Models\fazenda;
 use App\Models\informacao;
 use App\Models\lubrificante;
 use App\Models\terreno;
-use App\Models\tipo;
 use Illuminate\Http\Request;
 
 class informacaoController extends Controller
@@ -27,8 +26,6 @@ class informacaoController extends Controller
                                     ->leftJoin('corte','corte.id','informacao.corte')
                                     ->leftJoin('comboio','comboio.id','informacao.origem_abastecimento')
                                     ->leftJoin('lubrificante','lubrificante.id','informacao.tipo_lubrificante')
-                                    ->leftJoin('tipo','tipo.id','informacao.veiculo_carregado')
-                                    ->leftJoin('tipo as descarregado','descarregado.id','informacao.veiculo_descarregado')
                                     ->leftJoin('clima','clima.id','informacao.clima')
                                     ->leftJoin('terreno','terreno.id','informacao.terreno')
                                     ->orderBy('informacao.id', 'ASC')
@@ -53,10 +50,6 @@ class informacaoController extends Controller
                                         , 'informacao.relogio_tanque_final'
                                         , 'informacao.qnt_lubrificante'
                                         , 'lubrificante.lubrificante'
-                                        , 'informacao.carregamento'
-                                        , 'tipo.tipo as tipo_carregado'
-                                        , 'informacao.descarregamento'
-                                        , 'descarregado.tipo as tipo_descarregado'
                                         , 'informacao.producao_terceiros'
                                         , 'informacao.comprimento_madeira'
                                         , 'informacao.baldeio_curto'
@@ -81,11 +74,10 @@ class informacaoController extends Controller
         $cortes         = corte::orderby('corte')->get();
         $comboios       = comboio::orderby('tanque')->get();
         $lubrificantes  = lubrificante::orderby('lubrificante')->get();
-        $tipos          = tipo::orderby('tipo')->get();
         $terrenos       = terreno::orderby('terreno')->get();
         $climas         = clima::orderby('clima')->get();
         return view('informacao.add',compact('colaboradores','fazendas','atividades',
-        'equipamentos','cortes','comboios','lubrificantes','tipos','terrenos','climas'));
+        'equipamentos','cortes','comboios','lubrificantes','terrenos','climas'));
     }
     public function store(Request $request)
     {
@@ -102,18 +94,14 @@ class informacaoController extends Controller
                 , "horimetro_final"             => $request->horimetro_final
                 , "corte"                       => $request->corte
                 , "fat_m"                       => $request->fat_m
-                , "tanque"                      => $request->tanque
+                , "origem_abastecimento"        => $request->origem_abastecimento
                 , "nr_nf"                       => $request->nr_nf
                 , "qnt_diesel"                  => $request->qnt_diesel
                 , "horimetro_abastecimento"     => $request->horimetro_abastecimento
                 , "relogio_tanque_inicial"      => $request->relogio_tanque_inicial
                 , "relogio_tanque_final"        => $request->relogio_tanque_final
                 , "qnt_lubrificante"            => $request->qnt_lubrificante
-                , "lubrificante"                => $request->lubrificante
-                , "carregamento"                => $request->carregamento
-                , "tipo_carregado"              => $request->tipo_carregado
-                , "descarregamento"             => $request->descarregamento
-                , "tipo_descarregado"           => $request->tipo_descarregado
+                , "tipo_lubrificante"           => $request->tipo_lubrificante
                 , "producao_terceiros"          => $request->producao_terceiros
                 , "comprimento_madeira"         => $request->comprimento_madeira
                 , "baldeio_curto"               => $request->baldeio_curto
@@ -155,18 +143,14 @@ class informacaoController extends Controller
             $informacao->horimetro_final		    = $request->horimetro_final;
             $informacao->corte		                = $request->corte;
             $informacao->fat_m		                = $request->fat_m;
-            $informacao->tanque		                = $request->tanque;
+            $informacao->origem_abastecimento		= $request->origem_abastecimento;
             $informacao->nr_nf		                = $request->nr_nf;
             $informacao->qnt_diesel		            = $request->qnt_diesel;
             $informacao->horimetro_abastecimento	= $request->horimetro_abastecimento;
             $informacao->relogio_tanque_inicial		= $request->relogio_tanque_inicial;
             $informacao->relogio_tanque_final		= $request->relogio_tanque_final;
             $informacao->qnt_lubrificante		    = $request->qnt_lubrificante;
-            $informacao->lubrificante		        = $request->lubrificante;
-            $informacao->carregamento		        = $request->carregamento;
-            $informacao->tipo_carregado		        = $request->tipo_carregado;
-            $informacao->descarregamento		    = $request->descarregamento;
-            $informacao->tipo_descarregado		    = $request->tipo_descarregado;
+            $informacao->tipo_lubrificante		    = $request->tipo_lubrificante;
             $informacao->producao_terceiros		    = $request->producao_terceiros;
             $informacao->comprimento_madeira		= $request->comprimento_madeira;
             $informacao->baldeio_curto		        = $request->baldeio_curto;
