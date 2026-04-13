@@ -838,39 +838,40 @@ $(document).ready(function(){
         var type = $(this).find('input#type').val();
         var origem = $(this).find('#origem').val();
 
-        var data                = $(this).find('input#data').val();
-        var fazenda         = $(this).find('input#fazenda').val();
+        var data                    = $(this).find('input#data').val();
+        var fazenda                 = $(this).find('input#fazenda').val();
         var equipamento             = $(this).find('select#equipamento').val();
-        var atividade             = $(this).find('select#atividade').val();
+        var atividade               = $(this).find('select#atividade').val();
         var colaborador             = $(this).find('select#colaborador').val();
-        var hora_inicial        = $(this).find('input#hora_inicial').val();
-        var hora_final          = $(this).find('input#hora_final').val();
-        var horimetro_inicial           = $(this).find('input#horimetro_inicial').val();
-        var horimetro_final     = $(this).find('select#horimetro_final').val();
-        var corte               = $(this).find('input#corte').val();
-        var fat_m   = $(this).find('input#fat_m').val();
-        var origem_abastecimento            = $(this).find('select#origem_abastecimento').val();
-        var nr_nf                 = $(this).find('input#nr_nf').val();
-        var qnt_diesel                 = $(this).find('input#qnt_diesel').val();
-        var horimetro_abastecimento                 = $(this).find('input#horimetro_abastecimento').val();
-        var relogio_tanque_inicial                 = $(this).find('input#relogio_tanque_inicial').val();
-        var relogio_tanque_final                 = $(this).find('input#relogio_tanque_final').val();
-        var qnt_lubrificante                 = $(this).find('input#qnt_lubrificante').val();
-        var tipo_lubrificante                 = $(this).find('input#tipo_lubrificante').val();
-        var carregamento                 = $(this).find('input#carregamento').val();
-        var veiculo_carregado                 = $(this).find('input#veiculo_carregado').val();
-        var descarregamento                 = $(this).find('input#descarregamento').val();
-        var veiculo_descarregado                 = $(this).find('input#veiculo_descarregado').val();
-        var producao_terceiros                 = $(this).find('input#producao_terceiros').val();
-        var comprimento_madeira                 = $(this).find('input#comprimento_madeira').val();
-        var baldeio_curto                 = $(this).find('input#baldeio_curto').val();
-        var baldeio_medio                 = $(this).find('input#baldeio_medio').val();
-        var baldeio_longo                 = $(this).find('input#baldeio_longo').val();
-        var arrasto_curto                 = $(this).find('input#arrasto_curto').val();
-        var arrasto_medio                 = $(this).find('input#arrasto_medio').val();
-        var arrasto_longo                 = $(this).find('input#arrasto_longo').val();
-        var clima                 = $(this).find('input#clima').val();
+        var hora_inicial            = $(this).find('input#hora_inicial').val();
+        var hora_final              = $(this).find('input#hora_final').val();
+        var horimetro_inicial       = $(this).find('input#horimetro_inicial').val();
+        var horimetro_final         = $(this).find('select#horimetro_final').val();
+        var corte                   = $(this).find('input#corte').val();
+        var fat_m                   = $(this).find('input#fat_m').val();
+        var origem_abastecimento    = $(this).find('select#origem_abastecimento').val();
+        var nr_nf                   = $(this).find('input#nr_nf').val();
+        var qnt_diesel              = $(this).find('input#qnt_diesel').val();
+        var horimetro_abastecimento = $(this).find('input#horimetro_abastecimento').val();
+        var relogio_tanque_inicial  = $(this).find('input#relogio_tanque_inicial').val();
+        var relogio_tanque_final    = $(this).find('input#relogio_tanque_final').val();
+        var qnt_lubrificante        = $(this).find('input#qnt_lubrificante').val();
+        var tipo_lubrificante       = $(this).find('input#tipo_lubrificante').val();
+        var carregamento            = $(this).find('input#carregamento').val();
+        var veiculo_carregado       = $(this).find('input#veiculo_carregado').val();
+        var descarregamento         = $(this).find('input#descarregamento').val();
+        var veiculo_descarregado    = $(this).find('input#veiculo_descarregado').val();
+        var producao_terceiros      = $(this).find('input#producao_terceiros').val();
+        var comprimento_madeira     = $(this).find('input#comprimento_madeira').val();
+        var baldeio_curto           = $(this).find('input#baldeio_curto').val();
+        var baldeio_medio           = $(this).find('input#baldeio_medio').val();
+        var baldeio_longo           = $(this).find('input#baldeio_longo').val();
+        var arrasto_curto           = $(this).find('input#arrasto_curto').val();
+        var arrasto_medio           = $(this).find('input#arrasto_medio').val();
+        var arrasto_longo           = $(this).find('input#arrasto_longo').val();
+        var clima                   = $(this).find('input#clima').val();
         var terreno                 = $(this).find('input#terreno').val();
+        var obs                     = $(this).find('input#obs').val();
 
 
 /********************************************************************************************* */
@@ -882,39 +883,40 @@ $(document).ready(function(){
             })
         }else{
             var dados= {
-                'data'                  : data
-                ,'fazenda'          : fazenda
+                'data'                      : data
+                ,'fazenda'                  : fazenda
                 ,'equipamento'              : equipamento
-                ,'atividade'              : atividade
-                ,'colaborador'             : colaborador
-                ,'hora_inicial'         : hora_inicial
-                ,'hora_final'           : hora_final
-                ,'horimetro_inicial'            : horimetro_inicial
-                ,'horimetro_final'      : horimetro_final
-                ,'corte'                : corte
-                ,'fat_m'    : fat_m
-                ,'origem_abastecimento'             : origem_abastecimento
-                ,'nr_nf'                  : nr_nf
-                ,'qnt_diesel'                  : qnt_diesel
-                ,'horimetro_abastecimento'                  : horimetro_abastecimento
-                ,'relogio_tanque_inicial'                  : relogio_tanque_inicial
-                ,'relogio_tanque_final'                  : relogio_tanque_final
-                ,'qnt_lubrificante'                  : qnt_lubrificante
-                ,'tipo_lubrificante'                  : tipo_lubrificante
-                ,'carregamento'                  : carregamento
-                ,'veiculo_carregado'                  : veiculo_carregado
-                ,'descarregamento'                  : descarregamento
-                ,'veiculo_descarregado'                  : veiculo_descarregado
-                ,'producao_terceiros'                  : producao_terceiros
-                ,'comprimento_madeira'                  : comprimento_madeira
-                ,'baldeio_curto'                  : baldeio_curto
-                ,'baldeio_medio'                  : baldeio_medio
-                ,'baldeio_longo'                  : baldeio_longo
-                ,'arrasto_curto'                  : arrasto_curto
-                ,'arrasto_medio'                  : arrasto_medio
-                ,'arrasto_longo'                  : arrasto_longo
-                ,'clima'                  : clima
+                ,'atividade'                : atividade
+                ,'colaborador'              : colaborador
+                ,'hora_inicial'             : hora_inicial
+                ,'hora_final'               : hora_final
+                ,'horimetro_inicial'        : horimetro_inicial
+                ,'horimetro_final'          : horimetro_final
+                ,'corte'                    : corte
+                ,'fat_m'                    : fat_m
+                ,'origem_abastecimento'     : origem_abastecimento
+                ,'nr_nf'                    : nr_nf
+                ,'qnt_diesel'               : qnt_diesel
+                ,'horimetro_abastecimento'  : horimetro_abastecimento
+                ,'relogio_tanque_inicial'   : relogio_tanque_inicial
+                ,'relogio_tanque_final'     : relogio_tanque_final
+                ,'qnt_lubrificante'         : qnt_lubrificante
+                ,'tipo_lubrificante'        : tipo_lubrificante
+                ,'carregamento'             : carregamento
+                ,'veiculo_carregado'        : veiculo_carregado
+                ,'descarregamento'          : descarregamento
+                ,'veiculo_descarregado'     : veiculo_descarregado
+                ,'producao_terceiros'       : producao_terceiros
+                ,'comprimento_madeira'      : comprimento_madeira
+                ,'baldeio_curto'            : baldeio_curto
+                ,'baldeio_medio'            : baldeio_medio
+                ,'baldeio_longo'            : baldeio_longo
+                ,'arrasto_curto'            : arrasto_curto
+                ,'arrasto_medio'            : arrasto_medio
+                ,'arrasto_longo'            : arrasto_longo
+                ,'clima'                    : clima
                 ,'terreno'                  : terreno
+                ,'obs'                      : obs
 
             }
         grava(dados,route,type,origem);

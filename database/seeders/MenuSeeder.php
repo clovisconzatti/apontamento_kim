@@ -172,9 +172,9 @@ class MenuSeeder extends Seeder
             ],
             [
                 'ordem'         =>'03.001'
-                , 'descricao'   =>'Abastecimento'
+                , 'descricao'   =>'Informação Diária'
                 , 'tipo'        =>'Link'
-                , 'rota'        =>'apontamento.listAll'
+                , 'rota'        =>'informacao.listAll'
                 , 'icone'       =>'fas fa-gas-pump'
             ],
             [

@@ -42,6 +42,7 @@ class informacao extends Model
         , 'arrasto_curto'
         , 'arrasto_medio'
         , 'arrasto_longo'
+        , 'obs'
         , 'clima'
         , 'terreno'
 
