@@ -15,19 +15,19 @@ class Manutencao extends Migration
     {
         Schema::create('manutencao', function(Blueprint $table){
             $table->increments('id');
-            $table->integer('data')->nullable();
+            $table->date('data')->nullable();
             $table->integer('ord_servico')->nullable();
             $table->integer('fazenda')->nullable();
-            $table->integer('maquina')->nullable();
+            $table->integer('equipamento')->nullable();
             $table->integer('operador')->nullable();
-            $table->integer('hora_inicial')->nullable();
-            $table->integer('hora_final')->nullable();
-            $table->integer('horimetro')->nullable();
+            $table->time('hora_inicial')->nullable();
+            $table->time('hora_final')->nullable();
+            $table->double('horimetro')->nullable();
             $table->integer('tipo_manutencao')->nullable();
-            $table->integer('custo')->nullable();
-            $table->integer('manutencao_diaria')->nullable();
+            $table->double('custo')->nullable();
+            $table->double('manutencao_diaria')->nullable();
             $table->integer('situacao')->nullable();
-            $table->integer('obs')->nullable();
+            $table->string('obs',255)->nullable();
 
             $table->softDeletes();
             $table->timestamps();

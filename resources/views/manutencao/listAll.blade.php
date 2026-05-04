@@ -35,7 +35,7 @@
                     <td align="center"> {{ date('d/m/Y',strtotime($manutencao->data)) }} </td>
                     <td align="">{{ $manutencao->equipamento }} </td>
                     <td align="">{{ $manutencao->fazenda }}  </td>
-                    <td align="">{{ $manutencao->colaborador }}  </td>
+                    <td align="">{{ $manutencao->operador }}  </td>
                     <td align="center">
                         <div class="btn-group-vertical">
                             <div class="btn-group">

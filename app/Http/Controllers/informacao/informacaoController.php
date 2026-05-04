@@ -116,7 +116,7 @@ class informacaoController extends Controller
             ]);
             $informacao->save();
         }catch(\Exception $e){
-            return response()->json($informacao);
+            return response()->json($e);
         }
         return response()->json('success');
     }

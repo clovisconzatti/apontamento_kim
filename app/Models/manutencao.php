@@ -13,7 +13,7 @@ class manutencao extends Model
         , 'data'
         , 'ord_servico'
         , 'fazenda'
-        , 'maquina'
+        , 'equipamento'
         , 'operador'
         , 'hora_inicial'
         , 'hora_final'

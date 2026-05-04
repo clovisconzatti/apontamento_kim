@@ -792,8 +792,8 @@ $(document).ready(function(){
         var data                = $(this).find('input#data').val();
         var ord_servico         = $(this).find('input#ord_servico').val();
         var fazenda             = $(this).find('select#fazenda').val();
-        var maquina             = $(this).find('select#maquina').val();
-        var maquina             = $(this).find('select#maquina').val();
+        var equipamento         = $(this).find('select#equipamento').val();
+        var operador            = $(this).find('select#operador').val();
         var hora_inicial        = $(this).find('input#hora_inicial').val();
         var hora_final          = $(this).find('input#hora_final').val();
         var horimetro           = $(this).find('input#horimetro').val();
@@ -805,7 +805,7 @@ $(document).ready(function(){
 
 
 /********************************************************************************************* */
-        if(!data ){
+        if(!data || !equipamento || !hora_inicial || !hora_final || !ord_servico){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
                 type: 'error',
@@ -816,7 +816,7 @@ $(document).ready(function(){
                 'data'                  : data
                 ,'ord_servico'          : ord_servico
                 ,'fazenda'              : fazenda
-                ,'maquina'              : maquina
+                ,'equipamento'          : equipamento
                 ,'operador'             : operador
                 ,'hora_inicial'         : hora_inicial
                 ,'hora_final'           : hora_final
@@ -829,6 +829,7 @@ $(document).ready(function(){
 
             }
         grava(dados,route,type,origem);
+        // console.log(dados,route,type,origem);
         }
     })
 /**********************gravar informacao diária **************************************************/

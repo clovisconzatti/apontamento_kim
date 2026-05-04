@@ -34,7 +34,7 @@
             <div class="form-group col-md-3">
                 Veiculo/Equipamento
                 <select class="form-control limpar" type="text" name="equipamento" id="equipamento">
-                    <option value="%">Todas</option>
+                    <option value="">Todas</option>
                     @foreach ($equipamentos as $equipamento )
                         <option value="{{ $equipamento->id }}">{{ $equipamento->placa }} - {{ $equipamento->equipamento }}</option>
                     @endforeach
@@ -43,7 +43,7 @@
             <div class="form-group col-md-3">
                 Fazenda
                 <select class="form-control limpar" type="text" name="fazenda" id="fazenda">
-                    <option value="%">Todas</option>
+                    <option value="0">Todas</option>
                     @foreach ($fazendas as $fazenda )
                         <option value="{{ $fazenda->id }}">{{ $fazenda->fazenda }}</option>
                     @endforeach
@@ -52,7 +52,7 @@
             <div class="form-group col-md-3">
                 Colaborador
                 <select class="form-control limpar" type="text" name="colaborador" id="colaborador">
-                    <option value="%">Todas</option>
+                    <option value="0">Todas</option>
                     @foreach ($colaboradores as $colaborador )
                         <option value="{{ $colaborador->id }}">{{ $colaborador->colaborador }}</option>
                     @endforeach
@@ -63,7 +63,7 @@
             <div class="form-group col-md-4">
                 Atividade
                 <select class="form-control limpar" type="text" name="atividade" id="atividade">
-                    <option value="%">Todas</option>
+                    <option value="0">Todas</option>
                     @foreach ($atividades as $atividade )
                         <option value="{{ $atividade->id }}">{{ $atividade->atividade }}</option>
                     @endforeach
@@ -90,7 +90,7 @@
             <div class="form-group col-md-3">
                 Tipo do Corte
                 <select class="form-control limpar" type="text" name="corte" id="corte">
-                    <option value="%">Todas</option>
+                    <option value="0">Todas</option>
                     @foreach ($cortes as $corte )
                         <option value="{{ $corte->id }}">{{ $corte->corte }}</option>
                     @endforeach
@@ -103,7 +103,7 @@
             <div class="form-group col-md-3">
                 Tanque de Origem
                 <select class="form-control limpar" type="text" name="origem_abastecimento" id="origem_abastecimento">
-                    <option value="%">Todas</option>
+                    <option value="0">Todas</option>
                     @foreach ($comboios as $comboio )
                         <option value="{{ $comboio->id }}">{{ $comboio->tanque }}</option>
                     @endforeach
@@ -134,7 +134,7 @@
             <div class="form-group col-md-3">
                 Lubrificante
                 <select class="form-control limpar" type="text" name="tipo_lubrificante" id="tipo_lubrificante">
-                    <option value="%">Todas</option>
+                    <option value="0">Todas</option>
                     @foreach ($lubrificantes as $lubrificante )
                         <option value="{{ $lubrificante->id }}">{{ $lubrificante->lubrificante }}</option>
                     @endforeach
@@ -157,7 +157,7 @@
             <div class="form-group col-md-3">
                 Tipo do Terreno
                 <select class="form-control limpar" type="text" name="terreno" id="terreno">
-                    <option value="%">Todas</option>
+                    <option value="0">Todas</option>
                     @foreach ($terrenos as $terreno )
                         <option value="{{ $terreno->id }}">{{ $terreno->terreno }}</option>
                     @endforeach
@@ -166,7 +166,7 @@
             <div class="form-group col-md-3">
                 Clima
                 <select class="form-control limpar" type="text" name="clima" id="clima">
-                    <option value="%">Todas</option>
+                    <option value="0">Todas</option>
                     @foreach ($climas as $clima )
                         <option value="{{ $clima->id }}">{{ $clima->clima }}</option>
                     @endforeach

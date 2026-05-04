@@ -277,7 +277,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('manutencao',[manutencaoController::class,'listAll'])->name('manutencao.listAll');
         Route::get('manutencao/novo',[manutencaoController::class,'formAdd'])->name('manutencao.formAdd');
         Route::get('manutencao/editar/{manutencao}',[manutencaoController::class,'formEdit'])->name('manutencao.formEdit');
-        Route::post('manutencao/store',[manutencaoController::class,'strore'])->name('manutencao.store');
+        Route::post('manutencao/store',[manutencaoController::class,'store'])->name('manutencao.store');
         Route::patch('manutencao/edit/{manutencao}',[manutencaoController::class,'edit'])->name('manutencao.edit');
         Route::delete('manutencao/destroy/{manutencao}',[manutencaoController::class,'destroy'])->name('manutencao.destroy');
     });

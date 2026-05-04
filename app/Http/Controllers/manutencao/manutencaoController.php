@@ -16,7 +16,7 @@ class manutencaoController extends Controller
     public function listAll(Request $request ){
 
         $manutencoes = manutencao::leftJoin('fazenda','fazenda.id','manutencao.fazenda')
-                                    ->leftJoin('equipamento','equipamento.id','manutencao.maquina')
+                                    ->leftJoin('equipamento','equipamento.id','manutencao.equipamento')
                                     ->leftJoin('colaborador','colaborador.id','manutencao.operador')
                                     ->leftJoin('tipo_manutencao','tipo_manutencao.id','manutencao.tipo_manutencao')
                                     ->leftJoin('situacao_manutencao','situacao_manutencao.id','manutencao.situacao')
@@ -57,7 +57,7 @@ class manutencaoController extends Controller
                 , "ord_servico"                 => $request->ord_servico
                 , "fazenda"                     => $request->fazenda
                 , "equipamento"                 => $request->equipamento
-                , "colaborador"                 => $request->colaborador
+                , "operador"                    => $request->operador
                 , "hora_inicial"                => $request->hora_inicial
                 , "hora_final"                  => $request->hora_final
                 , "horimetro"                   => $request->horimetro
@@ -89,7 +89,7 @@ class manutencaoController extends Controller
             $manutencao->ord_servico		        = $request->ord_servico;
             $manutencao->fazenda		            = $request->fazenda;
             $manutencao->equipamento		        = $request->equipamento;
-            $manutencao->colaborador		        = $request->colaborador;
+            $manutencao->operador		            = $request->operador;
             $manutencao->hora_inicial		        = $request->hora_inicial;
             $manutencao->hora_final		            = $request->hora_final;
             $manutencao->horimetro		            = $request->horimetro;

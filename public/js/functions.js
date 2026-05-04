@@ -160,7 +160,6 @@ function grava(dados,route,type,origem){
         url:url+route,
         success: function(result)
         {
-            console.log(result,type,origem);
             if(result=="success"){
                 Swal({
                     title: title,
@@ -172,6 +171,7 @@ function grava(dados,route,type,origem){
                 }else{
                     $('.limpar').val('');
                     $('select').trigger('chosen:updated');
+                    window.location.reload();
                 }
             }
         }
