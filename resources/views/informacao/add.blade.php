@@ -119,8 +119,8 @@
             </div>
         </div>
         <div class="row">
-            <div class="form-group col-md-3">
-                Horimetro do Abastecimento
+            <div class="form-group col-md-2">
+                Horimetro Abastecimento
                 <input class="form-control" type="number" step="any" name="horimetro_abastecimento" id="horimetro_abastecimento"  value="" >
             </div>
             <div class="form-group col-md-2">
@@ -131,7 +131,7 @@
                 Horimetro Tanque Final
                 <input class="form-control" type="number" step="any" name="relogio_tanque_final" id="relogio_tanque_final"  value="" >
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 Lubrificante
                 <select class="form-control limpar" type="text" name="tipo_lubrificante" id="tipo_lubrificante">
                     <option value="0">Todas</option>
@@ -144,19 +144,27 @@
                 Quantidade Lubrificante
                 <input class="form-control" type="number" step="any" name="qnt_lubrificante" id="qnt_lubrificante"  value="" >
             </div>
-        </div>
-        <div class="row">
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 Produção de Terceiros (m³)
                 <input class="form-control" type="number" step="any" name="producao_terceiros" id="producao_terceiros"  value="" >
             </div>
+             </div>
+        <div class="row">
             <div class="form-group col-md-2">
                 Comprimento Madeira (m)
                 <input class="form-control" type="number" step="any" name="comprimento_madeira" id="comprimento_madeira"  value="" >
             </div>
             <div class="form-group col-md-2">
-                Carregamento
-                <input class="form-control" type="number" step="any" name="carregamento" id="carregamento"  value="" >
+                Carreg. Julieta
+                <input class="form-control" type="number" step="any" name="carg_julieta" id="carg_julieta"  value="" >
+            </div>
+            <div class="form-group col-md-2">
+                Carreg. Truck
+                <input class="form-control" type="number" step="any" name="carg_truck" id="carg_truck"  value="" >
+            </div>
+            <div class="form-group col-md-2">
+                Carreg. Bitrem
+                <input class="form-control" type="number" step="any" name="carg_bitrem" id="carg_bitrem"  value="" >
             </div>
             <div class="form-group col-md-2">
                 Tipo do Terreno
@@ -167,7 +175,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 Clima
                 <select class="form-control limpar" type="text" name="clima" id="clima">
                     <option value="0">Todas</option>

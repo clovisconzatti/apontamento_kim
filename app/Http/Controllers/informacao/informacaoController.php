@@ -61,8 +61,10 @@ class informacaoController extends Controller
                                         , 'clima.clima'
                                         , 'terreno.terreno'
                                         , 'informacao.obs'
-                                        , 'informacao.carregamento'
-                                    ]);
+                                        , 'informacao.carg_julieta'
+                                        , 'informacao.carg_truck'
+                                        , 'informacao.carg_bitrem'
+                                        ]);
         return view('informacao.listAll' , compact('informacoes'));
     }
 
@@ -114,7 +116,9 @@ class informacaoController extends Controller
                 , "clima"                       => $request->clima
                 , "terreno"                     => $request->terreno
                 , "obs"                         => $request->obs
-                , "carregamento"                => $request->carregamento
+                , "carg_julieta"                => $request->carg_julieta
+                , "carg_truck"                  => $request->carg_truck
+                , "carg_bitrem"                 => $request->carg_bitrem
             ]);
             $informacao->save();
         }catch(\Exception $e){
@@ -187,7 +191,9 @@ class informacaoController extends Controller
             $informacao->clima		                = $request->clima;
             $informacao->terreno		            = $request->terreno;
             $informacao->obs		                = $request->obs;
-            $informacao->carregamento		        = $request->carregamento;
+            $informacao->carg_julieta		        = $request->carg_julieta;
+            $informacao->carg_truck		            = $request->carg_truck;
+            $informacao->carg_bitrem		        = $request->carg_bitrem;
             $informacao->save();
         }catch(\Exception $e){
             return response()->json($informacao);

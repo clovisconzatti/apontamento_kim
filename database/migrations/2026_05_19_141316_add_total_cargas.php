@@ -9,7 +9,9 @@ class AddTotalCargas extends Migration
     public function up()
     {
        Schema::table('informacao', function (Blueprint $table) {
-        $table->double('carregamento', 15, 2)->nullable();
+        $table->double('carg_julieta', 15, 2)->nullable();
+        $table->double('carg_truck', 15, 2)->nullable();
+        $table->double('carg_bitrem', 15, 2)->nullable();
 
         });
     }

@@ -41,8 +41,9 @@ class informacao extends Model
         , 'obs'
         , 'clima'
         , 'terreno'
-        , 'carregamento'
-
+        , 'carg_julieta'
+        , 'carg_truck'
+        , 'carg_bitrem'
     ];
     protected $primaryKey = 'id';
     protected $table = 'informacao';

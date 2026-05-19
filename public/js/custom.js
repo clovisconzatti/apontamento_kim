@@ -872,7 +872,9 @@ $(document).ready(function(){
         var clima                   = $(this).find('select#clima').val();
         var terreno                 = $(this).find('select#terreno').val();
         var obs                     = $(this).find('input#obs').val();
-        var carregamento            = $(this).find('input#carregamento').val();
+        var carg_julieta            = $(this).find('input#carg_julieta').val();
+        var carg_truck              = $(this).find('input#carg_truck').val();
+        var carg_bitrem             = $(this).find('input#carg_bitrem').val();
 
 
 /********************************************************************************************* */
@@ -915,7 +917,9 @@ $(document).ready(function(){
                 ,'clima'                    : clima
                 ,'terreno'                  : terreno
                 ,'obs'                      : obs
-                ,'carregamento'             : carregamento
+                ,'carg_julieta'             : carg_julieta
+                ,'carg_truck'               : carg_truck
+                ,'carg_bitrem'              : carg_bitrem
             }
         grava(dados,route,type,origem);
         // console.log(dados,route,type,origem);
