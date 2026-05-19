@@ -1,6 +1,6 @@
 @extends('layouts.model')
 @section('content')
-    <table class="table table-borderless table-advance table-condensed">
+    <table class="table table-bordered table-striped table-sm">
         <tr>
             <td width="80%">
                 <h3>
@@ -8,7 +8,7 @@
                     <i class="fas fa-arrow-right-arrow-left"></i> Transferência entre Reservatórios/Comboios
                 </h3>
             </td>
-            <td width="50%" align="center">
+            <td width="20%" align="center">
                 <h3>
                     <a class="cor-digiliza" href="{{route('transferencia.formAdd')}}">
                         <i class="fas fa-plus-circle"></i>&nbsp;&nbsp;&nbsp;
@@ -19,12 +19,16 @@
         </tr>
     </table><hr>
 
-    <table class="table table-bordered table-condensed table-striped">
-        <thead>
+
+<div class="table-responsive">
+        <table class="table table-bordered table-striped table-sm tabela-transferencia">
+            <thead class="thead-light">
+
             <tr>
                 <th width="10%" data-field="name">Data</th>
                 <th width="10%" data-field="name">Origem</th>
                 <th width="10%" data-field="name">Destino</th>
+                <th width="10%" data-field="name">Equipamento/Caminhão</th>
                 <th width="5%" data-field="name">Litros</th>
                 <th width="10%" data-field="name">Documento</th>
                 <th width="10%" data-field="name">Combustivel</th>
@@ -33,7 +37,6 @@
                 <th width="10%" data-field="name">Fazenda</th>
                 <th width="10%" data-field="name">Hori.Inicial</th>
                 <th width="10%" data-field="name">Hori.Final</th>
-                <th width="10%" data-field="name">Tanque</th>
                 <th width="10%" data-field="name">Obs</th>
                 <th width="5%" data-field="">Ação</th>
             </tr>
@@ -44,6 +47,7 @@
                 <tr>
                     <td align="center"> {{ date('d/m/Y',strtotime($transferencia->data)) }} </td>
                     <td>{{ $transferencia->origem }} </td>
+                    <td>{{ $transferencia->tanque }} </td>
                     <td>{{ $transferencia->destino }} </td>
                     <td align="right"> {{ number_format($transferencia->litros,2,',','.') }} </td>
                     <td>{{ $transferencia->nr_doc }} </td>
@@ -53,7 +57,6 @@
                     <td>{{ $transferencia->fazenda }} </td>
                     <td align="right"> {{ number_format($transferencia->horimetro_inicial,2,',','.') }} </td>
                     <td align="right"> {{ number_format($transferencia->horimetro_final,2,',','.') }} </td>
-                    <td>{{ $transferencia->tanque }} </td>
                     <td>{{ $transferencia->obs }} </td>
                     <td align="center">
                         <div class="btn-group-vertical">
@@ -85,5 +88,8 @@
         </tbody>
     </table>
 @endsection
+
+
+
 
 

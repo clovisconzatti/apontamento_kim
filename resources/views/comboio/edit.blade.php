@@ -38,7 +38,7 @@
             <div class="form-group col-md-4">
                 Fazenda:
                 <select class="form-control limpar" type="text" name="fazenda" id="fazenda">
-                    <option value="%">Todas</option>
+                    <option value="">Todas</option>
                     @foreach ($fazendas as $fazenda )
                         <option value="{{ $fazenda->id }}" {{ $fazenda->id == $comboios->fazenda ? 'selected' : '' }}>{{ $fazenda->fazenda }}</option>
                     @endforeach

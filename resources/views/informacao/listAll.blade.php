@@ -1,6 +1,6 @@
 @extends('layouts.model')
 @section('content')
-    <table class="table table-borderless table-advance table-condensed">
+    <table class="table table-bordered table-striped table-sm">
         <tr>
             <td width="80%">
                 <h3>
@@ -18,7 +18,7 @@
         </tr>
     </table><hr>
 
-    <table class="table table-bordered table-condensed table-striped">
+    <table class="table table-bordered table-striped table-sm">
         <thead>
             <tr>
                 <th width="10%" data-field="name">Data</th>

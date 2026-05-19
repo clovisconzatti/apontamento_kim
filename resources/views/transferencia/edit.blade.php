@@ -18,7 +18,7 @@
         </div>
         <br/>
     @endif
-    <h3 class=""><i class="fas fa-truck"></i> Transferencia</h3>
+    <h3 class=""><i class="fas fa-tree"></i> Alteração de Transferência</h3>
     <form action="" id="cadastro-transferencia" nome="cadastro-transferencia" method="post">
         @csrf
         @method('patch')
@@ -28,49 +28,89 @@
 
         <div class="row">
             <div class="form-group col-md-3">
-                Data:
-                <input class="form-control" type="date" name="data" id="data"  value="" >
+                * Data:
+                <input class="form-control" type="date" name="data" id="data"  value="{{ date('Y-m-d') }}">
             </div>
             <div class="form-group col-md-3">
-            Combustivel:
-                <select class="form-control limpar" type="text" name="combustivel" id="combustivel" >
-                    <option value="">Selecione</option>
-                    <option value="Diesel-S10">Diesel-S10</option>
-                    <option value="Diesel-S500">Diesel-S500</option>
-                    <option value="Arla">Arla</option>
+                * Origem:
+                <select class="form-control limpar" type="text" name="origem" id="origem">
+                    <option value="">Todas</option>
+                    @foreach ($comboios as $comboio )
+                        <option value="{{ $comboio->id }}" {{ $comboio->id == $transferencia->origem ? 'selected' : '' }}>{{ $comboio->tanque }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="form-group col-md-3">
-                Origem:
-                <select class="form-control limpar" type="text" name="origem" id="origem" >
-                    <option value="">Selecione</option>
-                    <option value="Externo">Externo</option>
-                    <option value="Principal">Tanque Principal</option>
-                    <option value="Secundario">Tanque Secundario</option>
+                Tanque/Comboio:
+                <select class="form-control limpar" type="text" name="tanque" id="tanque" >
+                    <option value="">Todas</option>
+                    @foreach ($comboios as $comboio )
+                        <option value="{{ $comboio->id }}" {{ $comboio->id == $transferencia->tanque ? 'selected' : '' }}>{{ $comboio->tanque }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="form-group col-md-3">
-                Destino:
+                Equipamento/Caminhão:
                 <select class="form-control limpar" type="text" name="destino" id="destino" >
-                    <option value="">Selecione</option>
-                    <option value="Extorno">Externo</option>
-                    <option value="Principal">Tanque Principal</option>
-                    <option value="Secundario">Tanque Secundario</option>
+                    <option value="">Todas</option>
+                    @foreach ($equipamentos as $equipamento )
+                        <option value="{{ $equipamento->id }}" {{ $equipamento->id == $transferencia->destino ? 'selected' : '' }}>{{ $equipamento->equipamento }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="form-group col-md-2">
-                Total de Litros:
-                <input class="form-control limpar" type="number" step="any" name="litros" id="litros"  value="" >
-            </div>
-            <div class="form-group col-md-6">
-                Fornecedor:
-                <input class="form-control" type="text" name="fornecedor" id="fornecedor"  value="" >
+                * Total de Litros:
+                <input class="form-control limpar" type="number" step="any" name="litros" id="litros"  value="{{ $transferencia->litros }}" >
             </div>
             <div class="form-group col-md-2">
                 Nr Documento:
-                <input class="form-control limpar" type="number" step="any" name="nr_doc" id="nr_doc"  value="" >
+                <input class="form-control limpar" type="number" step="any" name="nr_doc" id="nr_doc"  value="{{ $transferencia->nr_doc }}" >
+            </div>
+            <div class="form-group col-md-3">
+            * Combustivel:
+                <select class="form-control limpar" type="text" name="combustivel" id="combustivel" >
+                    <option value="">Todas</option>
+                    @foreach ($tipo_combustiveis as $tipo_combustivel )
+                        <option value="{{ $tipo_combustivel->id }}" {{ $tipo_combustivel->id == $transferencia->combustivel ? 'selected' : '' }}>{{ $tipo_combustivel->combustivel }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                Horimetro Equipamento:
+                <input class="form-control limpar" type="number" step="any" name="horimetro" id="horimetro"  value="{{ $transferencia->horimetro }}" >
+            </div>
+            <div class="form-group col-md-3">
+            Operador:
+                <select class="form-control limpar" type="text" name="operador" id="operador" >
+                    <option value="">Todas</option>
+                    @foreach ($colaboradores as $colaborador )
+                        <option value="{{ $colaborador->id }}" {{ $colaborador->id == $transferencia->operador ? 'selected' : '' }}>{{ $colaborador->colaborador }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+            Fazenda:
+                <select class="form-control limpar" type="text" name="fazenda" id="fazenda" >
+                    <option value="">Todas</option>
+                    @foreach ($fazendas as $fazenda )
+                        <option value="{{ $fazenda->id }}" {{ $fazenda->id == $transferencia->fazenda ? 'selected' : '' }}>{{ $fazenda->fazenda }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                Horimetro Inicial:
+                <input class="form-control limpar" type="number" step="any" name="horimetro_inicial" id="horimetro_inicial"  value="{{ $transferencia->horimetro_inicial }}" >
+            </div>
+            <div class="form-group col-md-3">
+                Horimetro Final:
+                <input class="form-control limpar" type="number" step="any" name="horimetro_final" id="horimetro_final"  value="{{ $transferencia->horimetro_final }}" >
+            </div>
+            <div class="form-group col-md-11">
+                Obs:
+                <input class="form-control limpar" type="text" name="obs" id="obs"  value="{{ $transferencia->obs }}" >
             </div>
         </div>
+
         <div class="row">
             <div class="form-group col-md-3">
                 <button type="submit" name="salvar" value="" id="salvar" class="btn btn-success btn-block">
@@ -87,12 +127,13 @@
     </form>
 
     <script>
-        $(document).ready(function(){
+        $(document).ready(function () {
 
-            $('button#sair').click(function(){
-                $(location).attr('href',url+'/menu');
-            })
-        })
+            $('#sair').on('click', function () {
+                window.location.href = "{{ route('transferencia.listAll') }}";
+            });
+
+        });
     </script>
 
 @endsection

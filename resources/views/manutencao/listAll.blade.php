@@ -1,6 +1,6 @@
 @extends('layouts.model')
 @section('content')
-    <table class="table table-borderless table-advance table-condensed">
+    <table class="table table-bordered table-striped table-sm">
         <tr>
             <td width="80%">
                 <h3>
@@ -18,13 +18,15 @@
         </tr>
     </table><hr>
 
-    <table class="table table-bordered table-condensed table-striped">
+    <table class="table table-bordered table-striped table-sm tabela-manutencao">
         <thead>
             <tr>
                 <th width="10%" data-field="name">Data</th>
                 <th width="10%" data-field="name">Equipamento</th>
+                <th width="10%" data-field="name">Ordem de Serviço</th>
                 <th width="10%" data-field="name">Fazenda</th>
                 <th width="10%" data-field="name">Colaborador</th>
+                <th width="10%" data-field="name">Observação</th>
                 <th width="10%" data-field="">Ação</th>
             </tr>
         </thead>
@@ -34,8 +36,10 @@
                 <tr>
                     <td align="center"> {{ date('d/m/Y',strtotime($manutencao->data)) }} </td>
                     <td align="">{{ $manutencao->equipamento }} </td>
+                    <td align="">{{ $manutencao->ord_servico }} </td>
                     <td align="">{{ $manutencao->fazenda }}  </td>
-                    <td align="">{{ $manutencao->operador }}  </td>
+                    <td align="">{{ $manutencao->colaborador }}  </td>
+                    <td align="">{{ $manutencao->obs }}  </td>
                     <td align="center">
                         <div class="btn-group-vertical">
                             <div class="btn-group">

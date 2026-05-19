@@ -28,7 +28,7 @@ class informacaoController extends Controller
                                     ->leftJoin('lubrificante','lubrificante.id','informacao.tipo_lubrificante')
                                     ->leftJoin('clima','clima.id','informacao.clima')
                                     ->leftJoin('terreno','terreno.id','informacao.terreno')
-                                    ->orderBy('informacao.id', 'ASC')
+                                    ->orderBy('informacao.data','DESC','informacao.id', 'DESC')
                                     ->get([
                                         'informacao.id'
                                         ,'informacao.data'
@@ -123,10 +123,33 @@ class informacaoController extends Controller
 
     public function formEdit($id)
     {
-        $informacao = informacao::where('id','=',$id)->first();
 
-        return view('informacao.edit' , compact('informacao'));
-    }
+ $informacao     = informacao::findOrFail($id);
+    $colaboradores  = colaborador::orderby('colaborador')->get();
+    $fazendas       = fazenda::orderby('fazenda')->get();
+    $atividades     = atividade::orderby('atividade')->get();
+    $equipamentos   = equipamento::orderby('equipamento')->get();
+    $cortes         = corte::orderby('corte')->get();
+    $comboios       = comboio::orderby('tanque')->get();
+    $lubrificantes  = lubrificante::orderby('lubrificante')->get();
+    $terrenos       = terreno::orderby('terreno')->get();
+    $climas         = clima::orderby('clima')->get();
+
+    return view('informacao.edit', compact(
+        'informacao',
+        'colaboradores',
+        'fazendas',
+        'atividades',
+        'equipamentos',
+        'cortes',
+        'comboios',
+        'lubrificantes',
+        'terrenos',
+        'climas'
+    ));
+}
+
+
 
     public function edit($id, Request $request)
     {

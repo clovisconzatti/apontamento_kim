@@ -77,8 +77,13 @@ class manutencaoController extends Controller
     public function formEdit($id)
     {
         $manutencao = manutencao::where('id','=',$id)->first();
+        $colaboradores          = colaborador::orderby('colaborador')->get();
+        $fazendas               = fazenda::orderby      ('fazenda')->get();
+        $equipamentos           = equipamento::orderby('equipamento')->get();
+        $tipos_manutencao       = tipo_manutencao::orderby('tipo')->get();
+        $situacoes_manutencao   = situacao_manutencao::orderby('situacao')->get();
 
-        return view('manutencao.edit' , compact('manutencao'));
+        return view('manutencao.edit' , compact('manutencao', 'colaboradores', 'fazendas', 'equipamentos', 'tipos_manutencao', 'situacoes_manutencao' ));
     }
 
     public function edit($id, Request $request)

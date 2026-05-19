@@ -64,7 +64,6 @@ return array(
     'App\\Models\\combustivel' => $baseDir . '/app/Models/combustivel.php',
     'App\\Models\\comprimento_madeira' => $baseDir . '/app/Models/comprimento_madeira.php',
     'App\\Models\\corte' => $baseDir . '/app/Models/corte.php',
-    'App\\Models\\dados' => $baseDir . '/app/Models/dados.php',
     'App\\Models\\equipamento' => $baseDir . '/app/Models/equipamento.php',
     'App\\Models\\fazenda' => $baseDir . '/app/Models/fazenda.php',
     'App\\Models\\fornecedor' => $baseDir . '/app/Models/fornecedor.php',

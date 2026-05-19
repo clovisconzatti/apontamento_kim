@@ -24,6 +24,7 @@ class transferencia extends Model
         ,'horimetro_final'
         ,'tanque'
         ,'obs'
+        ,'comboio_id'
 
     ];
     protected $primaryKey = 'id';

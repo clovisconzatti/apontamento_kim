@@ -589,7 +589,6 @@ class ComposerStaticInitde3237f7d66211c5fc4a8c37d65e4079
         'App\\Models\\combustivel' => __DIR__ . '/../..' . '/app/Models/combustivel.php',
         'App\\Models\\comprimento_madeira' => __DIR__ . '/../..' . '/app/Models/comprimento_madeira.php',
         'App\\Models\\corte' => __DIR__ . '/../..' . '/app/Models/corte.php',
-        'App\\Models\\dados' => __DIR__ . '/../..' . '/app/Models/dados.php',
         'App\\Models\\equipamento' => __DIR__ . '/../..' . '/app/Models/equipamento.php',
         'App\\Models\\fazenda' => __DIR__ . '/../..' . '/app/Models/fazenda.php',
         'App\\Models\\fornecedor' => __DIR__ . '/../..' . '/app/Models/fornecedor.php',

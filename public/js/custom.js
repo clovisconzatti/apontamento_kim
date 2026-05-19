@@ -274,12 +274,13 @@ $(document).ready(function(){
         var horimetro_final     = $(this).find('input#horimetro_final').val();
         var tanque              = $(this).find('select#tanque').val();
         var obs                 = $(this).find('input#obs').val();
+        var tanque              = $(this).find('select#tanque').val();
 
 
 
 
         /********************************************************************************************* */
-        if(!data || !combustivel || !origem || !destino || !litros ){
+        if(!data || !combustivel || !origem || !litros ){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
                 type: 'error',
@@ -300,9 +301,11 @@ $(document).ready(function(){
                 ,'horimetro_final'      : horimetro_final
                 ,'tanque'               : tanque
                 ,'obs'                  : obs
+                ,'tanque'               : tanque
 
             }
-        grava(dados,route,type,origem);
+        // grava(dados,route,type,origem);
+        console.log(dados,route,type,origem);
         }
     })
 

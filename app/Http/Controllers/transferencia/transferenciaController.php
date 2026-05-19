@@ -19,7 +19,7 @@ class transferenciaController extends Controller
         $transferencias = transferencia::leftJoin('colaborador','colaborador.id','transferencia.operador')
                                     ->leftJoin('comboio as origem_comboio','origem_comboio.id','transferencia.origem')
                                     ->leftJoin('equipamento as destino_comboio','destino_comboio.id','transferencia.destino')
-                                    ->leftJoin('comboio as tanque','tanque.id','transferencia.tanque')
+                                    ->leftJoin('comboio','comboio.id','transferencia.tanque')
                                     ->leftJoin('fazenda','fazenda.id','transferencia.fazenda')
                                     ->leftJoin('tipo_combustivel','tipo_combustivel.id','transferencia.combustivel')
                                     ->orderBy('data', 'DESC')
@@ -36,8 +36,8 @@ class transferenciaController extends Controller
                                         ,'fazenda.fazenda'
                                         ,'transferencia.horimetro_inicial'
                                         ,'transferencia.horimetro_final'
-                                        ,'tanque.tanque'
                                         ,'transferencia.obs'
+                                        ,'comboio.tanque'
                                     ]);
         return view('transferencia.listAll' , compact('transferencias'));
     }
@@ -68,8 +68,8 @@ class transferenciaController extends Controller
                 ,"fazenda"              => $request->fazenda
                 ,"horimetro_inicial"    => $request->horimetro_inicial
                 ,"horimetro_final"      => $request->horimetro_final
-                ,"tanque"               => $request->tanque
                 ,"obs"                  => $request->obs
+                ,"tanque"               => $request->tanque
             ]);
             $transferencia->save();
         }catch(\Exception $e){
@@ -85,7 +85,7 @@ class transferenciaController extends Controller
         $tipo_combustiveis = tipo_combustivel::orderby('combustivel')->get();
         $colaboradores = colaborador::orderby('colaborador')->get();
         $fazendas = fazenda::orderby('fazenda')->get();
-        $equiapmentos = equipamento::orderby('equipamento')->get();
+        $equipamentos = equipamento::orderby('equipamento')->get();
         return view('transferencia.edit' , compact('transferencia','comboios','tipo_combustiveis','colaboradores','fazendas','equipamentos'));
     }
 
@@ -105,8 +105,8 @@ class transferenciaController extends Controller
             $transferencia->fazenda             = $request->fazenda;
             $transferencia->horimetro_inicial   = $request->horimetro_inicial;
             $transferencia->horimetro_final     = $request->horimetro_final;
-            $transferencia->tanque              = $request->tanque;
             $transferencia->obs                 = $request->obs;
+            $transferencia->tanque              = $request->tanque;
             $transferencia->save();
         }catch(\Exception $e){
             return response()->json($transferencia);
