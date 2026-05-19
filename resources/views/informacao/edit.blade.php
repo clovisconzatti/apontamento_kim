@@ -154,7 +154,7 @@
                 <input class="form-control" type="number" step="any" name="comprimento_madeira" id="comprimento_madeira" value="{{ $informacao->comprimento_madeira }}" >
             </div>
             <div class="form-group col-md-2">
-                Carreg. Juliera
+                Carreg. Julieta
                 <input class="form-control" type="number" step="any" name="carg_julieta" id="carg_julieta" value="{{ $informacao->carg_julieta }}" >
             </div>
             <div class="form-group col-md-2">
@@ -174,7 +174,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 Clima
                 <select class="form-control limpar" type="text" name="clima" id="clima">
                     <option value="0">Todas</option>
