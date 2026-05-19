@@ -187,27 +187,27 @@
         </div>
         <div class="row">
             <div class="form-group col-md-2">
-                Baldeio Curto
+                Baldeio 0-100m (Curto)
                 <input class="form-control" type="number" step="any" name="baldeio_curto" id="baldeio_curto"  value="" >
             </div>
             <div class="form-group col-md-2">
-                Baldeio Medio
+                Baldeio 100-300m (Médio)
                 <input class="form-control" type="number" step="any" name="baldeio_medio" id="baldeio_medio"  value="" >
             </div>
             <div class="form-group col-md-2">
-                Baldeio Longo
+                Baldeio 300m+ (Longo)
                 <input class="form-control" type="number" step="any" name="baldeio_longo" id="baldeio_longo"  value="" >
             </div>
             <div class="form-group col-md-2">
-                Arrasto Curto
+                Arrasto 0-100m (Curto)
                 <input class="form-control" type="number" step="any" name="arrasto_curto" id="arrasto_curto"  value="" >
             </div>
             <div class="form-group col-md-2">
-                Arrasto Medio
+                Arrasto 100-300m (Médio)
                 <input class="form-control" type="number" step="any" name="arrasto_medio" id="arrasto_medio"  value="" >
             </div>
             <div class="form-group col-md-2">
-                Arrasto Longo
+                Arrasto 300m+ (Longo)
                 <input class="form-control" type="number" step="any" name="arrasto_longo" id="arrasto_longo"  value="" >
             </div>
         </div>
