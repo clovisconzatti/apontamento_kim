@@ -150,11 +150,15 @@
                 Produção de Terceiros (m³)
                 <input class="form-control" type="number" step="any" name="producao_terceiros" id="producao_terceiros"  value="" >
             </div>
-            <div class="form-group col-md-3">
-                Comprimento da Madeira (m)
+            <div class="form-group col-md-2">
+                Comprimento Madeira (m)
                 <input class="form-control" type="number" step="any" name="comprimento_madeira" id="comprimento_madeira"  value="" >
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
+                Carregamento
+                <input class="form-control" type="number" step="any" name="carregamento" id="carregamento"  value="" >
+            </div>
+            <div class="form-group col-md-2">
                 Tipo do Terreno
                 <select class="form-control limpar" type="text" name="terreno" id="terreno">
                     <option value="0">Todas</option>

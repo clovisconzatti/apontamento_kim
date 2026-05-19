@@ -61,6 +61,7 @@ class informacaoController extends Controller
                                         , 'clima.clima'
                                         , 'terreno.terreno'
                                         , 'informacao.obs'
+                                        , 'informacao.carregamento'
                                     ]);
         return view('informacao.listAll' , compact('informacoes'));
     }
@@ -113,6 +114,7 @@ class informacaoController extends Controller
                 , "clima"                       => $request->clima
                 , "terreno"                     => $request->terreno
                 , "obs"                         => $request->obs
+                , "carregamento"                => $request->carregamento
             ]);
             $informacao->save();
         }catch(\Exception $e){
@@ -185,7 +187,7 @@ class informacaoController extends Controller
             $informacao->clima		                = $request->clima;
             $informacao->terreno		            = $request->terreno;
             $informacao->obs		                = $request->obs;
-
+            $informacao->carregamento		        = $request->carregamento;
             $informacao->save();
         }catch(\Exception $e){
             return response()->json($informacao);

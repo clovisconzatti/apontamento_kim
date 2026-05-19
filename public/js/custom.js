@@ -304,8 +304,8 @@ $(document).ready(function(){
                 ,'tanque'               : tanque
 
             }
-        // grava(dados,route,type,origem);
-        console.log(dados,route,type,origem);
+        grava(dados,route,type,origem);
+        // console.log(dados,route,type,origem);
         }
     })
 
@@ -872,6 +872,7 @@ $(document).ready(function(){
         var clima                   = $(this).find('select#clima').val();
         var terreno                 = $(this).find('select#terreno').val();
         var obs                     = $(this).find('input#obs').val();
+        var carregamento            = $(this).find('input#carregamento').val();
 
 
 /********************************************************************************************* */
@@ -914,7 +915,7 @@ $(document).ready(function(){
                 ,'clima'                    : clima
                 ,'terreno'                  : terreno
                 ,'obs'                      : obs
-
+                ,'carregamento'             : carregamento
             }
         grava(dados,route,type,origem);
         // console.log(dados,route,type,origem);

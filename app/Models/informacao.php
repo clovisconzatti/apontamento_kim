@@ -41,7 +41,7 @@ class informacao extends Model
         , 'obs'
         , 'clima'
         , 'terreno'
-
+        , 'carregamento'
 
     ];
     protected $primaryKey = 'id';
