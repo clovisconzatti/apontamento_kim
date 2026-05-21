@@ -60,6 +60,9 @@
                     <option value="TSC">TSC</option>
                     <option value="Mid">Mid</option>
                     <option value="Marumbi">Marumbi</option>
+                    <option value="Marumbi">Terceiro</option>
+                    <option value="Marumbi">Arcano</option>
+                    <option value="Marumbi">Sto.Expedido</option>
                 </select>
             </div>
         </div>

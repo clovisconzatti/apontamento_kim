@@ -60,6 +60,9 @@
                     <option value="TSC" {{ $colaborador->empresa == 'TSC' ? 'selected' : '' }}>TSC</option>
                     <option value="Mid" {{ $colaborador->empresa == 'Mid' ? 'selected' : '' }}>Mid</option>
                     <option value="Marumbi" {{ $colaborador->empresa == 'Marumbi' ? 'selected' : '' }}>Marumbi</option>
+                    <option value="Terceiro" {{ $colaborador->empresa == 'Terceiro' ? 'selected' : '' }}>Terceiro</option>
+                    <option value="Arcano" {{ $colaborador->empresa == 'Arcano' ? 'selected' : '' }}>Arcano</option>
+                    <option value="Sto.Expedido" {{ $colaborador->empresa == 'Sto.Expedido' ? 'selected' : '' }}>Sto.Expedido</option>
                 </select>
             </div>
         </div>
