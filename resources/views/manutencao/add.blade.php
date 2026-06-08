@@ -34,7 +34,7 @@
             <div class="form-group col-md-3">
                 * Veiculo/Equipamento
                 <select class="form-control limpar" type="text" name="equipamento" id="equipamento">
-                    <option value="0">Todas</option>
+                    <option value="">Todas</option>
                     @foreach ($equipamentos as $equipamento )
                         <option value="{{ $equipamento->id }}">{{ $equipamento->placa }} - {{ $equipamento->equipamento }}</option>
                     @endforeach
@@ -43,7 +43,7 @@
             <div class="form-group col-md-3">
                 Fazenda
                 <select class="form-control limpar" type="text" name="fazenda" id="fazenda">
-                    <option value="0">Todas</option>
+                    <option value="">Todas</option>
                     @foreach ($fazendas as $fazenda )
                         <option value="{{ $fazenda->id }}">{{ $fazenda->fazenda }}</option>
                     @endforeach
@@ -52,7 +52,7 @@
             <div class="form-group col-md-3">
                 Colaborador
                 <select class="form-control limpar" type="text" name="operador" id="operador">
-                    <option value="0">Todas</option>
+                    <option value="">Todas</option>
                     @foreach ($colaboradores as $colaborador )
                         <option value="{{ $colaborador->id }}">{{ $colaborador->colaborador }}</option>
                     @endforeach
@@ -79,7 +79,7 @@
             <div class="form-group col-md-3">
                 Tipo da Manutenção
                 <select class="form-control limpar" type="text" name="tipo_manutencao" id="tipo_manutencao">
-                    <option value="0">Todas</option>
+                    <option value="">Todas</option>
                     @foreach ($tipos_manutencao as $tipo_manutencao )
                         <option value="{{ $tipo_manutencao->id }}">{{ $tipo_manutencao->tipo }}</option>
                     @endforeach
@@ -98,7 +98,7 @@
             <div class="form-group col-md-3">
                 Situação da Manutenção
                 <select class="form-control limpar" type="text" name="situacao" id="situacao">
-                    <option value="0">Todas</option>
+                    <option value="">Todas</option>
                     @foreach ($situacoes_manutencao as $situacao_manutencao )
                         <option value="{{ $situacao_manutencao->id }}">{{ $situacao_manutencao->situacao }}</option>
                     @endforeach
