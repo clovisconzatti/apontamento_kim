@@ -808,7 +808,7 @@ $(document).ready(function(){
 
 
 /********************************************************************************************* */
-        if(!data || !equipamento || !hora_inicial || !hora_final || !ord_servico){
+        if(!data || !equipamento || !ord_servico){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
                 type: 'error',
