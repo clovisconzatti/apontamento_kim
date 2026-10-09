@@ -16,7 +16,30 @@ class transferenciaController extends Controller
 
     public function listAll(Request $request ){
 
-        $transferencias = transferencia::leftJoin('colaborador','colaborador.id','transferencia.operador')
+        $camposFiltro = [
+            'dtInicial'   => ['label' => 'Data inicial', 'tipo' => 'data', 'col' => 2],
+            'dtFinal'     => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
+            'origem'      => ['label' => 'Origem (comboio)', 'tipo' => 'select', 'col' => 4, 'opcoes' => $this->opcoesTabela('comboio', 'tanque')],
+            'destino'     => ['label' => 'Destino (equipamento)', 'tipo' => 'select', 'col' => 4, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
+            'fazenda'     => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
+            'combustivel' => ['label' => 'Combustível', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('tipo_combustivel', 'combustivel')],
+            'operador'    => ['label' => 'Operador', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('colaborador', 'colaborador')],
+            'busca'       => ['label' => 'Nº documento', 'tipo' => 'texto', 'col' => 4],
+        ];
+        $filtros = $this->lerFiltros($request, 'transferencia', $camposFiltro);
+
+        $query = transferencia::query();
+        $this->filtrarPeriodo($query, $filtros, 'transferencia.data');
+        $this->filtrarIgual($query, $filtros, [
+            'origem'      => 'transferencia.origem',
+            'destino'     => 'transferencia.destino',
+            'fazenda'     => 'transferencia.fazenda',
+            'combustivel' => 'transferencia.combustivel',
+            'operador'    => 'transferencia.operador',
+        ]);
+        $this->filtrarTexto($query, $filtros['busca'], ['transferencia.nr_doc']);
+
+        $transferencias = $query->leftJoin('colaborador','colaborador.id','transferencia.operador')
                                     ->leftJoin('comboio as origem_comboio','origem_comboio.id','transferencia.origem')
                                     ->leftJoin('equipamento as destino_comboio','destino_comboio.id','transferencia.destino')
                                     ->leftJoin('comboio','comboio.id','transferencia.tanque')
@@ -39,7 +62,9 @@ class transferenciaController extends Controller
                                         ,'transferencia.obs'
                                         ,'comboio.tanque'
                                     ]);
-        return view('transferencia.listAll' , compact('transferencias'));
+        $totalRegistros = $transferencias->count();
+
+        return view('transferencia.listAll' , compact('transferencias', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

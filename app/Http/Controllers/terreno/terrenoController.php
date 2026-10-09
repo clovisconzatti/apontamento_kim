@@ -10,8 +10,17 @@ class terrenoController extends Controller
 {
     public function listAll(Request $request ){
 
-        $terrenos = terreno::orderBy('terreno', 'ASC')->get();
-        return view('terreno.listAll' , compact('terrenos'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Terreno'],
+        ];
+        $filtros = $this->lerFiltros($request, 'terreno', $camposFiltro);
+
+        $query = terreno::orderBy('terreno', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['terreno']);
+        $terrenos = $query->get();
+        $totalRegistros = $terrenos->count();
+
+        return view('terreno.listAll' , compact('terrenos', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

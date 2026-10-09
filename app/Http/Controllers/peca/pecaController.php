@@ -11,8 +11,17 @@ class pecaController extends Controller
 
     public function listAll(Request $request ){
 
-        $pecas = peca::orderBy('peca', 'ASC')->get();
-        return view('peca.listAll' , compact('pecas'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Peça ou código'],
+        ];
+        $filtros = $this->lerFiltros($request, 'peca', $camposFiltro);
+
+        $query = peca::orderBy('peca', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['peca', 'cod_cargo']);
+        $pecas = $query->get();
+        $totalRegistros = $pecas->count();
+
+        return view('peca.listAll' , compact('pecas', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

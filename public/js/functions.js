@@ -174,6 +174,32 @@ function grava(dados,route,type,origem){
                     window.location.reload();
                 }
             }
+        },
+        error: function(xhr)
+        {
+            // Mostra as mensagens de validação (422) ou de erro do servidor
+            var mensagens = ['Erro ao gravar. Tente novamente.'];
+            try {
+                var resposta = JSON.parse(xhr.responseText);
+                if(resposta.errors){
+                    mensagens = $.map(resposta.errors, function(erros){ return erros[0]; });
+                }else if(resposta.message){
+                    mensagens = [resposta.message];
+                }
+            } catch(e) {}
+            var html = $.map(mensagens, function(mensagem){
+                return '<div style="background:#fdecea;border-left:5px solid #d93025;color:#5f2120;'
+                     + 'padding:12px 14px;margin:10px 0;text-align:left;font-size:17px;line-height:1.5;border-radius:4px">'
+                     + $('<div>').text(mensagem).html()
+                     + '</div>';
+            }).join('');
+            Swal({
+                title: 'Não foi possível gravar',
+                html: html,
+                type: 'error',
+                width: 640,
+                confirmButtonText: 'Corrigir'
+            })
         }
     })
 }
@@ -302,9 +328,19 @@ function removeMenuUsuario(liberadoId){
 
 }
 
+// Busca o último km e a última hora lançados para o equipamento (antes da data do formulário)
 function checaKm(equipamento){
+    $('#ultimoKm').val('');
+    $('#ultimaHora').val('');
+    $('#infoUltimoKm').text('');
+    $('#infoUltimaHora').text('');
+    if(!equipamento){
+        return;
+    }
     var dados = {
         'equipamento': equipamento
+        ,'data'      : $('input#data').val()
+        ,'id'        : $('input#idApontamento').val()
     };
     var route = '/apontamento/checaKm'
     $.ajax({
@@ -313,25 +349,21 @@ function checaKm(equipamento){
         dataType: 'JSON',
         url: url + route,
         success:function(result){
-            console.log(result);
-            $('#ultimoKm').val(result.km)
+            if(!result){
+                return;
+            }
+            if(result.km !== null && result.km !== undefined){
+                $('#ultimoKm').val(result.km);
+                $('#infoUltimoKm').text('Km anterior: ' + result.km);
+            }
+            if(result.horas !== null && result.horas !== undefined){
+                $('#ultimaHora').val(result.horas);
+                $('#infoUltimaHora').text('Hora anterior: ' + result.horas);
+            }
         }
     })
 }
 
 function checaHora(equipamento){
-    var dados = {
-        'equipamento': equipamento
-    };
-    var route = '/apontamento/checaHora'
-    $.ajax({
-        data: dados,
-        type: 'post',
-        dataType: 'JSON',
-        url: url + route,
-        success:function(result){
-            console.log(result);
-            $('#ultimaHora').val(result.horas)
-        }
-    })
+    checaKm(equipamento);
 }

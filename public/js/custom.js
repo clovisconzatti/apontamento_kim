@@ -226,13 +226,18 @@ $(document).ready(function(){
         var combustivel         = $(this).find('select#combustivel').val();
         var obs                 = $(this).find('input#obs').val();
         var origemAbastecimento = $(this).find('select#origemAbastecimento').val();
-        var ultimo_km           = $(this).find('select#ultimo_km').val();
 
 
         /********************************************************************************************* */
-        if(!data || !equipamento || !km || !horas || !litros || !combustivel || !origem ){
+        if(!data || !equipamento || !litros || !combustivel || (!km && !horas)){
             Swal({
-                title: 'Preencha todos os campos obrigatório',
+                title: 'Preencha todos os campos obrigatórios (informe o Km e/ou a Hora atual)',
+                type: 'error',
+                timer:3000
+            })
+        }else if(parseFloat(litros) <= 0){
+            Swal({
+                title: 'O total de litros deve ser maior que zero',
                 type: 'error',
                 timer:3000
             })
@@ -246,7 +251,6 @@ $(document).ready(function(){
                 ,'combustivel'      : combustivel
                 ,'obs'              : obs
                 ,'origemAbastecimento':origemAbastecimento
-                ,'ultimo_km'        :ultimo_km
             }
             // console.log(dados,route,type,origem);
             grava(dados,route,type,origem);
@@ -926,40 +930,34 @@ $(document).ready(function(){
         }
     })
 
-/************************checa km ***********************************************************/
-    $(document).on('change','select#placa',function(event){
-        var equipamento = $(this).val();
+/************************checa km / hora anterior ***********************************************************/
+    // Uma única consulta devolve o último km e a última hora do equipamento
+    $(document).on('change','select#placa, input#data',function(event){
+        if(!$('select#placa').length){ return; }
+        var equipamento = $('select#placa').val();
         checaKm(equipamento);
     })
+    // Compara como número (comparar texto dava "900" >= "1000" verdadeiro)
     $(document).on('blur','#km',function(event){
-        var kmAtual = $(this).val();
-        var kmAnterior = $('#ultimoKm').val();
-        if(kmAtual){
-            if(kmAnterior>=kmAtual){
-                Swal({
-                    title: 'Km Atual menor que Km anterior!',
-                    type: 'warning',
-                    timer:1000
-                })
-            }
+        var kmAtual = parseFloat($(this).val());
+        var kmAnterior = parseFloat($('#ultimoKm').val());
+        if(!isNaN(kmAtual) && !isNaN(kmAnterior) && kmAtual <= kmAnterior){
+            Swal({
+                title: 'Km Atual (' + kmAtual + ') menor ou igual ao Km anterior (' + kmAnterior + ')!',
+                type: 'warning',
+                timer:3000
+            })
         }
     })
-    /************************checa hora ***********************************************************/
-    $(document).on('change','select#placa',function(event){
-        var equipamento = $(this).val();
-        checaHora(equipamento);
-    })
     $(document).on('blur','#horas',function(event){
-        var horaAtual = $(this).val();
-        var horaAnterior = $('#ultimaHora').val();
-        if(horaAtual){
-            if(horaAnterior>=horaAtual){
-                Swal({
-                    title: 'Hora Atual menor que Hora anterior!',
-                    type: 'warning',
-                    timer:1000
-                })
-            }
+        var horaAtual = parseFloat($(this).val());
+        var horaAnterior = parseFloat($('#ultimaHora').val());
+        if(!isNaN(horaAtual) && !isNaN(horaAnterior) && horaAtual <= horaAnterior){
+            Swal({
+                title: 'Hora Atual (' + horaAtual + ') menor ou igual à Hora anterior (' + horaAnterior + ')!',
+                type: 'warning',
+                timer:3000
+            })
         }
     })
 

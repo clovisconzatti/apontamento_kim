@@ -11,8 +11,17 @@ class tipo_manutencaoController extends Controller
 
     public function listAll(Request $request ){
 
-        $tipo_manutencoes = tipo_manutencao::orderBy('tipo', 'ASC')->get();
-        return view('tipo_manutencao.listAll' , compact('tipo_manutencoes'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Tipo de manutenção'],
+        ];
+        $filtros = $this->lerFiltros($request, 'tipo_manutencao', $camposFiltro);
+
+        $query = tipo_manutencao::orderBy('tipo', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['tipo']);
+        $tipo_manutencoes = $query->get();
+        $totalRegistros = $tipo_manutencoes->count();
+
+        return view('tipo_manutencao.listAll' , compact('tipo_manutencoes', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

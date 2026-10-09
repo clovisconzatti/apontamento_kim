@@ -19,6 +19,9 @@
         </tr>
     </table><hr>
 
+    @include('partials.filtros')
+
+
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>

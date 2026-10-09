@@ -12,7 +12,18 @@ class comboioController extends Controller
 
     public function listAll(Request $request ){
 
-        $comboios = comboio::leftJoin('fazenda','fazenda.id','comboio.fazenda')
+        $camposFiltro = [
+            'busca'   => ['label' => 'Tanque', 'tipo' => 'texto', 'col' => 4],
+            'fazenda' => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 4, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
+            'uf'      => ['label' => 'UF', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesDistintas('comboio', 'uf')],
+        ];
+        $filtros = $this->lerFiltros($request, 'comboio', $camposFiltro);
+
+        $query = comboio::leftJoin('fazenda','fazenda.id','comboio.fazenda');
+        $this->filtrarTexto($query, $filtros['busca'], ['comboio.tanque']);
+        $this->filtrarIgual($query, $filtros, ['fazenda' => 'comboio.fazenda', 'uf' => 'comboio.uf']);
+
+        $comboios = $query
                                     ->orderBy('comboio.tanque', 'ASC')
                                     ->get([
                                         'comboio.id'
@@ -22,7 +33,10 @@ class comboioController extends Controller
                                         ,'comboio.obs'
                                         ,'fazenda.fazenda'
                                     ]);
-        return view('comboio.listAll' , compact('comboios'));}
+        $totalRegistros = $comboios->count();
+
+        return view('comboio.listAll' , compact('comboios', 'camposFiltro', 'filtros', 'totalRegistros'));
+    }
 
     public function formAdd()
     {

@@ -1,6 +1,6 @@
 @extends('layouts.model')
 @section('content')
-    <table class="table table-bordered table-striped table-sm">
+    <table class="table table-borderless table-advance table-condensed">
         <tr>
             <td width="80%">
                 <h3>
@@ -18,6 +18,9 @@
             </td>
         </tr>
     </table><hr>
+
+    @include('partials.filtros')
+
 
 
 <div class="table-responsive">

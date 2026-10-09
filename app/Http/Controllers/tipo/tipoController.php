@@ -11,8 +11,17 @@ class tipoController extends Controller
 
     public function listAll(Request $request ){
 
-        $tipos = tipo::orderBy('tipo', 'ASC')->get();
-        return view('tipo.listAll' , compact('tipos'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Tipo de veículo'],
+        ];
+        $filtros = $this->lerFiltros($request, 'tipo', $camposFiltro);
+
+        $query = tipo::orderBy('tipo', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['tipo']);
+        $tipos = $query->get();
+        $totalRegistros = $tipos->count();
+
+        return view('tipo.listAll' , compact('tipos', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

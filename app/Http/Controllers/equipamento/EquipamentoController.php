@@ -13,9 +13,29 @@ class EquipamentoController extends Controller
 {
     public function listAll(Request $request ){
 
-        $equipamentos = equipamento::leftJoin('tipo','tipo.id','equipamento.tipo')
+        $camposFiltro = [
+            'busca'     => ['label' => 'Placa ou equipamento', 'tipo' => 'texto', 'col' => 4],
+            'tipo'      => ['label' => 'Tipo', 'tipo' => 'select', 'opcoes' => $this->opcoesTabela('tipo', 'tipo')],
+            'atividade' => ['label' => 'Atividade', 'tipo' => 'select', 'opcoes' => $this->opcoesTabela('atividade', 'atividade')],
+            'operacao'  => ['label' => 'Operação', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('operacao', 'operacao')],
+            'ativo'     => ['label' => 'Ativo', 'tipo' => 'select', 'col' => 2, 'opcoes' => ['Sim' => 'Sim', 'Nao' => 'Não']],
+            'uf'        => ['label' => 'UF', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesDistintas('equipamento', 'uf')],
+        ];
+        $filtros = $this->lerFiltros($request, 'equipamento', $camposFiltro);
+
+        $query = equipamento::leftJoin('tipo','tipo.id','equipamento.tipo')
                                     ->leftJoin('atividade','atividade.id','equipamento.atividade')
-                                    ->leftJoin('operacao','operacao.id','equipamento.operacao')
+                                    ->leftJoin('operacao','operacao.id','equipamento.operacao');
+        $this->filtrarTexto($query, $filtros['busca'], ['equipamento.placa', 'equipamento.equipamento']);
+        $this->filtrarIgual($query, $filtros, [
+            'tipo'      => 'equipamento.tipo',
+            'atividade' => 'equipamento.atividade',
+            'operacao'  => 'equipamento.operacao',
+            'ativo'     => 'equipamento.ativo',
+            'uf'        => 'equipamento.uf',
+        ]);
+
+        $equipamentos = $query
                                     ->orderBy('equipamento', 'ASC')
                                     ->get([
                                         'equipamento.id'
@@ -32,7 +52,9 @@ class EquipamentoController extends Controller
                                         ,'equipamento.consumo_minimo'
                                         ,'equipamento.consumo_maximo'
                                     ]);
-        return view('equipamento.listAll' , compact('equipamentos'));
+        $totalRegistros = $equipamentos->count();
+
+        return view('equipamento.listAll' , compact('equipamentos', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

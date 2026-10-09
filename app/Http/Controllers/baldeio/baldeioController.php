@@ -11,8 +11,17 @@ class baldeioController extends Controller
 
     public function listAll(Request $request ){
 
-        $baldeios = baldeio::orderBy('baldeio', 'ASC')->get();
-        return view('baldeio.listAll' , compact('baldeios'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Baldeio ou distância'],
+        ];
+        $filtros = $this->lerFiltros($request, 'baldeio', $camposFiltro);
+
+        $query = baldeio::orderBy('baldeio', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['baldeio', 'distancia']);
+        $baldeios = $query->get();
+        $totalRegistros = $baldeios->count();
+
+        return view('baldeio.listAll' , compact('baldeios', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

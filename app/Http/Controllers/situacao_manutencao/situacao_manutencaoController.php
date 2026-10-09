@@ -11,8 +11,17 @@ class situacao_manutencaoController extends Controller
 
     public function listAll(Request $request ){
 
-        $situacao_manutencoes = situacao_manutencao::orderBy('situacao', 'ASC')->get();
-        return view('situacao_manutencao.listAll' , compact('situacao_manutencoes'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Situação'],
+        ];
+        $filtros = $this->lerFiltros($request, 'situacao_manutencao', $camposFiltro);
+
+        $query = situacao_manutencao::orderBy('situacao', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['situacao']);
+        $situacao_manutencoes = $query->get();
+        $totalRegistros = $situacao_manutencoes->count();
+
+        return view('situacao_manutencao.listAll' , compact('situacao_manutencoes', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

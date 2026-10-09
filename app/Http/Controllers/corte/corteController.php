@@ -11,8 +11,17 @@ class corteController extends Controller
 
     public function listAll(Request $request ){
 
-        $cortes = corte::orderBy('corte', 'ASC')->get();
-        return view('corte.listAll' , compact('cortes'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Corte'],
+        ];
+        $filtros = $this->lerFiltros($request, 'corte', $camposFiltro);
+
+        $query = corte::orderBy('corte', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['corte']);
+        $cortes = $query->get();
+        $totalRegistros = $cortes->count();
+
+        return view('corte.listAll' , compact('cortes', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

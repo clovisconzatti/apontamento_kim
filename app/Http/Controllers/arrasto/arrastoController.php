@@ -11,8 +11,17 @@ class arrastoController extends Controller
 
     public function listAll(Request $request ){
 
-        $arrastos = arrasto::orderBy('arrasto', 'ASC')->get();
-        return view('arrasto.listAll' , compact('arrastos'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Arrasto'],
+        ];
+        $filtros = $this->lerFiltros($request, 'arrasto', $camposFiltro);
+
+        $query = arrasto::orderBy('arrasto', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['arrasto']);
+        $arrastos = $query->get();
+        $totalRegistros = $arrastos->count();
+
+        return view('arrasto.listAll' , compact('arrastos', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

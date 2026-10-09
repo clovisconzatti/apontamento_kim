@@ -14,12 +14,44 @@ use App\Models\informacao;
 use App\Models\lubrificante;
 use App\Models\terreno;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class informacaoController extends Controller
 {
     public function listAll(Request $request ){
 
-        $informacoes = informacao::leftJoin('fazenda','fazenda.id','informacao.fazenda')
+        $camposFiltro = [
+            'dtInicial'   => ['label' => 'Data inicial', 'tipo' => 'data', 'col' => 2],
+            'dtFinal'     => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
+            'fazenda'     => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 4, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
+            'equipamento' => ['label' => 'Equipamento', 'tipo' => 'select', 'col' => 4, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
+            'colaborador' => ['label' => 'Operador', 'tipo' => 'select', 'col' => 4, 'opcoes' => $this->opcoesTabela('colaborador', 'colaborador')],
+            'atividade'   => ['label' => 'Atividade', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('atividade', 'atividade')],
+            'corte'       => ['label' => 'Corte', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('corte', 'corte')],
+            'clima'       => ['label' => 'Clima', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('clima', 'clima')],
+            'terreno'     => ['label' => 'Terreno', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('terreno', 'terreno')],
+            'busca'       => ['label' => 'Nº NF', 'tipo' => 'texto', 'col' => 4],
+        ];
+        // Padrão: mês atual (a tabela é grande; evita carregar todo o histórico)
+        $filtros = $this->lerFiltros($request, 'informacao', $camposFiltro, [
+            'dtInicial' => date('Y-m-01'),
+            'dtFinal'   => date('Y-m-d'),
+        ]);
+
+        $query = informacao::query();
+        $this->filtrarPeriodo($query, $filtros, 'informacao.data');
+        $this->filtrarIgual($query, $filtros, [
+            'fazenda'     => 'informacao.fazenda',
+            'equipamento' => 'informacao.equipamento',
+            'colaborador' => 'informacao.colaborador',
+            'atividade'   => 'informacao.atividade',
+            'corte'       => 'informacao.corte',
+            'clima'       => 'informacao.clima',
+            'terreno'     => 'informacao.terreno',
+        ]);
+        $this->filtrarTexto($query, $filtros['busca'], ['informacao.nr_nf']);
+
+        $informacoes = $query->leftJoin('fazenda','fazenda.id','informacao.fazenda')
                                     ->leftJoin('equipamento','equipamento.id','informacao.equipamento')
                                     ->leftJoin('atividade','atividade.id','informacao.atividade')
                                     ->leftJoin('colaborador','colaborador.id','informacao.colaborador')
@@ -28,7 +60,8 @@ class informacaoController extends Controller
                                     ->leftJoin('lubrificante','lubrificante.id','informacao.tipo_lubrificante')
                                     ->leftJoin('clima','clima.id','informacao.clima')
                                     ->leftJoin('terreno','terreno.id','informacao.terreno')
-                                    ->orderBy('informacao.data','DESC','informacao.id', 'DESC')
+                                    ->orderBy('informacao.data', 'DESC')
+                                    ->orderBy('informacao.id', 'DESC')
                                     ->get([
                                         'informacao.id'
                                         ,'informacao.data'
@@ -65,7 +98,9 @@ class informacaoController extends Controller
                                         , 'informacao.carg_truck'
                                         , 'informacao.carg_bitrem'
                                         ]);
-        return view('informacao.listAll' , compact('informacoes'));
+        $totalRegistros = $informacoes->count();
+
+        return view('informacao.listAll' , compact('informacoes', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()
@@ -84,6 +119,8 @@ class informacaoController extends Controller
     }
     public function store(Request $request)
     {
+        $this->validarHorimetros($request);
+
         try{
             $informacao = new informacao([
                 "data"                          => $request->data
@@ -159,6 +196,8 @@ class informacaoController extends Controller
 
     public function edit($id, Request $request)
     {
+        $this->validarHorimetros($request, $id);
+
         try{
             $informacao = informacao::find($id);
             $informacao->data		                = $request->data;
@@ -199,5 +238,81 @@ class informacaoController extends Controller
             return response()->json($informacao);
         }
         return response()->json('success');
+    }
+
+    /*********************************** auxiliares ***********************************/
+
+    // Horímetro final não pode ser menor que o inicial, e o inicial não pode ser menor
+    // que o final do apontamento anterior do mesmo equipamento (dias anteriores ou mesmo dia).
+    private function validarHorimetros(Request $request, $id = null)
+    {
+        $inicial = is_numeric($request->horimetro_inicial) ? (float) $request->horimetro_inicial : null;
+        $final   = is_numeric($request->horimetro_final) ? (float) $request->horimetro_final : null;
+        $erros   = [];
+
+        if ($inicial !== null && $final !== null && $final < $inicial) {
+            $erros['horimetro_final'] = 'O horímetro final ('.$this->formatarHorimetro($final).') é menor que o horímetro inicial ('
+                .$this->formatarHorimetro($inicial).') deste apontamento.';
+        }
+
+        if ($inicial !== null && $request->equipamento && $request->data) {
+            $anterior = $this->apontamentoAnterior($request->equipamento, $request->data, $request->hora_inicial, $id);
+
+            if ($anterior && $inicial < (float) $anterior->horimetro_final) {
+                $quando = date('d/m/Y', strtotime($anterior->data));
+                if ($anterior->hora_inicial) {
+                    $quando .= ' às '.substr($anterior->hora_inicial, 0, 5);
+                }
+                $erros['horimetro_inicial'] = 'O horímetro inicial ('.$this->formatarHorimetro($inicial).') é menor que o horímetro final ('
+                    .$this->formatarHorimetro($anterior->horimetro_final).') do apontamento anterior deste equipamento, de '.$quando.'.';
+            }
+        }
+
+        if ($erros) {
+            throw ValidationException::withMessages($erros);
+        }
+    }
+
+    // Último apontamento do equipamento antes deste, pela ordem data > hora inicial > id
+    private function apontamentoAnterior($equipamento, $data, $hora = null, $id = null)
+    {
+        return informacao::where('equipamento', $equipamento)
+            ->whereNotNull('horimetro_final')
+            ->when($id, function ($q) use ($id) {
+                $q->where('id', '<>', $id);
+            })
+            ->where(function ($q) use ($data, $hora, $id) {
+                $q->where('data', '<', $data)
+                  ->orWhere(function ($q) use ($data, $hora, $id) {
+                      $q->where('data', $data);
+
+                      // Mesmo dia: vem antes quem tem hora inicial menor; empate ou sem hora, decide pelo id
+                      // (num cadastro novo, todos os registros já existentes contam como anteriores)
+                      $q->where(function ($q) use ($hora, $id) {
+                          if ($hora) {
+                              $q->where('hora_inicial', '<', $hora);
+                          }
+                          $q->orWhere(function ($q) use ($hora, $id) {
+                              if ($hora) {
+                                  $q->where(function ($q) use ($hora) {
+                                      $q->where('hora_inicial', $hora)->orWhereNull('hora_inicial');
+                                  });
+                              }
+                              if ($id) {
+                                  $q->where('id', '<', $id);
+                              }
+                          });
+                      });
+                  });
+            })
+            ->orderBy('data', 'DESC')
+            ->orderBy('hora_inicial', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->first(['id', 'data', 'hora_inicial', 'horimetro_final']);
+    }
+
+    private function formatarHorimetro($valor)
+    {
+        return rtrim(rtrim(number_format((float) $valor, 2, ',', '.'), '0'), ',');
     }
 }

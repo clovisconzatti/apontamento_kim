@@ -8,9 +8,9 @@ function initializeJS() {
 
     //custom scrollbar
         //for html
-    jQuery("html").niceScroll({styler:"fb",cursorcolor:"#007AFF", cursorwidth: '6', cursorborderradius: '10px', background: '#F7F7F7', cursorborder: '', zindex: '1000'});
+    jQuery("html").niceScroll({styler:"fb",cursorcolor:"#1b7a3e", cursorwidth: '6', cursorborderradius: '10px', background: 'transparent', cursorborder: '', zindex: '1000'});
         //for sidebar
-    jQuery("#sidebar").niceScroll({styler:"fb",cursorcolor:"#007AFF", cursorwidth: '3', cursorborderradius: '10px', background: '#F7F7F7', cursorborder: ''});
+    jQuery("#sidebar").niceScroll({styler:"fb",cursorcolor:"#ffcc00", cursorwidth: '3', cursorborderradius: '10px', background: 'transparent', cursorborder: ''});
         // for scroll panel
     jQuery(".scroll-panel").niceScroll({styler:"fb",cursorcolor:"#007AFF", cursorwidth: '3', cursorborderradius: '10px', background: '#F7F7F7', cursorborder: ''});
 
@@ -63,13 +63,13 @@ function initializeJS() {
                 'margin-left': '0px'
             });
             jQuery('#sidebar').css({
-                'margin-left': '-180px'
+                'margin-left': '-200px'
             });
             jQuery('#sidebar > ul').hide();
             jQuery("#container").addClass("sidebar-closed");
         } else {
             jQuery('#main-content').css({
-                'margin-left': '180px'
+                'margin-left': '200px'
             });
             jQuery('#sidebar > ul').show();
             jQuery('#sidebar').css({

@@ -11,8 +11,17 @@ class operacaoController extends Controller
 
     public function listAll(Request $request ){
 
-        $operacoes = operacao::orderBy('operacao', 'ASC')->get();
-        return view('operacao.listAll' , compact('operacoes'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Operação'],
+        ];
+        $filtros = $this->lerFiltros($request, 'operacao', $camposFiltro);
+
+        $query = operacao::orderBy('operacao', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['operacao']);
+        $operacoes = $query->get();
+        $totalRegistros = $operacoes->count();
+
+        return view('operacao.listAll' , compact('operacoes', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

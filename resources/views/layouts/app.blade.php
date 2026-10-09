@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="pt-BR">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,42 +7,41 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Kim</title>
-    <link rel="shortcut icon" href=" {{ asset('img/icone.png') }} ">
+    <title>Kim Logística</title>
+    <link rel="shortcut icon" href="{{ asset('img/icone.png') }}">
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 
     <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
-    <script src="https://kit.fontawesome.com/9083a84e48.js" crossorigin="anonymous"></script>
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
-
+    <link href="{{ asset('css/kim-theme.css') }}?v={{ @filemtime(public_path('css/kim-theme.css')) }}" rel="stylesheet">
 </head>
-<body class="fundo img">
+<body class="kim-auth">
     <div id="app">
-        <nav class="">
-            <div class="container">
-                <br>
-                <img src=" {{url('/img/logo.png')}} " height="50">
-
-                {{-- <div class="collapse navbar-collapse" id="navbarSupportedContent"> --}}
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav mr-auto">
-
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <main class="py-4">
+        @hasSection('telaCheia')
             @yield('content')
-        </main>
+        @else
+            {{-- Demais telas de autenticação (recuperar senha, verificar e-mail...) --}}
+            <nav class="kim-auth-topo">
+                <a href="{{ url('/') }}" class="kim-marca" style="display:flex; align-items:center; gap:12px; text-decoration:none;">
+                    <span class="kim-logo-selo"><img src="{{ asset('img/logo.png') }}" alt="Kim Logística"></span>
+                    <span class="kim-marca-texto">
+                        <span class="kim-marca-nome">KIM <span>Logística</span></span>
+                        <span class="kim-marca-sub">Colheita e transporte de madeira</span>
+                    </span>
+                </a>
+            </nav>
+            <main class="py-5" style="background: var(--kim-fundo); min-height: calc(100vh - 70px);">
+                @yield('content')
+            </main>
+        @endif
     </div>
 </body>
 </html>

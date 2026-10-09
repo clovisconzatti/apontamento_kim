@@ -11,8 +11,17 @@ class comprimento_madeiraController extends Controller
 
     public function listAll(Request $request ){
 
-        $comprimento_madeiras = comprimento_madeira::orderBy('comprimento', 'ASC')->get();
-        return view('comprimento_madeira.listAll' , compact('comprimento_madeiras'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Comprimento'],
+        ];
+        $filtros = $this->lerFiltros($request, 'comprimento_madeira', $camposFiltro);
+
+        $query = comprimento_madeira::orderBy('comprimento', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['comprimento']);
+        $comprimento_madeiras = $query->get();
+        $totalRegistros = $comprimento_madeiras->count();
+
+        return view('comprimento_madeira.listAll' , compact('comprimento_madeiras', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

@@ -1,43 +1,55 @@
 @extends('layouts.model')
 @section('content')
-    <h3 class=""><i class="fa fa-upload"></i> abastecida -> {{$abastecida->placa}} ({{$abastecida->id}}) </h4>
+    <h3 class=""><i class="fa fa-upload"></i> Anexo do abastecimento -> {{ $abastecida->placa }} - {{ $abastecida->equipamento }}
+        <small class="text-muted">(#{{ $abastecida->id }} - {{ date('d/m/Y', strtotime($abastecida->data)) }})</small>
+    </h3>
     <hr>
+
+    @if (session()->get('success'))
+        <div class="alert alert-success">{{ session()->get('success') }}</div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form action="{{ route('upload') }}" method="post" enctype="multipart/form-data">
         @csrf
+        <input type="hidden" name="apontamento" id="apontamento" value="{{ $abastecida->id }}">
         <div class="row">
-            <div class="form-group col-md-4">
-                Arquivo:<br>
-                <div class="input-group mb-3">
-                    <div class="">
-                        <input type="file" class="" name="arquivo" id="arquivo" aria-describedby="" required>
-                        {{-- <label class="custom-file-label" for="validatedCustomFile">Selecione....</label> --}}
-                        <input type="hidden" name="nomeArquivo" id="nomeArquivo" value="Anexo">
-                        <input type="hidden" name="apontamento" id="apontamento" value="{{$abastecida->id}}">
-                        <input type="hidden" name="placa" id="placa" value="{{$abastecida->placa}}">
-
-                    </div>
-                </div>
+            <div class="form-group col-md-6">
+                Arquivo (PDF ou imagem, até 10 MB):<br>
+                <input type="file" name="arquivo" id="arquivo" accept=".pdf,.jpg,.jpeg,.png,.webp" required>
+                @if ($abastecida->anexo)
+                    <br><small class="text-muted">Enviar um novo arquivo substitui o anexo atual.</small>
+                @endif
             </div>
-
             <div class="form-group col-md-4">
                 <br>
-                <button type="submit" class="btn btn-primary">Enviar arquivo</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-upload"></i> Enviar arquivo
+                </button>
             </div>
         </div>
-    </form><hr>
-           <div class="row">
-            <table class="table table-condensed table-bordered">
-                <thead>
-                    <tr>
-                        <th>Anexo</th>
-                    </tr>
-                </thead>
+    </form>
+    <hr>
 
-                <tbody>
-                    <td>
-                        <embed src="{{ asset('storage/'.$abastecida->placa.'/'.$abastecida->anexo)  }}" type=""  style="height: 500px; width: 100%">
-                    </td>
-                </tbody>
-            </table>
+    <div class="row">
+        <div class="col-md-12">
+            @if ($urlAnexo)
+                <p><a href="{{ $urlAnexo }}" target="_blank"><i class="fa fa-external-link-alt"></i> Abrir em nova aba</a></p>
+                <embed src="{{ $urlAnexo }}" style="height: 500px; width: 100%">
+            @elseif ($abastecida->anexo)
+                <div class="alert alert-warning">O arquivo {{ $abastecida->anexo }} está registrado, mas não foi encontrado no servidor.</div>
+            @else
+                <div class="alert alert-info">Nenhum anexo enviado para este abastecimento.</div>
+            @endif
         </div>
+    </div>
 @endsection

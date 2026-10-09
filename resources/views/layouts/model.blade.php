@@ -7,7 +7,7 @@
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>Kim</title>
+        <title>Kim Logística</title>
         <link rel="shortcut icon" href=" {{ asset('img/icone.png') }} ">
         <link href="{{ asset('css/bootstrap-select.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
@@ -47,6 +47,11 @@
         {{-- <script src="{{ asset('ckeditor/ckeditor.js') }}" type="text/javascript"></script>
         <script src="{{ asset('ckeditor/sample.js') }}" type="text/javascript"></script> --}}
 
+        <!-- Tema Kim (sempre por último) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="{{ asset('css/kim-theme.css') }}?v={{ @filemtime(public_path('css/kim-theme.css')) }}" rel="stylesheet">
+
     </head>
 
     <body>
@@ -56,13 +61,19 @@
 
             <header class="header dark-bg">
                 <div class="toggle-nav">
-                <div class="icon-reorder tooltips" data-original-title="Toggle Navigation" data-placement="bottom"><i class="icon_menu"></i></div>
+                <div class="icon-reorder tooltips" data-original-title="Toggle Navigation" data-placement="bottom"><i class="fas fa-bars"></i></div>
                 </div>
 
                 <!--logo start-->
 
-                <a href="#" class="logo">
-                    <img src=" {{asset('img/logo.png')}} " height="40"> &nbsp; &nbsp;<i>Kim</i>
+                <a href="{{ route('home') }}" class="logo kim-marca">
+                    <span class="kim-logo-selo">
+                        <img src="{{ asset('img/logo.png') }}" alt="Kim Logística">
+                    </span>
+                    <span class="kim-marca-texto">
+                        <span class="kim-marca-nome">KIM <span>Logística</span></span>
+                        <span class="kim-marca-sub">Colheita e transporte de madeira</span>
+                    </span>
                 </a>
                 <!--logo end-->
 
@@ -82,7 +93,7 @@
                         <div class="log-arrow-up"></div>
                         <li>
                             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fa fa-sign-out"> Sair</i>
+                                <i class="fas fa-sign-out-alt"></i> Sair
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf
@@ -105,6 +116,7 @@
             <section class="wrapper">
                 <div class="col-lg-12">
                     @yield('content')
+                </div>
             </section>
         </section>
 

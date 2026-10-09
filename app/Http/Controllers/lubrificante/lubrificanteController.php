@@ -11,8 +11,17 @@ class lubrificanteController extends Controller
 
     public function listAll(Request $request ){
 
-        $lubrificantes = lubrificante::orderBy('lubrificante', 'ASC')->get();
-        return view('lubrificante.listAll' , compact('lubrificantes'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Lubrificante'],
+        ];
+        $filtros = $this->lerFiltros($request, 'lubrificante', $camposFiltro);
+
+        $query = lubrificante::orderBy('lubrificante', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['lubrificante']);
+        $lubrificantes = $query->get();
+        $totalRegistros = $lubrificantes->count();
+
+        return view('lubrificante.listAll' , compact('lubrificantes', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

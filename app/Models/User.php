@@ -49,49 +49,64 @@ class User extends Authenticatable
 
     public static function montarMenu()
     {
-        $menu = '';
-        $finalT = 0;
+        // Tela atual (ex.: "informacao.formEdit" -> "informacao") para destacar o item no menu
+        $rotaAtual = (string) \Illuminate\Support\Facades\Route::currentRouteName();
+        $moduloAtual = explode('.', $rotaAtual)[0];
+
         $menu = '<aside>';
             $menu.='<div id="sidebar" class="nav-collapse">';
                 $menu.='<ul class="sidebar-menu">';
-                    $menu.='<li class="active">';
-                        $menu.='<a class="" href="#">';
+                    $menu.='<li class="'.($rotaAtual == 'home' ? 'kim-ativo' : '').'">';
+                        $menu.='<a class="" href="'.route('home').'">';
                             $menu.='<i class="fas fa-tachometer-alt"></i>';
-                            $menu.='<span class="text"Dashboard</span>';
+                            $menu.='<span class="text">Painel</span>';
                         $menu.='</a>';
                     $menu.='</li>';
-                    // dd(auth()->user()->menus);
-                    foreach (auth()->user()->menus as $item){
-                        if($item->tipo=='Título' && $finalT==0){
-                            $menu.=' <li class="sub-menu">';
-                                $menu.='<a href="javascript:;" class="">';
-                                    $menu.='<i class="fa fa-angle-double-down"></i>';
-                                    $menu.='<span class="text">'.$item->descricao.'</span>';
-                                    $menu.='<span class="menu-arrow arrow_carrot-right"></span>';
-                                $menu.='</a>';
-                                $menu.='<ul class="sub">';
-                        }elseif($item->tipo=='Título' && $finalT>0){
-                            $menu.='</ul>';
-                            $menu.='</li>';
-                            $menu.=' <li class="sub-menu">';
-                                $menu.='<a href="javascript:;" class="">';
-                                    $menu.='<i class="fa fa-angle-double-down"></i>';
-                                    $menu.='<span class="text">'.$item->descricao.'</span>';
-                                    $menu.='<span class="menu-arrow arrow_carrot-right"></span>';
-                                $menu.='</a>';
-                                $menu.='<ul class="sub">';
-                        }elseif($item->tipo=='Link' && $item->rota){
-                            $menu.='<li>';
-                                $menu.=' <a class="" href="'.route($item->rota).'">';
-                                    $menu.='<i class="'.$item->icone.'"></i>';
-                                    $menu.='<span class="text">'.$item->descricao.'</span>';
-                                $menu.='</a>';
-                            $menu.='</li>';
-                        }
-                        $finalT++;
 
-                        $item->descricao;
-                    };
+                    // Monta cada seção (Título + links) separadamente para saber se contém a tela atual
+                    $secoes = [];
+                    $atual = null;
+                    foreach (auth()->user()->menus as $item){
+                        if($item->tipo=='Título'){
+                            if($atual){
+                                $secoes[] = $atual;
+                            }
+                            $atual = ['titulo' => $item->descricao, 'links' => '', 'aberta' => false];
+                        }elseif($item->tipo=='Link' && $item->rota && \Illuminate\Support\Facades\Route::has($item->rota)){
+                            $ativo = $moduloAtual !== '' && explode('.', $item->rota)[0] == $moduloAtual;
+                            $link  = '<li class="'.($ativo ? 'kim-ativo' : '').'">';
+                                $link.=' <a class="" href="'.route($item->rota).'">';
+                                    $link.='<i class="'.e($item->icone).'"></i>';
+                                    $link.='<span class="text">'.e($item->descricao).'</span>';
+                                $link.='</a>';
+                            $link.='</li>';
+                            if(!$atual){
+                                $atual = ['titulo' => null, 'links' => '', 'aberta' => false];
+                            }
+                            $atual['links'] .= $link;
+                            $atual['aberta'] = $atual['aberta'] || $ativo;
+                        }
+                    }
+                    if($atual){
+                        $secoes[] = $atual;
+                    }
+
+                    foreach ($secoes as $secao){
+                        if($secao['titulo'] === null){
+                            $menu.=$secao['links'];
+                            continue;
+                        }
+                        $menu.=' <li class="sub-menu">';
+                            $menu.='<a href="javascript:;" class="">';
+                                $menu.='<i class="fa fa-angle-double-down"></i>';
+                                $menu.='<span class="text">'.e($secao['titulo']).'</span>';
+                                $menu.='<span class="menu-arrow arrow_carrot-right"></span>';
+                            $menu.='</a>';
+                            $menu.='<ul class="sub"'.($secao['aberta'] ? ' style="display:block"' : '').'>';
+                                $menu.=$secao['links'];
+                            $menu.='</ul>';
+                        $menu.='</li>';
+                    }
                 $menu.='</ul>';
             $menu.='</div>';
         $menu .= '</aside>';

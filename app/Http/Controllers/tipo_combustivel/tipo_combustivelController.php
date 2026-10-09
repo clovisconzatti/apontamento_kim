@@ -11,8 +11,17 @@ class tipo_combustivelController extends Controller
 
     public function listAll(Request $request ){
 
-        $tipo_combustiveis = tipo_combustivel::orderBy('combustivel', 'ASC')->get();
-        return view('tipo_combustivel.listAll' , compact('tipo_combustiveis'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Combustível ou unidade'],
+        ];
+        $filtros = $this->lerFiltros($request, 'tipo_combustivel', $camposFiltro);
+
+        $query = tipo_combustivel::orderBy('combustivel', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['combustivel', 'unidade']);
+        $tipo_combustiveis = $query->get();
+        $totalRegistros = $tipo_combustiveis->count();
+
+        return view('tipo_combustivel.listAll' , compact('tipo_combustiveis', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

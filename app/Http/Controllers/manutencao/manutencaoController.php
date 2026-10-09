@@ -15,7 +15,30 @@ class manutencaoController extends Controller
 {
     public function listAll(Request $request ){
 
-        $manutencoes = manutencao::leftJoin('fazenda','fazenda.id','manutencao.fazenda')
+        $camposFiltro = [
+            'dtInicial'       => ['label' => 'Data inicial', 'tipo' => 'data', 'col' => 2],
+            'dtFinal'         => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
+            'ord_servico'     => ['label' => 'Ordem de serviço', 'tipo' => 'texto', 'col' => 2],
+            'equipamento'     => ['label' => 'Equipamento', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
+            'fazenda'         => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
+            'operador'        => ['label' => 'Operador', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('colaborador', 'colaborador')],
+            'tipo_manutencao' => ['label' => 'Tipo de manutenção', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('tipo_manutencao', 'tipo')],
+            'situacao'        => ['label' => 'Situação', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('situacao_manutencao', 'situacao')],
+        ];
+        $filtros = $this->lerFiltros($request, 'manutencao', $camposFiltro);
+
+        $query = manutencao::query();
+        $this->filtrarPeriodo($query, $filtros, 'manutencao.data');
+        $this->filtrarTexto($query, $filtros['ord_servico'], ['manutencao.ord_servico']);
+        $this->filtrarIgual($query, $filtros, [
+            'equipamento'     => 'manutencao.equipamento',
+            'fazenda'         => 'manutencao.fazenda',
+            'operador'        => 'manutencao.operador',
+            'tipo_manutencao' => 'manutencao.tipo_manutencao',
+            'situacao'        => 'manutencao.situacao',
+        ]);
+
+        $manutencoes = $query->leftJoin('fazenda','fazenda.id','manutencao.fazenda')
                                     ->leftJoin('equipamento','equipamento.id','manutencao.equipamento')
                                     ->leftJoin('colaborador','colaborador.id','manutencao.operador')
                                     ->leftJoin('tipo_manutencao','tipo_manutencao.id','manutencao.tipo_manutencao')
@@ -37,7 +60,9 @@ class manutencaoController extends Controller
                                         , 'situacao_manutencao.situacao'
                                         , 'manutencao.obs'
                                     ]);
-        return view('manutencao.listAll' , compact('manutencoes'));
+        $totalRegistros = $manutencoes->count();
+
+        return view('manutencao.listAll' , compact('manutencoes', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

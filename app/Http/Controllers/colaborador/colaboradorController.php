@@ -11,8 +11,21 @@ class colaboradorController extends Controller
 
     public function listAll(Request $request ){
 
-        $colaboradores = colaborador::orderBy('colaborador', 'ASC')->get();
-        return view('colaborador.listAll' , compact('colaboradores'));
+        $camposFiltro = [
+            'busca'   => ['label' => 'Nome ou código', 'tipo' => 'texto', 'col' => 4],
+            'empresa' => ['label' => 'Empresa', 'tipo' => 'select', 'opcoes' => $this->opcoesDistintas('colaborador', 'empresa')],
+            'uf'      => ['label' => 'UF', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesDistintas('colaborador', 'uf')],
+            'ativo'   => ['label' => 'Ativo', 'tipo' => 'select', 'col' => 2, 'opcoes' => ['Sim' => 'Sim', 'Nao' => 'Não']],
+        ];
+        $filtros = $this->lerFiltros($request, 'colaborador', $camposFiltro);
+
+        $query = colaborador::orderBy('colaborador', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['colaborador', 'cod']);
+        $this->filtrarIgual($query, $filtros, ['empresa' => 'empresa', 'uf' => 'uf', 'ativo' => 'ativo']);
+        $colaboradores = $query->get();
+        $totalRegistros = $colaboradores->count();
+
+        return view('colaborador.listAll' , compact('colaboradores', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

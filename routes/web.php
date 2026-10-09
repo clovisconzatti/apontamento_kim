@@ -75,7 +75,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('apontamento/editar/{apontamento}',[apontamentoController::class,'formEdit'])->name('apontamento.formEdit');
         Route::post('apontamento/store',[apontamentoController::class,'strore'])->name('apontamento.store');
         Route::patch('apontamento/edit/{apontamento}',[apontamentoController::class,'edit'])->name('apontamento.edit');
-        // Route::delete('apontamento/destroy/{apontamento}',[apontamentoController::class,'destroy'])->name('apontamento.destroy');
+        Route::delete('apontamento/destroy/{apontamento}',[apontamentoController::class,'destroy'])->name('apontamento.destroy');
 
         Route::post('apontamento/checaKm',[apontamentoController::class,'checaKm'])->name('apontamento.checaKm');
         Route::post('apontamento/checaHora',[apontamentoController::class,'checaHora'])->name('apontamento.checaHora');

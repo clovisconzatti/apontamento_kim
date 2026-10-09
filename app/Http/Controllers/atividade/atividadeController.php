@@ -10,8 +10,17 @@ class atividadeController extends Controller
 {
     public function listAll(Request $request ){
 
-        $atividades = atividade::orderBy('atividade', 'ASC')->get();
-        return view('atividade.listAll' , compact('atividades'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Atividade'],
+        ];
+        $filtros = $this->lerFiltros($request, 'atividade', $camposFiltro);
+
+        $query = atividade::orderBy('atividade', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['atividade']);
+        $atividades = $query->get();
+        $totalRegistros = $atividades->count();
+
+        return view('atividade.listAll' , compact('atividades', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

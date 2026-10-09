@@ -11,8 +11,17 @@ class fornecedorController extends Controller
 
     public function listAll(Request $request ){
 
-        $fornecedores = fornecedor::orderBy('fornecedor', 'ASC')->get();
-        return view('fornecedor.listAll' , compact('fornecedores'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Fornecedor ou código'],
+        ];
+        $filtros = $this->lerFiltros($request, 'fornecedor', $camposFiltro);
+
+        $query = fornecedor::orderBy('fornecedor', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['fornecedor', 'cod_cargo']);
+        $fornecedores = $query->get();
+        $totalRegistros = $fornecedores->count();
+
+        return view('fornecedor.listAll' , compact('fornecedores', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

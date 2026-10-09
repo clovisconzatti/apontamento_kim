@@ -10,8 +10,17 @@ class climaController extends Controller
 {
     public function listAll(Request $request ){
 
-        $climas = clima::orderBy('clima', 'ASC')->get();
-        return view('clima.listAll' , compact('climas'));
+        $camposFiltro = [
+            'busca' => ['label' => 'Pesquisar', 'tipo' => 'texto', 'col' => 6, 'placeholder' => 'Clima'],
+        ];
+        $filtros = $this->lerFiltros($request, 'clima', $camposFiltro);
+
+        $query = clima::orderBy('clima', 'ASC');
+        $this->filtrarTexto($query, $filtros['busca'], ['clima']);
+        $climas = $query->get();
+        $totalRegistros = $climas->count();
+
+        return view('clima.listAll' , compact('climas', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

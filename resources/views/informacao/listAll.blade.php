@@ -1,13 +1,13 @@
 @extends('layouts.model')
 @section('content')
-    <table class="table table-bordered table-striped table-sm">
+    <table class="table table-borderless table-advance table-condensed">
         <tr>
             <td width="80%">
                 <h3>
                     <i class="fas fa-tree"></i> Informações Diárias
                 </h3>
             </td>
-            <td width="50%" align="center">
+            <td width="20%" align="center">
                 <h3>
                     <a class="cor-digiliza" href="{{route('informacao.formAdd')}}">
                         <i class="fas fa-plus-circle"></i>&nbsp;&nbsp;&nbsp;
@@ -18,51 +18,54 @@
         </tr>
     </table><hr>
 
-    <table class="table table-bordered table-striped table-sm">
+    @include('partials.filtros')
+
+
+    <table class="table table-bordered table-condensed table-striped fonte-10">
         <thead>
             <tr>
-                <th width="10%" data-field="name">Data</th>
-                <th width="10%" data-field="name">Equipamento</th>
-                <th width="10%" data-field="name">Fazenda</th>
-                <th width="10%" data-field="name">Colaborador</th>
-                <th width="10%" data-field="">Ação</th>
+                <th width="9%" class="text-center">Data</th>
+                <th width="19%">Equipamento</th>
+                <th width="16%">Atividade</th>
+                <th width="18%">Fazenda</th>
+                <th width="19%">Colaborador</th>
+                <th width="10%" class="text-right text-nowrap">Horímetro inicial</th>
+                <th width="9%" class="text-center">Ação</th>
             </tr>
         </thead>
         <tbody>
-            {{-- {{ dd($informacoes) }} --}}
-            @foreach ($informacoes as $informacao)
+            @forelse ($informacoes as $informacao)
                 <tr>
-                    <td align="center"> {{ date('d/m/Y',strtotime($informacao->data)) }} </td>
-                    <td align="">{{ $informacao->equipamento }} </td>
-                    <td align="">{{ $informacao->fazenda }}  </td>
-                    <td align="">{{ $informacao->colaborador }}  </td>
-                    <td align="center">
-                        <div class="btn-group-vertical">
-                            <div class="btn-group">
-                            <button type="button"  class="btn btn-outline-info dropdown-toggle" data-toggle="dropdown">
+                    <td align="center" class="align-middle">{{ date('d/m/Y',strtotime($informacao->data)) }}</td>
+                    <td class="align-middle">{{ $informacao->equipamento }}</td>
+                    <td class="align-middle">{{ $informacao->atividade }}</td>
+                    <td class="align-middle">{{ $informacao->fazenda }}</td>
+                    <td class="align-middle">{{ $informacao->colaborador }}</td>
+                    <td align="right" class="align-middle text-nowrap">
+                        @if (!is_null($informacao->horimetro_inicial))
+                            {{ rtrim(rtrim(number_format($informacao->horimetro_inicial, 2, ',', '.'), '0'), ',') }}
+                        @endif
+                    </td>
+                    <td align="center" class="align-middle">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-info btn-sm dropdown-toggle" data-toggle="dropdown">
                                 <i class="fas fa-cogs"></i>
                                 <span>Ação</span>
                             </button>
-                            <div class="dropdown-menu">
+                            <div class="dropdown-menu dropdown-menu-right">
                                 <a class="dropdown-item" href="{{route('informacao.formEdit', $informacao->id)}}">
                                     <i class="far fa-edit"></i>&nbsp;&nbsp;&nbsp;
                                     <span>Editar</span>
                                 </a>
-                                <a class="dropdown-item" href="#">
-                                    {{-- <form action=" {{ route('menu.destroy',['menu'=> $menu->id ]) }} " method="POST">
-                                        @csrf
-                                        @method('delete')
-                                        <input type="hidden" name='menu' value=" {{ $menu->id }} ">
-                                        <i class="far fa-trash-alt"></i>
-                                        <input type="submit" class="btn btn-default delete"  value="Eliminar">
-                                    </form> --}}
-                                </a>
-                            </div>
                             </div>
                         </div>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="7" class="text-center text-muted">Nenhuma informação encontrada para os filtros selecionados.</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 @endsection

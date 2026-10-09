@@ -11,7 +11,19 @@ class fazendaController extends Controller
 {
     public function listAll(Request $request ){
 
-        $fazendas = fazenda::leftJoin('colaborador','colaborador.id','fazenda.apontador')
+        $camposFiltro = [
+            'busca'     => ['label' => 'Fazenda', 'tipo' => 'texto', 'col' => 4],
+            'apontador' => ['label' => 'Apontador', 'tipo' => 'select', 'col' => 4, 'opcoes' => $this->opcoesTabela('colaborador', 'colaborador')],
+            'uf'        => ['label' => 'UF', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesDistintas('fazenda', 'uf')],
+            'ativa'     => ['label' => 'Ativa', 'tipo' => 'select', 'col' => 2, 'opcoes' => ['Sim' => 'Sim', 'Nao' => 'Não']],
+        ];
+        $filtros = $this->lerFiltros($request, 'fazenda', $camposFiltro);
+
+        $query = fazenda::leftJoin('colaborador','colaborador.id','fazenda.apontador');
+        $this->filtrarTexto($query, $filtros['busca'], ['fazenda.fazenda']);
+        $this->filtrarIgual($query, $filtros, ['apontador' => 'fazenda.apontador', 'uf' => 'fazenda.uf', 'ativa' => 'fazenda.ativa']);
+
+        $fazendas = $query
                                     ->orderBy('fazenda', 'ASC')
                                     ->get([
                                         'fazenda.id'
@@ -21,7 +33,9 @@ class fazendaController extends Controller
                                         ,'fazenda.ativa'
                                         ,'colaborador.colaborador'
                                     ]);
-        return view('fazenda.listAll' , compact('fazendas'));
+        $totalRegistros = $fazendas->count();
+
+        return view('fazenda.listAll' , compact('fazendas', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()

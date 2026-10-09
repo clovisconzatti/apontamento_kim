@@ -1,0 +1,786 @@
+/* =====================================================================
+   Kim Logística - tema visual
+   Verde e amarelo (bandeira) como cores principais,
+   vermelho da logomarca como cor de marca/destaque.
+   Este arquivo é carregado por último e sobrepõe o template.
+   ===================================================================== */
+
+:root {
+    --kim-verde-950: #072415;
+    --kim-verde-900: #0a2e1c;
+    --kim-verde-800: #0f3d26;
+    --kim-verde-700: #145a32;
+    --kim-verde-600: #1b7a3e;
+    --kim-verde-500: #009c3b;
+    --kim-verde-100: #d8eddf;
+    --kim-verde-50:  #eef6f0;
+
+    --kim-amarelo:     #ffcc00;
+    --kim-amarelo-600: #e6b800;
+    --kim-amarelo-100: #fff2bf;
+    --kim-amarelo-50:  #fff9e0;
+
+    --kim-vermelho:     #e30613;
+    --kim-vermelho-700: #b8050f;
+
+    --kim-fundo:        #f2f4f1;
+    --kim-borda:        #dde5df;
+    --kim-texto:        #1f2a24;
+    --kim-texto-suave:  #5c6b62;
+
+    --kim-sidebar:      200px;
+    --kim-header:       64px;
+    --kim-raio:         8px;
+    --kim-sombra:       0 1px 3px rgba(10, 46, 28, .08), 0 1px 2px rgba(10, 46, 28, .06);
+    --kim-faixa:        linear-gradient(90deg, var(--kim-amarelo) 0 78%, var(--kim-verde-500) 78% 92%, var(--kim-vermelho) 92% 100%);
+}
+
+/* ---------- base ---------- */
+html, body {
+    background: var(--kim-fundo) !important;
+}
+body {
+    color: var(--kim-texto);
+    font-family: 'Barlow', 'Segoe UI', Roboto, Arial, sans-serif !important;
+}
+a {
+    color: var(--kim-verde-700);
+}
+a:hover {
+    color: var(--kim-verde-900);
+}
+
+/* ---------- cabeçalho ---------- */
+header.header.dark-bg {
+    height: var(--kim-header);
+    min-height: var(--kim-header);
+    background: linear-gradient(90deg, var(--kim-verde-950) 0%, var(--kim-verde-800) 55%, var(--kim-verde-700) 100%);
+    border-bottom: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+    display: flex;
+    align-items: center;
+}
+header.header.dark-bg::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 4px;
+    background: var(--kim-faixa);
+}
+.toggle-nav {
+    margin-top: 0;
+    color: var(--kim-amarelo);
+}
+.toggle-nav .icon-reorder {
+    font-size: 22px;
+}
+a.logo.kim-marca {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 0;
+    text-transform: none;
+    color: #fff;
+}
+.kim-logo-selo {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 2px var(--kim-amarelo);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.kim-logo-selo img {
+    height: 42px;
+    width: auto;
+}
+.kim-marca-texto {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+/* "a.logo span" do template pintava o texto de cinza: seletores mais específicos */
+.kim-marca .kim-marca-texto .kim-marca-nome {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    color: #fff;
+}
+.kim-marca .kim-marca-texto .kim-marca-nome span {
+    color: var(--kim-amarelo);
+    font-weight: 600;
+}
+.kim-marca .kim-marca-texto .kim-marca-sub {
+    font-size: 12px;
+    color: var(--kim-verde-100);
+    letter-spacing: .3px;
+}
+.top-nav {
+    margin-left: auto;
+}
+.top-nav ul.top-menu > li > a {
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.top-nav .username {
+    color: #fff !important;
+    font-weight: 500;
+}
+.profile-ava {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--kim-amarelo);
+    color: var(--kim-verde-900);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.top-nav .dropdown-menu.extended.logout {
+    border: none;
+    border-top: 3px solid var(--kim-amarelo);
+    border-radius: 0 0 var(--kim-raio) var(--kim-raio);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .15);
+}
+
+/* ---------- menu lateral ---------- */
+#sidebar {
+    width: var(--kim-sidebar);
+    background: var(--kim-verde-900);
+    box-shadow: 2px 0 6px rgba(0, 0, 0, .15);
+}
+ul.sidebar-menu {
+    margin-top: calc(var(--kim-header) + 12px);
+    padding-bottom: 40px;
+}
+ul.sidebar-menu li a {
+    color: #cfe3d6;
+    border: none !important;
+    border-left: 4px solid transparent !important;
+    padding: 12px 10px 12px 12px;
+    font-size: 15px;
+    font-weight: 500;
+}
+ul.sidebar-menu li a i {
+    width: 22px;
+    text-align: center;
+    font-size: 15px;
+    color: #8fbfa0;
+}
+ul.sidebar-menu li a:hover,
+ul.sidebar-menu li a:focus,
+ul.sidebar-menu li.active a {
+    background: rgba(255, 255, 255, .06);
+    color: #fff;
+}
+ul.sidebar-menu li a:hover i,
+ul.sidebar-menu li a:focus i {
+    color: var(--kim-amarelo);
+}
+/* títulos das seções (Cadastro, Veículos, Apontamento) */
+ul.sidebar-menu li.sub-menu > a {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--kim-amarelo);
+    margin-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, .06) !important;
+}
+ul.sidebar-menu li.sub-menu > a i {
+    color: var(--kim-amarelo);
+}
+ul.sidebar-menu li ul.sub li {
+    background: var(--kim-verde-950);
+}
+ul.sidebar-menu li ul.sub li a {
+    color: #cfe3d6;
+    font-size: 14px;
+    padding: 0 0 0 22px;
+    line-height: 36px;
+    height: 36px;
+}
+ul.sidebar-menu li ul.sub li a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, .06);
+}
+/* item da tela atual */
+ul.sidebar-menu li.kim-ativo > a,
+ul.sidebar-menu li ul.sub li.kim-ativo > a {
+    background: rgba(255, 204, 0, .13) !important;
+    border-left-color: var(--kim-amarelo) !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+ul.sidebar-menu li.kim-ativo > a i {
+    color: var(--kim-amarelo) !important;
+}
+
+/* ---------- área de conteúdo ---------- */
+#main-content {
+    margin-left: var(--kim-sidebar);
+    background: var(--kim-fundo);
+    min-height: 100vh;
+}
+.wrapper {
+    margin-top: calc(var(--kim-header) + 4px);
+    padding: 20px;
+}
+.sidebar-closed #main-content,
+#main-content.hover_content.sidebar-closed {
+    margin-left: 80px !important;
+}
+
+/* título das telas */
+.wrapper h3 {
+    color: var(--kim-verde-800);
+    font-weight: 700;
+    margin: 0;
+}
+.wrapper h3 > i:first-child,
+.wrapper h3 > .fa:first-child,
+.wrapper h3 > .fas:first-child {
+    color: var(--kim-vermelho);
+    margin-right: 6px;
+}
+.table-advance {
+    color: var(--kim-texto-suave);
+    margin-bottom: 0;
+}
+.wrapper hr {
+    border: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--kim-verde-600), var(--kim-amarelo) 70%, transparent);
+    border-radius: 3px;
+    margin: 6px 0 18px;
+    opacity: 1;
+}
+
+/* botão "Novo" */
+a.cor-digiliza {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: var(--kim-amarelo);
+    color: var(--kim-verde-900) !important;
+    box-shadow: var(--kim-sombra);
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: background .15s, transform .15s;
+}
+a.cor-digiliza:hover {
+    background: var(--kim-amarelo-600);
+    transform: translateY(-1px);
+}
+.cor-digiliza i {
+    color: var(--kim-verde-800);
+}
+
+/* ---------- tabelas ---------- */
+.wrapper .table {
+    background: #fff;
+    color: var(--kim-texto);
+    border-radius: var(--kim-raio);
+    box-shadow: var(--kim-sombra);
+}
+/* tabela usada só para posicionar o título e o botão "Novo" */
+.wrapper .table.table-borderless.table-advance,
+.wrapper .table.table-borderless.table-advance tr,
+.wrapper .table.table-borderless.table-advance td {
+    background: transparent !important;
+    box-shadow: none;
+    border: none !important;
+    padding-left: 0;
+}
+.wrapper .table.table-borderless.table-advance td[align="center"] {
+    text-align: right;
+    padding-right: 0;
+}
+.table-condensed th,
+.wrapper .table thead th {
+    background: var(--kim-verde-800) !important;
+    color: #fff !important;
+    font-weight: 600;
+    border-color: var(--kim-verde-700) !important;
+    vertical-align: middle;
+    text-align: center;
+}
+.wrapper .table-bordered td {
+    border-color: var(--kim-borda);
+    vertical-align: middle;
+}
+.wrapper .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 156, 59, .035);
+}
+.wrapper .table tbody tr:hover {
+    background-color: var(--kim-amarelo-50);
+}
+.wrapper .table tfoot tr,
+.wrapper .table tfoot td {
+    background: var(--kim-amarelo-50) !important;
+    color: var(--kim-verde-900);
+    font-weight: 600;
+}
+.wrapper .table tfoot tr:last-child td {
+    background: var(--kim-amarelo-100) !important;
+}
+
+/* ---------- botões ---------- */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+.btn-primary,
+.btn-primary:not(:disabled):not(.disabled):active {
+    background-color: var(--kim-verde-600) !important;
+    border-color: var(--kim-verde-600) !important;
+    color: #fff !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--kim-verde-700) !important;
+    border-color: var(--kim-verde-700) !important;
+}
+.btn-success {
+    background-color: var(--kim-verde-500);
+    border-color: var(--kim-verde-500);
+}
+.btn-success:hover {
+    background-color: var(--kim-verde-600);
+    border-color: var(--kim-verde-600);
+}
+.btn-warning,
+.btn-info {
+    background-color: var(--kim-amarelo);
+    border-color: var(--kim-amarelo);
+    color: var(--kim-verde-900);
+}
+.btn-warning:hover,
+.btn-info:hover {
+    background-color: var(--kim-amarelo-600);
+    border-color: var(--kim-amarelo-600);
+    color: var(--kim-verde-900);
+}
+.btn-danger {
+    background-color: var(--kim-vermelho);
+    border-color: var(--kim-vermelho);
+}
+.btn-danger:hover {
+    background-color: var(--kim-vermelho-700);
+    border-color: var(--kim-vermelho-700);
+}
+.btn-outline-info {
+    color: var(--kim-verde-700);
+    border-color: var(--kim-verde-600);
+    background: #fff;
+}
+.btn-outline-info:hover,
+.btn-outline-info:focus,
+.show > .btn-outline-info.dropdown-toggle {
+    color: #fff !important;
+    background-color: var(--kim-verde-600) !important;
+    border-color: var(--kim-verde-600) !important;
+}
+.btn-secondary {
+    background-color: #6c7a72;
+    border-color: #6c7a72;
+}
+
+/* menu de ações */
+.dropdown-menu {
+    border: 1px solid var(--kim-borda);
+    border-radius: var(--kim-raio);
+    box-shadow: 0 6px 16px rgba(10, 46, 28, .12);
+}
+.dropdown-item {
+    color: var(--kim-texto);
+}
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: var(--kim-verde-50);
+    color: var(--kim-verde-900);
+}
+.dropdown-item.text-danger:hover {
+    background: #fdecec;
+    color: var(--kim-vermelho-700) !important;
+}
+
+/* ---------- formulários ---------- */
+.form-control {
+    border-color: #cfd8d2;
+    border-radius: 6px;
+}
+.form-control:focus {
+    border-color: var(--kim-verde-500);
+    box-shadow: 0 0 0 .2rem rgba(0, 156, 59, .18);
+}
+.form-group {
+    color: var(--kim-verde-900);
+    font-weight: 500;
+}
+.form-group .form-control {
+    font-weight: 400;
+    margin-top: 3px;
+}
+.chosen-container-single .chosen-single {
+    border-color: #cfd8d2 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    margin-top: 3px;
+}
+.chosen-container-active .chosen-single {
+    border-color: var(--kim-verde-500) !important;
+}
+.chosen-container .chosen-results li.highlighted {
+    background: var(--kim-verde-600) !important;
+    color: #fff !important;
+}
+
+/* ---------- cartões, painel de filtros, avisos ---------- */
+.card {
+    border: none;
+    border-radius: var(--kim-raio);
+    box-shadow: var(--kim-sombra);
+}
+#painelFiltros {
+    border-left: 4px solid var(--kim-amarelo);
+    background: #fff;
+}
+.badge-info {
+    background: var(--kim-verde-50);
+    color: var(--kim-verde-800);
+    border: 1px solid var(--kim-verde-100);
+}
+.badge-light {
+    background: var(--kim-amarelo);
+    color: var(--kim-verde-900);
+}
+.alert-success {
+    background: var(--kim-verde-50);
+    border-color: var(--kim-verde-100);
+    border-left: 4px solid var(--kim-verde-500);
+    color: var(--kim-verde-900);
+}
+.alert-danger {
+    border-left: 4px solid var(--kim-vermelho);
+}
+.alert-warning {
+    background: var(--kim-amarelo-50);
+    border-color: var(--kim-amarelo-100);
+    border-left: 4px solid var(--kim-amarelo);
+    color: #5c4a00;
+}
+.alert-info {
+    background: #fff;
+    border-color: var(--kim-borda);
+    border-left: 4px solid var(--kim-verde-600);
+    color: var(--kim-texto);
+}
+
+/* paginação */
+.page-link {
+    color: var(--kim-verde-700);
+}
+.page-item.active .page-link {
+    background-color: var(--kim-verde-600);
+    border-color: var(--kim-verde-600);
+}
+
+/* SweetAlert */
+.swal2-styled.swal2-confirm {
+    background-color: var(--kim-verde-600) !important;
+}
+
+/* ---------- painel inicial ---------- */
+.kim-hero {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 210px;
+    padding: 32px;
+    color: #fff;
+    background:
+        linear-gradient(90deg, rgba(7, 36, 21, .94) 0%, rgba(15, 61, 38, .82) 45%, rgba(15, 61, 38, .25) 100%),
+        url('../img/fundo.png') center 40% / cover no-repeat;
+    box-shadow: var(--kim-sombra);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.kim-hero::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5px;
+    background: var(--kim-faixa);
+}
+.kim-hero h1 {
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: #fff;
+}
+.kim-hero h1 span {
+    color: var(--kim-amarelo);
+}
+.kim-hero p {
+    margin: 0;
+    font-size: 16px;
+    color: var(--kim-verde-100);
+    max-width: 560px;
+}
+.kim-hero .kim-hero-data {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(255, 204, 0, .15);
+    border: 1px solid rgba(255, 204, 0, .5);
+    color: var(--kim-amarelo);
+    font-size: 13px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.kim-indicador {
+    background: #fff;
+    border-radius: var(--kim-raio);
+    box-shadow: var(--kim-sombra);
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 100%;
+    border-top: 4px solid var(--kim-verde-500);
+}
+.kim-indicador.amarelo  { border-top-color: var(--kim-amarelo); }
+.kim-indicador.vermelho { border-top-color: var(--kim-vermelho); }
+.kim-indicador.escuro   { border-top-color: var(--kim-verde-800); }
+.kim-indicador-icone {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background: var(--kim-verde-50);
+    color: var(--kim-verde-600);
+    flex-shrink: 0;
+}
+.kim-indicador.amarelo  .kim-indicador-icone { background: var(--kim-amarelo-50); color: #a68400; }
+.kim-indicador.vermelho .kim-indicador-icone { background: #fdecec; color: var(--kim-vermelho); }
+.kim-indicador.escuro   .kim-indicador-icone { background: var(--kim-verde-100); color: var(--kim-verde-800); }
+.kim-indicador-valor {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--kim-verde-900);
+    line-height: 1;
+}
+.kim-indicador-rotulo {
+    font-size: 13px;
+    color: var(--kim-texto-suave);
+    margin-top: 4px;
+}
+
+.kim-secao-titulo {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--kim-verde-700);
+    margin: 26px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.kim-secao-titulo::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, var(--kim-amarelo), transparent);
+}
+.kim-atalho {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border-radius: var(--kim-raio);
+    box-shadow: var(--kim-sombra);
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    color: var(--kim-texto) !important;
+    font-weight: 600;
+    text-decoration: none !important;
+    border-left: 4px solid transparent;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+.kim-atalho i {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--kim-verde-50);
+    color: var(--kim-verde-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.kim-atalho:hover {
+    border-left-color: var(--kim-amarelo);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(10, 46, 28, .12);
+}
+.kim-atalho:hover i {
+    background: var(--kim-amarelo);
+    color: var(--kim-verde-900);
+}
+
+/* ---------- tela de login ---------- */
+body.kim-auth {
+    background: var(--kim-verde-950) !important;
+    min-height: 100vh;
+    margin: 0;
+}
+.kim-login {
+    min-height: 100vh;
+    display: flex;
+}
+.kim-login-foto {
+    flex: 1.3;
+    position: relative;
+    background:
+        linear-gradient(160deg, rgba(7, 36, 21, .55) 0%, rgba(7, 36, 21, .85) 100%),
+        url('../img/fundo.png') center / cover no-repeat;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 48px;
+}
+.kim-login-foto::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 6px;
+    background: linear-gradient(180deg, var(--kim-amarelo) 0 78%, var(--kim-verde-500) 78% 92%, var(--kim-vermelho) 92% 100%);
+}
+.kim-login-foto h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    max-width: 520px;
+    line-height: 1.15;
+}
+.kim-login-foto h2 span {
+    color: var(--kim-amarelo);
+}
+.kim-login-foto p {
+    font-size: 17px;
+    color: var(--kim-verde-100);
+    max-width: 480px;
+    margin: 0;
+}
+.kim-login-painel {
+    flex: 1;
+    max-width: 520px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 32px;
+}
+.kim-login-caixa {
+    width: 100%;
+    max-width: 360px;
+}
+.kim-login-caixa .kim-login-logo {
+    height: 120px;
+    display: block;
+    margin: 0 auto 18px;
+}
+.kim-login-caixa h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--kim-verde-900);
+    text-align: center;
+    margin: 0 0 4px;
+}
+.kim-login-caixa .kim-login-sub {
+    text-align: center;
+    color: var(--kim-texto-suave);
+    margin-bottom: 26px;
+}
+.kim-login-caixa label {
+    font-weight: 600;
+    color: var(--kim-verde-900);
+    margin-bottom: 4px;
+}
+.kim-login-caixa .form-control {
+    height: 46px;
+}
+.kim-login-caixa .btn-entrar {
+    width: 100%;
+    height: 48px;
+    font-size: 16px;
+    font-weight: 700;
+    background: var(--kim-verde-600) !important;
+    border-color: var(--kim-verde-600) !important;
+    color: #fff;
+    border-bottom: 3px solid var(--kim-amarelo) !important;
+}
+.kim-login-caixa .btn-entrar:hover {
+    background: var(--kim-verde-700) !important;
+}
+.kim-login-rodape {
+    text-align: center;
+    font-size: 12px;
+    color: var(--kim-texto-suave);
+    margin-top: 28px;
+}
+.kim-auth-topo {
+    background: var(--kim-verde-900);
+    padding: 10px 20px;
+    position: relative;
+}
+.kim-auth-topo::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 4px;
+    background: var(--kim-faixa);
+}
+
+/* ---------- telas pequenas ---------- */
+@media (max-width: 768px) {
+    .kim-marca .kim-marca-texto .kim-marca-sub { display: none; }
+    .kim-marca .kim-marca-texto .kim-marca-nome { font-size: 18px; }
+    .kim-login, .kim-login-foto, .kim-login-painel { width: 100%; max-width: 100%; box-sizing: border-box; }
+    .top-nav .username { display: none; }
+    .wrapper { padding: 12px; }
+    .kim-hero { padding: 22px; }
+    .kim-hero h1 { font-size: 24px; }
+    .kim-login { flex-direction: column; }
+    .kim-login-foto { flex: none; min-height: 200px; padding: 24px; }
+    .kim-login-foto::after { top: auto; left: 0; width: auto; height: 5px; background: var(--kim-faixa); }
+    .kim-login-foto h2 { font-size: 24px; }
+    .kim-login-foto p { font-size: 14px; }
+    .kim-login-painel { max-width: none; }
+}
