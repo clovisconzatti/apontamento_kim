@@ -32,7 +32,7 @@
                 <input class="form-control" type="date" name="data" id="data"  value="{{ date('Y-m-d') }}">
             </div>
             <div class="form-group col-md-3">
-                Veiculo/Equipamento
+                Veiculo/Equipamento.
                 <select class="form-control limpar" type="text" name="equipamento" id="equipamento">
                     <option value="">Todas</option>
                     @foreach ($equipamentos as $equipamento )
@@ -50,7 +50,7 @@
                 </select>
             </div>
             <div class="form-group col-md-3">
-                Colaborador
+                Colaborador.
                 <select class="form-control limpar" type="text" name="colaborador" id="colaborador">
                     <option value="0">Todas</option>
                     @foreach ($colaboradores as $colaborador )
