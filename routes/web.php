@@ -28,6 +28,7 @@ use App\Http\Controllers\tipo_manutencao\tipo_manutencaoController;
 use App\Http\Controllers\transferencia\transferenciaController;
 use App\Http\Controllers\tipo_revisao\tipo_revisaoController;
 use App\Http\Controllers\revisao\revisaoController;
+use App\Http\Controllers\painel\painelRevisaoController;
 use Illuminate\Support\Facades\Auth;
 
 Auth::routes();
@@ -268,7 +269,6 @@ Route::group(['middleware' => ['auth']], function () {
  /********************************** informacao diária ***************************************************************/
     Route::group(['namespace' => 'informacao'], function () {
         Route::get('informacao',[informacaoController::class,'listAll'])->name('informacao.listAll');
-        Route::get('informacao/consumo',[informacaoController::class,'consumo'])->name('informacao.consumo');
         Route::get('informacao/novo',[informacaoController::class,'formAdd'])->name('informacao.formAdd');
         Route::get('informacao/editar/{informacao}',[informacaoController::class,'formEdit'])->name('informacao.formEdit');
         Route::post('informacao/store',[informacaoController::class,'store'])->name('informacao.store');
@@ -284,6 +284,12 @@ Route::group(['middleware' => ['auth']], function () {
         Route::patch('manutencao/edit/{manutencao}',[manutencaoController::class,'edit'])->name('manutencao.edit');
         Route::delete('manutencao/destroy/{manutencao}',[manutencaoController::class,'destroy'])->name('manutencao.destroy');
     });
+ /********************************** painel de operações (relatórios, gráficos) ***************************************************************/
+    // Rotas "painel.*": o menu destaca a seção Painel de Operações pelo prefixo do nome
+    Route::get('painel/consumo-maquina',[informacaoController::class,'consumo'])->name('painel.consumo_maquina');
+    Route::get('painel/revisoes',[painelRevisaoController::class,'index'])->name('painel.revisoes');
+    Route::get('painel/revisoes/exportar',[painelRevisaoController::class,'exportar'])->name('painel.revisoes.exportar');
+    Route::get('painel/revisoes/{lista}',[painelRevisaoController::class,'lista'])->where('lista', 'vencidas|proximas|em-dia')->name('painel.revisoes.lista');
  /********************************** tipo de revisão ***************************************************************/
     Route::group(['namespace' => 'tipo_revisao'], function () {
         Route::get('tipo_revisao',[tipo_revisaoController::class,'listAll'])->name('tipo_revisao.listAll');

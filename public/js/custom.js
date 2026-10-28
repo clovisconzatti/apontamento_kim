@@ -809,6 +809,7 @@ $(document).ready(function(){
         var manutencao_diaria   = $(this).find('input#manutencao_diaria').val();
         var situacao            = $(this).find('select#situacao').val();
         var obs                 = $(this).find('input#obs').val();
+        var itens               = coletaItens(this);
 
 
 /********************************************************************************************* */
@@ -833,6 +834,8 @@ $(document).ready(function(){
                 ,'manutencao_diaria'    : manutencao_diaria
                 ,'situacao'             : situacao
                 ,'obs'                  : obs
+                ,'pecas'                : itens.pecas || []
+                ,'lubrificantes'        : itens.lubrificantes || []
 
             }
         grava(dados,route,type,origem);
@@ -936,6 +939,38 @@ $(document).ready(function(){
         }
     })
 
+/**********************itens com quantidade (peças, lubrificantes) — partials.itens-quadro ****************/
+    // Linhas do formulário por grupo: { pecas: [{id, quantidade}, ...], ... } (as vazias o servidor ignora)
+    function coletaItens(form){
+        var itens = {};
+        $(form).find('tr.linha-item').each(function(){
+            var grupo = $(this).data('grupo');
+            itens[grupo] = itens[grupo] || [];
+            itens[grupo].push({
+                'id'            : $(this).find('select.item-id').val()
+                ,'quantidade'   : $(this).find('input.item-quantidade').val()
+            });
+        });
+        return itens;
+    }
+    // + acrescenta uma linha vazia (cópia do <template>); x remove, mas sempre sobra uma linha
+    $(document).on('click', '.item-adicionar', function(){
+        var grupo = $(this).data('grupo');
+        var linha = $($('#modelo-' + grupo).html());
+        $('#itens-' + grupo).append(linha);
+        linha.find('select').chosen();
+        linha.find('select').trigger('chosen:activate');
+    })
+    $(document).on('click', '.item-remover', function(){
+        var linha = $(this).closest('tr');
+        if(linha.siblings('.linha-item').length){
+            linha.remove();
+        }else{
+            linha.find('select').val('').trigger('chosen:updated');
+            linha.find('input').val('');
+        }
+    })
+
 /**********************gravar tipo de revisão **************************************************/
     $(document).on('submit', 'form#cadastro-tipo_revisao', function(event){
         event.preventDefault()
@@ -979,14 +1014,7 @@ $(document).ready(function(){
         var nr_os               = $(this).find('input#nr_os').val();
         var obs                 = $(this).find('input#obs').val();
 
-        // Linhas de peças e lubrificantes (as vazias o servidor ignora)
-        var itens = { 'pecas': [], 'lubrificantes': [] };
-        $(this).find('tr.linha-item').each(function(){
-            itens[$(this).data('grupo')].push({
-                'id'            : $(this).find('select.item-id').val()
-                ,'quantidade'   : $(this).find('input.item-quantidade').val()
-            });
-        });
+        var itens               = coletaItens(this);
 
 
 /********************************************************************************************* */
@@ -1004,8 +1032,8 @@ $(document).ready(function(){
                 ,'tipo_revisao'         : tipo_revisao
                 ,'nr_os'                : nr_os
                 ,'obs'                  : obs
-                ,'pecas'                : itens.pecas
-                ,'lubrificantes'        : itens.lubrificantes
+                ,'pecas'                : itens.pecas || []
+                ,'lubrificantes'        : itens.lubrificantes || []
             }
         grava(dados,route,type,origem);
         }

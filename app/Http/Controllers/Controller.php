@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\FiltrosListagem;
+use App\Http\Controllers\Concerns\ItensLancamento;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -10,5 +11,5 @@ use Illuminate\Routing\Controller as BaseController;
 
 class Controller extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests, FiltrosListagem;
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests, FiltrosListagem, ItensLancamento;
 }

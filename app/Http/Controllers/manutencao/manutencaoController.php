@@ -10,6 +10,7 @@ use App\Models\manutencao;
 use App\Models\situacao_manutencao;
 use App\Models\tipo_manutencao;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class manutencaoController extends Controller
 {
@@ -72,10 +73,13 @@ class manutencaoController extends Controller
         $equipamentos           = equipamento::orderby('equipamento')->get();
         $tipos_manutencao       = tipo_manutencao::orderby('tipo')->get();
         $situacoes_manutencao   = situacao_manutencao::orderby('situacao')->get();
-        return view('manutencao.add',compact('colaboradores','fazendas','equipamentos','tipos_manutencao','situacoes_manutencao'));
+        $opcoesPecas           = $this->opcoesPecas();
+        $opcoesLubrificantes   = $this->opcoesLubrificantes();
+        return view('manutencao.add',compact('colaboradores','fazendas','equipamentos','tipos_manutencao','situacoes_manutencao', 'opcoesPecas', 'opcoesLubrificantes'));
     }
     public function store(Request $request)
     {
+        [$pecas, $lubrificantes] = $this->validarItens($request);
         try{
             $manutencao = new manutencao([
                 "data"                          => $request->data
@@ -93,6 +97,7 @@ class manutencaoController extends Controller
                 , "obs"                         => $request->obs
             ]);
             $manutencao->save();
+            $this->gravarItens($manutencao, $pecas, $lubrificantes);
         }catch(\Exception $e){
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -101,18 +106,24 @@ class manutencaoController extends Controller
 
     public function formEdit($id)
     {
-        $manutencao = manutencao::where('id','=',$id)->first();
+        $manutencao = manutencao::with(['pecas', 'lubrificantes'])->findOrFail($id);
         $colaboradores          = colaborador::orderby('colaborador')->get();
         $fazendas               = fazenda::orderby      ('fazenda')->get();
         $equipamentos           = equipamento::orderby('equipamento')->get();
         $tipos_manutencao       = tipo_manutencao::orderby('tipo')->get();
         $situacoes_manutencao   = situacao_manutencao::orderby('situacao')->get();
 
-        return view('manutencao.edit' , compact('manutencao', 'colaboradores', 'fazendas', 'equipamentos', 'tipos_manutencao', 'situacoes_manutencao' ));
+        $opcoesPecas           = $this->opcoesPecas();
+        $opcoesLubrificantes   = $this->opcoesLubrificantes();
+        $linhasPecas           = $this->linhasItens($manutencao->pecas, 'peca');
+        $linhasLubrificantes   = $this->linhasItens($manutencao->lubrificantes, 'lubrificante');
+
+        return view('manutencao.edit' , compact('manutencao', 'colaboradores', 'fazendas', 'equipamentos', 'tipos_manutencao', 'situacoes_manutencao', 'opcoesPecas', 'opcoesLubrificantes', 'linhasPecas', 'linhasLubrificantes' ));
     }
 
     public function edit($id, Request $request)
     {
+        [$pecas, $lubrificantes] = $this->validarItens($request);
         try{
             $manutencao = manutencao::find($id);
             $manutencao->data		                = $request->data;
@@ -130,9 +141,36 @@ class manutencaoController extends Controller
             $manutencao->obs		                = $request->obs;
 
             $manutencao->save();
+            $this->gravarItens($manutencao, $pecas, $lubrificantes);
         }catch(\Exception $e){
             return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
+    }
+
+    // Linhas de peças e lubrificantes enviadas pela tela (as vazias são ignoradas): [peças, lubrificantes]
+    private function validarItens(Request $request)
+    {
+        $erros = [];
+        $pecas = $this->lerItens($request->input('pecas'), 'peca', 'Peça', 'pecas', $erros);
+        $lubrificantes = $this->lerItens($request->input('lubrificantes'), 'lubrificante', 'Lubrificante', 'lubrificantes', $erros);
+        if ($erros) {
+            throw ValidationException::withMessages($erros);
+        }
+        return [$pecas, $lubrificantes];
+    }
+
+    // Substitui as peças e os lubrificantes da manutenção pelas linhas enviadas
+    private function gravarItens(manutencao $manutencao, array $pecas, array $lubrificantes)
+    {
+        $manutencao->pecas()->delete();
+        foreach ($pecas as $item) {
+            $manutencao->pecas()->create(['peca' => $item['id'], 'quantidade' => $item['quantidade']]);
+        }
+
+        $manutencao->lubrificantes()->delete();
+        foreach ($lubrificantes as $item) {
+            $manutencao->lubrificantes()->create(['lubrificante' => $item['id'], 'quantidade' => $item['quantidade']]);
+        }
     }
 }

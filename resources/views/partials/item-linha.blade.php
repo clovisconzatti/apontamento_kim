@@ -1,6 +1,6 @@
 {{--
-    Uma linha de peça ou lubrificante da revisão.
-    Variáveis: $grupo ('pecas' | 'lubrificantes'), $rotulo, $opcoes ([id => texto]), $id e $quantidade (vazios numa linha nova).
+    Uma linha de peça ou lubrificante (Revisão, Manutenção).
+    Variáveis: $grupo (nome do grupo, ex.: pecas), $rotulo, $opcoes ([id => texto]), $id e $quantidade (vazios numa linha nova).
 --}}
 <tr class="linha-item" data-grupo="{{ $grupo }}">
     <td style="width: auto; white-space: normal; font-weight: 400; padding-right: 8px;">

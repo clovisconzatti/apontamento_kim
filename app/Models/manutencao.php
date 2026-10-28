@@ -27,4 +27,14 @@ class manutencao extends Model
     ];
     protected $primaryKey = 'id';
     protected $table = 'manutencao';
+
+    public function pecas()
+    {
+        return $this->hasMany(manutencao_peca::class, 'manutencao_id')->orderBy('id');
+    }
+
+    public function lubrificantes()
+    {
+        return $this->hasMany(manutencao_lubrificante::class, 'manutencao_id')->orderBy('id');
+    }
 }

@@ -4,8 +4,6 @@ namespace App\Http\Controllers\revisao;
 
 use App\Http\Controllers\Controller;
 use App\Models\equipamento;
-use App\Models\lubrificante;
-use App\Models\peca;
 use App\Models\revisao;
 use App\Models\tipo_revisao;
 use Illuminate\Http\Request;
@@ -58,8 +56,8 @@ class revisaoController extends Controller
         return [
             'equipamentos'   => equipamento::orderby('equipamento')->get(),
             'tipos_revisao'  => tipo_revisao::orderby('descricao')->get(),
-            'pecas'          => peca::orderby('peca')->get(),
-            'lubrificantes'  => lubrificante::orderby('lubrificante')->get(),
+            'opcoesPecas'          => $this->opcoesPecas(),
+            'opcoesLubrificantes'  => $this->opcoesLubrificantes(),
         ];
     }
 
@@ -94,7 +92,11 @@ class revisaoController extends Controller
     public function formEdit($id)
     {
         $revisao = revisao::with(['pecas', 'lubrificantes'])->findOrFail($id);
-        return view('revisao.edit', array_merge(['revisao' => $revisao], $this->listasFormulario()));
+        return view('revisao.edit', array_merge([
+            'revisao'              => $revisao,
+            'linhasPecas'          => $this->linhasItens($revisao->pecas, 'peca'),
+            'linhasLubrificantes'  => $this->linhasItens($revisao->lubrificantes, 'lubrificante'),
+        ], $this->listasFormulario()));
     }
 
     public function edit($id, Request $request)
@@ -163,29 +165,6 @@ class revisaoController extends Controller
         }
 
         return [tipo_revisao::find($request->tipo_revisao), $pecas, $lubrificantes];
-    }
-
-    // Linhas de peça/lubrificante: ignora as vazias e exige item do cadastro + quantidade maior que zero
-    private function lerItens($linhas, string $tabela, string $nome, string $campo, array &$erros): array
-    {
-        $itens = [];
-        $linha = 0;
-        foreach ((array) $linhas as $dados) {
-            $linha++;
-            $id = trim((string) ($dados['id'] ?? ''));
-            $quantidade = trim((string) ($dados['quantidade'] ?? ''));
-            if ($id === '' && $quantidade === '') {
-                continue;
-            }
-            if ($id === '' || !DB::table($tabela)->where('id', $id)->whereNull('deleted_at')->exists()) {
-                $erros[$campo.'.'.$linha.'.id'] = $nome.' da linha '.$linha.': selecione um item do cadastro.';
-            } elseif (!is_numeric($quantidade) || (float) $quantidade <= 0) {
-                $erros[$campo.'.'.$linha.'.quantidade'] = $nome.' da linha '.$linha.': informe uma quantidade maior que zero.';
-            } else {
-                $itens[] = ['id' => (int) $id, 'quantidade' => (float) $quantidade];
-            }
-        }
-        return $itens;
     }
 
     // Horímetro da próxima revisão = horímetro atual + KM/Horas do tipo de revisão.

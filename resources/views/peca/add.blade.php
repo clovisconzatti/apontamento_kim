@@ -32,7 +32,7 @@
                 <input class="form-control" type="text" name="peca" id="peca"  value="" >
             </div>
             <div class="form-group col-md-2">
-                Codigo Cargo:
+                Código Cargo:
                 <input class="form-control" type="text" name="cod_cargo" id="cod_cargo"  value="" >
             </div>
         </div>

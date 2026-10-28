@@ -38,7 +38,7 @@ class pecaController extends Controller
             ]);
             $peca->save();
         }catch(\Exception $e){
-            return response()->json($peca);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
     }
@@ -58,7 +58,7 @@ class pecaController extends Controller
             $peca->cod_cargo    = $request->cod_cargo;
             $peca->save();
         }catch(\Exception $e){
-            return response()->json($peca);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
     }

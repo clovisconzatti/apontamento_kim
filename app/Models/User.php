@@ -50,8 +50,13 @@ class User extends Authenticatable
     public static function montarMenu()
     {
         // Tela atual (ex.: "informacao.formEdit" -> "informacao") para destacar o item no menu
+        // No Painel de Operações cada relatório é um módulo ("painel.revisoes.exportar" -> "painel.revisoes")
+        $modulo = function ($rota) {
+            $partes = explode('.', (string) $rota);
+            return $partes[0] === 'painel' ? implode('.', array_slice($partes, 0, 2)) : $partes[0];
+        };
         $rotaAtual = (string) \Illuminate\Support\Facades\Route::currentRouteName();
-        $moduloAtual = explode('.', $rotaAtual)[0];
+        $moduloAtual = $modulo($rotaAtual);
 
         $menu = '<aside>';
             $menu.='<div id="sidebar" class="nav-collapse">';
@@ -73,7 +78,7 @@ class User extends Authenticatable
                             }
                             $atual = ['titulo' => $item->descricao, 'links' => '', 'aberta' => false];
                         }elseif($item->tipo=='Link' && $item->rota && \Illuminate\Support\Facades\Route::has($item->rota)){
-                            $ativo = $moduloAtual !== '' && explode('.', $item->rota)[0] == $moduloAtual;
+                            $ativo = $moduloAtual !== '' && $modulo($item->rota) == $moduloAtual;
                             $link  = '<li class="'.($ativo ? 'kim-ativo' : '').'">';
                                 $link.=' <a class="" href="'.route($item->rota).'">';
                                     $link.='<i class="'.e($item->icone).'"></i>';

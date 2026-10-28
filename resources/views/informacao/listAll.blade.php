@@ -9,7 +9,7 @@
             </td>
             <td width="20%" align="center">
                 <h3>
-                    <a class="cor-digiliza" href="{{route('informacao.consumo')}}" title="Diesel e lubrificantes por máquina, com os filtros atuais">
+                    <a class="cor-digiliza" href="{{route('painel.consumo_maquina')}}" title="Diesel e lubrificantes por máquina, com os filtros atuais">
                         <i class="fas fa-chart-bar"></i>&nbsp;&nbsp;&nbsp;
                         <span>Consumo por máquina</span>
                     </a>

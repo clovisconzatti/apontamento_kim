@@ -1,30 +1,15 @@
 {{--
     Formulário da Revisão (inclusão e alteração).
-    Variáveis: $revisao (null na inclusão), $route, $type, $equipamentos, $tipos_revisao.
+    Variáveis: $revisao (null na inclusão), $route, $type, $equipamentos, $tipos_revisao, $opcoesPecas, $opcoesLubrificantes,
+               $linhasPecas e $linhasLubrificantes (só na alteração).
     Os id/name dos campos são lidos pelo custom.js (form#cadastro-revisao): não renomear.
 --}}
 @php
     $revisao = $revisao ?? null;
-    $v   = fn($campo) => $revisao ? $revisao->$campo : null;
-    $sel = fn($campo, $id) => $revisao && $revisao->$campo == $id ? 'selected' : '';
-
-    // Peças e lubrificantes: opções dos selects e linhas já lançadas (uma linha vazia quando não há nenhuma)
-    $grupos = [
-        'pecas' => [
-            'titulo'  => 'Peças utilizadas',
-            'rotulo'  => 'Peça',
-            'botao'   => 'Adicionar peça',
-            'opcoes'  => $pecas->mapWithKeys(fn($p) => [$p->id => $p->cod_cargo ? $p->peca.' ('.$p->cod_cargo.')' : $p->peca])->all(),
-            'linhas'  => $revisao ? $revisao->pecas->map(fn($i) => ['id' => $i->peca, 'quantidade' => $i->quantidade])->all() : [],
-        ],
-        'lubrificantes' => [
-            'titulo'  => 'Óleo lubrificante',
-            'rotulo'  => 'Lubrificante',
-            'botao'   => 'Adicionar lubrificante',
-            'opcoes'  => $lubrificantes->pluck('lubrificante', 'id')->all(),
-            'linhas'  => $revisao ? $revisao->lubrificantes->map(fn($i) => ['id' => $i->lubrificante, 'quantidade' => $i->quantidade])->all() : [],
-        ],
-    ];
+    // Na inclusão, o Painel de Revisões pode já mandar equipamento, tipo e horímetro (?equipamento=&tipo_revisao=&horimetro_atual=)
+    $preenchidos = ['equipamento', 'tipo_revisao', 'horimetro_atual'];
+    $v   = fn($campo) => $revisao ? $revisao->$campo : (in_array($campo, $preenchidos) ? request($campo) : null);
+    $sel = fn($campo, $id) => (string) $v($campo) !== '' && $v($campo) == $id ? 'selected' : '';
 @endphp
 
 @include('partials.estilo-formulario')
@@ -89,30 +74,10 @@
     <section class="info-card">
         <div class="info-card-topo"><h4>Peças e lubrificantes</h4></div>
         <div class="info-grid info-g2">
-            @foreach ($grupos as $grupo => $g)
-                <div class="info-quadro">
-                    <h5>{{ $g['titulo'] }}</h5>
-                    <table>
-                        <thead><tr><th>{{ $g['rotulo'] }}</th><th style="width: 30%;">Quantidade</th><th style="width: 1%;"></th></tr></thead>
-                        <tbody id="itens-{{ $grupo }}">
-                            @forelse ($g['linhas'] as $linha)
-                                @include('revisao._item', ['grupo' => $grupo, 'rotulo' => $g['rotulo'], 'opcoes' => $g['opcoes'], 'id' => $linha['id'], 'quantidade' => $linha['quantidade']])
-                            @empty
-                                @include('revisao._item', ['grupo' => $grupo, 'rotulo' => $g['rotulo'], 'opcoes' => $g['opcoes'], 'id' => null, 'quantidade' => null])
-                            @endforelse
-                        </tbody>
-                    </table>
-                    <template id="modelo-{{ $grupo }}">
-                        @include('revisao._item', ['grupo' => $grupo, 'rotulo' => $g['rotulo'], 'opcoes' => $g['opcoes'], 'id' => null, 'quantidade' => null])
-                    </template>
-                    <button type="button" class="btn btn-outline-success btn-sm item-adicionar" data-grupo="{{ $grupo }}" style="margin: 6px 8px 4px;">
-                        <span class="fas fa-plus"></span> {{ $g['botao'] }}
-                    </button>
-                    @if (!count($g['opcoes']))
-                        <small class="text-muted d-block" style="margin: 0 8px;">Nenhum item cadastrado ainda.</small>
-                    @endif
-                </div>
-            @endforeach
+            @include('partials.itens-quadro', ['grupo' => 'pecas', 'titulo' => 'Peças utilizadas', 'rotulo' => 'Peça', 'botao' => 'Adicionar peça',
+                                               'opcoes' => $opcoesPecas, 'linhas' => $linhasPecas ?? []])
+            @include('partials.itens-quadro', ['grupo' => 'lubrificantes', 'titulo' => 'Óleo lubrificante', 'rotulo' => 'Lubrificante', 'botao' => 'Adicionar lubrificante',
+                                               'opcoes' => $opcoesLubrificantes, 'linhas' => $linhasLubrificantes ?? []])
         </div>
     </section>
 
@@ -166,24 +131,6 @@
         }
         $(document).on('input change', '#horimetro_atual, #tipo_revisao, #equipamento', calculaProxima);
         calculaProxima();
-
-        // + acrescenta uma linha vazia (cópia do <template>); x remove, mas sempre sobra uma linha
-        $('.item-adicionar').on('click', function () {
-            var grupo = $(this).data('grupo');
-            var linha = $($('#modelo-' + grupo).html());
-            $('#itens-' + grupo).append(linha);
-            linha.find('select').chosen();
-            linha.find('select').trigger('chosen:activate');
-        });
-        $(document).on('click', '.item-remover', function () {
-            var linha = $(this).closest('tr');
-            if (linha.siblings('.linha-item').length) {
-                linha.remove();
-            } else {
-                linha.find('select').val('').trigger('chosen:updated');
-                linha.find('input').val('');
-            }
-        });
 
     });
 </script>

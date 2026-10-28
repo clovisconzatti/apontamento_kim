@@ -109,6 +109,17 @@
                 <input class="form-control" type="text" name="obs" id="obs"  value="{{ $manutencao->obs }}" >
             </div>
         </div>
+        @include('partials.estilo-formulario')
+        <div class="row info-form">
+            <div class="form-group col-md-6">
+                @include('partials.itens-quadro', ['grupo' => 'pecas', 'titulo' => 'Peças utilizadas', 'rotulo' => 'Peça', 'botao' => 'Adicionar peça',
+                                                   'opcoes' => $opcoesPecas, 'linhas' => $linhasPecas])
+            </div>
+            <div class="form-group col-md-6">
+                @include('partials.itens-quadro', ['grupo' => 'lubrificantes', 'titulo' => 'Óleo lubrificante', 'rotulo' => 'Lubrificante', 'botao' => 'Adicionar lubrificante',
+                                                   'opcoes' => $opcoesLubrificantes, 'linhas' => $linhasLubrificantes])
+            </div>
+        </div>
 
         <div class="row">
             <div class="form-group col-md-3">
