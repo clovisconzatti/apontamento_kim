@@ -85,6 +85,21 @@ trait FiltrosListagem
         return $query;
     }
 
+    // Campo "Tipo de equipamento" (cadastro de Tipo Veículos, ligado a equipamento.tipo) para o painel de filtros
+    protected function campoTipoEquipamento(int $col = 2): array
+    {
+        return ['label' => 'Tipo de equipamento', 'tipo' => 'select', 'col' => $col, 'opcoes' => $this->opcoesTabela('tipo', 'tipo')];
+    }
+
+    // Só os lançamentos de equipamentos do tipo escolhido ($coluna = coluna com o id do equipamento)
+    protected function filtrarTipoEquipamento($query, array $filtros, string $coluna)
+    {
+        if (!empty($filtros['tipo_equipamento'])) {
+            $query->whereIn($coluna, DB::table('equipamento')->where('tipo', $filtros['tipo_equipamento'])->select('id'));
+        }
+        return $query;
+    }
+
     // Opções de um select a partir de uma tabela de cadastro: [id => descrição]
     protected function opcoesTabela(string $tabela, string $texto, string $valor = 'id'): array
     {

@@ -101,6 +101,7 @@ abstract class PainelBase extends Controller
                     ->whereNull('informacao.deleted_at');
         $this->filtrarPeriodo($query, $filtros, 'informacao.data');
         $this->filtrarIgual($query, $filtros, $filtrosIgual);
+        $this->filtrarTipoEquipamento($query, $filtros, 'informacao.equipamento');
         if ($restringir) {
             $restringir($query);
         }

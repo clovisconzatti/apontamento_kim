@@ -59,6 +59,7 @@ class painelHorasMaquinaController extends PainelBase
             'dtFinal'     => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'fazenda'     => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
             'equipamento' => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
+            'tipo_equipamento' => $this->campoTipoEquipamento(),
             'atividade'   => ['label' => 'Atividade', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('atividade', 'atividade')],
         ];
     }
@@ -111,6 +112,7 @@ class painelHorasMaquinaController extends PainelBase
                     ->whereRaw("NOT ($d >= 0 AND $d <= ".self::HORIMETRO_MAXIMO.')');
         $this->filtrarPeriodo($query, $filtros, 'informacao.data');
         $this->filtrarIgual($query, $filtros, $this->filtrosIgual());
+        $this->filtrarTipoEquipamento($query, $filtros, 'informacao.equipamento');
 
         return $query->orderByDesc('informacao.data')->get([
             'informacao.id', 'informacao.data', 'informacao.horimetro_inicial', 'informacao.horimetro_final',

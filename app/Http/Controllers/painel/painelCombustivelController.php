@@ -69,6 +69,7 @@ class painelCombustivelController extends PainelBase
             'dtFinal'     => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'fazenda'     => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
             'equipamento' => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
+            'tipo_equipamento' => $this->campoTipoEquipamento(),
             'tanque'      => ['label' => 'Tanque de origem', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('comboio', 'tanque')],
         ];
     }
@@ -114,6 +115,7 @@ class painelCombustivelController extends PainelBase
                     ->where('informacao.qnt_diesel', '>', self::ABASTECIMENTO_GRANDE);
         $this->filtrarPeriodo($query, $filtros, 'informacao.data');
         $this->filtrarIgual($query, $filtros, $this->filtrosIgual());
+        $this->filtrarTipoEquipamento($query, $filtros, 'informacao.equipamento');
 
         return $query->orderByDesc('informacao.qnt_diesel')->get([
             'informacao.id', 'informacao.data', 'informacao.qnt_diesel', 'informacao.nr_nf', 'comboio.tanque',

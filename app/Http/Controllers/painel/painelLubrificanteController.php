@@ -106,6 +106,7 @@ class painelLubrificanteController extends PainelBase
             'dtFinal'      => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'fazenda'      => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
             'equipamento'  => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
+            'tipo_equipamento' => $this->campoTipoEquipamento(),
             'lubrificante' => ['label' => 'Lubrificante', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('lubrificante', 'lubrificante')],
             'origem'       => ['label' => 'Lançado em', 'tipo' => 'select', 'col' => 2, 'opcoes' => self::ORIGENS],
         ];
@@ -156,6 +157,7 @@ class painelLubrificanteController extends PainelBase
             'lubrificante' => 'l.lubrificante',
             'origem'       => 'l.origem',
         ]);
+        $this->filtrarTipoEquipamento($query, $filtros, 'l.equipamento');
         return $query;
     }
 

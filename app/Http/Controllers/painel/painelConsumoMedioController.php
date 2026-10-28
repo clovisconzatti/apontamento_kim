@@ -84,6 +84,7 @@ class painelConsumoMedioController extends PainelBase
             'equipamento' => 'informacao.equipamento',
             'tanque'      => 'informacao.origem_abastecimento',
         ]);
+        $this->filtrarTipoEquipamento($query, $filtros, 'informacao.equipamento');
         return $query;
     }
 
@@ -110,6 +111,7 @@ class painelConsumoMedioController extends PainelBase
             'dtFinal'     => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'fazenda'     => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
             'equipamento' => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
+            'tipo_equipamento' => $this->campoTipoEquipamento(),
             'tanque'      => ['label' => 'Tanque de origem', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('comboio', 'tanque')],
         ];
     }
