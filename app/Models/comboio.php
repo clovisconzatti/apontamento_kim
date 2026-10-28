@@ -15,6 +15,10 @@ class comboio extends Model
         , 'fazenda'
         , 'uf'
         , 'obs'
+        , 'ativo'
+        , 'tipo'
+        , 'saldo_inicial'
+        , 'data_saldo_inicial'
 
     ];
     protected $primaryKey = 'id';

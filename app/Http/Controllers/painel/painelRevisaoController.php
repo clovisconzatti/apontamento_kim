@@ -257,7 +257,7 @@ class painelRevisaoController extends Controller
                         ->when($filtros['equipamento'], fn($q, $v) => $q->where('equipamento', $v))
                         ->when($filtros['tipo_revisao'], fn($q, $v) => $q->where('tipo_revisao', $v))
                         ->groupBy(DB::raw("DATE_FORMAT(data, '%Y-%m')"))
-                        ->pluck(DB::raw('COUNT(*)'), DB::raw("DATE_FORMAT(data, '%Y-%m')"))
+                        ->selectRaw("COUNT(*) as total, DATE_FORMAT(data, '%Y-%m') as mes")->pluck('total', 'mes')
                         ->all();
 
         $meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];

@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 
 class informacaoController extends Controller
 {
-    // Campos do filtro, compartilhados pela listagem e pelo relatório de consumo
+    // Campos do filtro da listagem
     private function camposFiltro()
     {
         return [
@@ -122,54 +122,6 @@ class informacaoController extends Controller
         return view('informacao.listAll' , compact('informacoes', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
-    // Relatório de consumo (diesel e lubrificantes) por máquina, com os mesmos filtros da listagem
-    public function consumo(Request $request)
-    {
-        $camposFiltro = $this->camposFiltro();
-        $query = $this->consultaFiltrada($request, $camposFiltro, $filtros);
-
-        // Horas trabalhadas: só conta lançamentos com horímetro coerente (entre 0 e 24h no dia);
-        // acima disso é erro de digitação e aparece na lista de suspeitos para correção
-        $diferenca = 'informacao.horimetro_final - informacao.horimetro_inicial';
-        $horas = "CASE WHEN $diferenca BETWEEN 0 AND 24 THEN $diferenca ELSE 0 END";
-
-        $suspeitos = (clone $query)->leftJoin('equipamento','equipamento.id','informacao.equipamento')
-                                    ->whereRaw("$diferenca > 24")
-                                    ->orderBy('informacao.data', 'DESC')
-                                    ->get([
-                                        'informacao.id'
-                                        ,'informacao.data'
-                                        ,'equipamento.equipamento'
-                                        ,'informacao.horimetro_inicial'
-                                        ,'informacao.horimetro_final'
-                                    ]);
-
-        $maquinas = (clone $query)->leftJoin('equipamento','equipamento.id','informacao.equipamento')
-                                    ->groupBy('informacao.equipamento', 'equipamento.equipamento')
-                                    ->orderBy('equipamento.equipamento')
-                                    ->selectRaw("equipamento.equipamento
-                                                ,COUNT(*) as registros
-                                                ,SUM($horas) as horas
-                                                ,SUM(COALESCE(informacao.qnt_diesel,0)) as diesel
-                                                ,SUM(COALESCE(informacao.qnt_lubrificante,0)) as lubrificante")
-                                    ->get();
-
-        $lubrificantes = (clone $query)->leftJoin('equipamento','equipamento.id','informacao.equipamento')
-                                    ->join('lubrificante','lubrificante.id','informacao.tipo_lubrificante')
-                                    ->where('informacao.qnt_lubrificante', '>', 0)
-                                    ->groupBy('informacao.equipamento', 'equipamento.equipamento', 'lubrificante.lubrificante')
-                                    ->orderBy('equipamento.equipamento')
-                                    ->orderBy('lubrificante.lubrificante')
-                                    ->selectRaw('equipamento.equipamento
-                                                ,lubrificante.lubrificante
-                                                ,COUNT(*) as registros
-                                                ,SUM(informacao.qnt_lubrificante) as quantidade')
-                                    ->get();
-
-        $totalRegistros = $maquinas->sum('registros');
-
-        return view('informacao.consumo', compact('maquinas', 'lubrificantes', 'suspeitos', 'camposFiltro', 'filtros', 'totalRegistros'));
-    }
 
     public function formAdd()
     {

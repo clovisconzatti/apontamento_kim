@@ -27,8 +27,16 @@ use App\Http\Controllers\tipo_combustivel\tipo_combustivelController;
 use App\Http\Controllers\tipo_manutencao\tipo_manutencaoController;
 use App\Http\Controllers\transferencia\transferenciaController;
 use App\Http\Controllers\tipo_revisao\tipo_revisaoController;
+use App\Http\Controllers\compra_combustivel\compra_combustivelController;
+use App\Http\Controllers\ajuste_combustivel\ajuste_combustivelController;
 use App\Http\Controllers\revisao\revisaoController;
 use App\Http\Controllers\painel\painelRevisaoController;
+use App\Http\Controllers\painel\painelHorasHomemController;
+use App\Http\Controllers\painel\painelHorasMaquinaController;
+use App\Http\Controllers\painel\painelCombustivelController;
+use App\Http\Controllers\painel\painelLubrificanteController;
+use App\Http\Controllers\painel\painelConsumoMedioController;
+use App\Http\Controllers\painel\painelSaldoCombustivelController;
 use Illuminate\Support\Facades\Auth;
 
 Auth::routes();
@@ -286,10 +294,41 @@ Route::group(['middleware' => ['auth']], function () {
     });
  /********************************** painel de operações (relatórios, gráficos) ***************************************************************/
     // Rotas "painel.*": o menu destaca a seção Painel de Operações pelo prefixo do nome
-    Route::get('painel/consumo-maquina',[informacaoController::class,'consumo'])->name('painel.consumo_maquina');
+    // O antigo "Consumo por Máquina" foi substituído pelos painéis de Combustível, Consumo Médio, Lubrificante e Horas Máquina
+    Route::redirect('painel/consumo-maquina', 'painel/consumo-medio');
     Route::get('painel/revisoes',[painelRevisaoController::class,'index'])->name('painel.revisoes');
     Route::get('painel/revisoes/exportar',[painelRevisaoController::class,'exportar'])->name('painel.revisoes.exportar');
+    Route::get('painel/horas-homem',[painelHorasHomemController::class,'index'])->name('painel.horas_homem');
+    Route::get('painel/horas-homem/exportar',[painelHorasHomemController::class,'exportar'])->name('painel.horas_homem.exportar');
+    Route::get('painel/horas-maquina',[painelHorasMaquinaController::class,'index'])->name('painel.horas_maquina');
+    Route::get('painel/horas-maquina/exportar',[painelHorasMaquinaController::class,'exportar'])->name('painel.horas_maquina.exportar');
+    Route::get('painel/combustivel',[painelCombustivelController::class,'index'])->name('painel.combustivel');
+    Route::get('painel/combustivel/exportar',[painelCombustivelController::class,'exportar'])->name('painel.combustivel.exportar');
+    Route::get('painel/saldo-combustivel',[painelSaldoCombustivelController::class,'index'])->name('painel.saldo_combustivel');
+    Route::get('painel/saldo-combustivel/exportar',[painelSaldoCombustivelController::class,'exportar'])->name('painel.saldo_combustivel.exportar');
+    Route::get('painel/consumo-medio',[painelConsumoMedioController::class,'index'])->name('painel.consumo_medio');
+    Route::get('painel/consumo-medio/exportar',[painelConsumoMedioController::class,'exportar'])->name('painel.consumo_medio.exportar');
+    Route::get('painel/consumo-medio/sem-horimetro',[painelConsumoMedioController::class,'semHorimetro'])->name('painel.consumo_medio.sem_horimetro');
+    Route::patch('painel/consumo-medio/sem-horimetro/{informacao}',[painelConsumoMedioController::class,'salvarHorimetro'])->name('painel.consumo_medio.salvar_horimetro');
+    Route::get('painel/lubrificante',[painelLubrificanteController::class,'index'])->name('painel.lubrificante');
+    Route::get('painel/lubrificante/exportar',[painelLubrificanteController::class,'exportar'])->name('painel.lubrificante.exportar');
     Route::get('painel/revisoes/{lista}',[painelRevisaoController::class,'lista'])->where('lista', 'vencidas|proximas|em-dia')->name('painel.revisoes.lista');
+ /********************************** compra de combustível ***************************************************************/
+    Route::group(['namespace' => 'compra_combustivel'], function () {
+        Route::get('compra_combustivel',[compra_combustivelController::class,'listAll'])->name('compra_combustivel.listAll');
+        Route::get('compra_combustivel/novo',[compra_combustivelController::class,'formAdd'])->name('compra_combustivel.formAdd');
+        Route::get('compra_combustivel/editar/{compra_combustivel}',[compra_combustivelController::class,'formEdit'])->name('compra_combustivel.formEdit');
+        Route::post('compra_combustivel/store',[compra_combustivelController::class,'store'])->name('compra_combustivel.store');
+        Route::patch('compra_combustivel/edit/{compra_combustivel}',[compra_combustivelController::class,'edit'])->name('compra_combustivel.edit');
+    });
+ /********************************** ajuste de saldo de combustível ***************************************************************/
+    Route::group(['namespace' => 'ajuste_combustivel'], function () {
+        Route::get('ajuste_combustivel',[ajuste_combustivelController::class,'listAll'])->name('ajuste_combustivel.listAll');
+        Route::get('ajuste_combustivel/novo',[ajuste_combustivelController::class,'formAdd'])->name('ajuste_combustivel.formAdd');
+        Route::get('ajuste_combustivel/editar/{ajuste_combustivel}',[ajuste_combustivelController::class,'formEdit'])->name('ajuste_combustivel.formEdit');
+        Route::post('ajuste_combustivel/store',[ajuste_combustivelController::class,'store'])->name('ajuste_combustivel.store');
+        Route::patch('ajuste_combustivel/edit/{ajuste_combustivel}',[ajuste_combustivelController::class,'edit'])->name('ajuste_combustivel.edit');
+    });
  /********************************** tipo de revisão ***************************************************************/
     Route::group(['namespace' => 'tipo_revisao'], function () {
         Route::get('tipo_revisao',[tipo_revisaoController::class,'listAll'])->name('tipo_revisao.listAll');

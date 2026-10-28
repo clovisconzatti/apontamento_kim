@@ -27,7 +27,7 @@
     .viz-root .viz-tile-nota { font-size: 12px; color: var(--text-secondary); }
 
     /* Barras horizontais: uso do intervalo */
-    .viz-root .viz-barras { display: grid; grid-template-columns: minmax(120px, 220px) minmax(0, 1fr) 52px; column-gap: 12px; row-gap: 4px; align-items: center; }
+    .viz-root .viz-barras { display: grid; grid-template-columns: minmax(120px, 220px) minmax(0, 1fr) max-content; column-gap: 12px; row-gap: 4px; align-items: center; }
     .viz-root .viz-barras .rotulo { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .viz-root .viz-trilho { position: relative; height: 26px; }
     .viz-root .viz-barra { position: absolute; left: 0; top: 5px; height: 16px; border-radius: 0 4px 4px 0; }
@@ -40,11 +40,11 @@
     .viz-root .viz-legenda i.cor { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 
     /* Colunas: revisões por mês */
-    .viz-root .viz-colunas { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; align-items: end; height: 180px; border-bottom: 1px solid var(--grid); }
+    .viz-root .viz-colunas { display: grid; gap: 2px; align-items: end; height: 180px; border-bottom: 1px solid var(--grid); }
     .viz-root .viz-coluna { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
     .viz-root .viz-coluna .fill { width: 60%; max-width: 24px; background: var(--series-1); border-radius: 4px 4px 0 0; min-height: 0; }
     .viz-root .viz-coluna .cap { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
-    .viz-root .viz-meses { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; font-size: 11px; color: var(--text-secondary); text-align: center; margin-top: 4px; }
+    .viz-root .viz-meses { display: grid; gap: 2px; white-space: nowrap; font-size: 11px; color: var(--text-secondary); text-align: center; margin-top: 4px; }
 
     /* Planilha */
     .viz-root .viz-tabela-box { overflow-x: auto; }
@@ -75,10 +75,59 @@
     .viz-root .viz-vazio { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
     .viz-root .viz-vazio i { font-size: 36px; color: var(--good); display: block; margin-bottom: 10px; }
 
+    /* Faixa de referência atrás da barra (ex.: consumo L/h do cadastro) e barra empilhada (2px de folga entre partes) */
+    .viz-root .viz-ref { position: absolute; top: 2px; bottom: 2px; background: rgba(12, 163, 12, .16); border-left: 1px solid rgba(12, 163, 12, .55); border-right: 1px solid rgba(12, 163, 12, .55); }
+    .viz-root .viz-pilha { position: absolute; left: 0; top: 5px; height: 16px; display: flex; gap: 2px; }
+    .viz-root .viz-pilha div { min-width: 2px; }
+    .viz-root .viz-pilha div:last-child { border-radius: 0 4px 4px 0; }
+    /* Dois gráficos lado a lado */
+    .viz-root .viz-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .viz-root .viz-grid2 > .viz-card { margin-bottom: 0; }
+    .viz-root .viz-grid2 + .viz-card, .viz-root .viz-grid2 + .viz-grid2 { margin-top: 16px; }
+    @media (max-width: 991px) { .viz-root .viz-grid2 { grid-template-columns: minmax(0, 1fr); } }
+
+    /* Aviso dentro de um indicador (ex.: lançamentos sem horímetro), com atalho para corrigir */
+    .viz-root a.viz-tile-alerta { display: block; margin-top: 8px; padding: 6px 8px; border-radius: 6px; background: #fff4d6; color: #6b4a00;
+                                  font-size: 12px; line-height: 1.35; text-decoration: none; }
+    .viz-root a.viz-tile-alerta:hover { background: #ffe9ad; color: #4a3300; }
+    .viz-root a.viz-tile-alerta i { color: #c98500; }
+    .viz-root .viz-tile-ok { display: block; margin-top: 8px; font-size: 12px; color: #0b5a2a; }
+
+    /* Interatividade (painel-interativo.js): clicar filtra os outros gráficos */
+    .viz-root .viz-clicavel { cursor: pointer; }
+    .viz-root a.rotulo { color: inherit; text-decoration: none; }
+    .viz-root a.rotulo:hover { text-decoration: underline; color: inherit; }
+    .viz-root .viz-trilho.viz-clicavel:hover .viz-barra, .viz-root .viz-trilho.viz-clicavel:hover .viz-pilha { filter: brightness(.9); }
+    .viz-root .viz-coluna.viz-clicavel:hover .fill { filter: brightness(.9); }
+    .viz-root .viz-apagado { opacity: .28; }
+    .viz-root .viz-tabela tr.viz-linha-sel td { background: #e3f1e7; box-shadow: inset 0 -1px 0 #0b5a2a; font-weight: 600; }
+    .viz-root .viz-tabela tbody tr[data-pi-dim]:hover td { background: #f3f7f4; }
+    .viz-root .viz-selecao { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 4; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+                             min-height: 44px; padding: 8px 14px; margin-bottom: 16px; background: #fff; border: 1px solid #dde4de; border-radius: 12px; font-size: 13px; }
+    .viz-root .viz-sel-dica { color: var(--text-secondary); }
+    .viz-root .viz-sel-titulo { font-weight: 700; color: #0b5a2a; }
+    .viz-root .viz-sel-chip { background: #0b5a2a; color: #fff; border-radius: 999px; padding: 4px 6px 4px 12px; }
+    .viz-root .viz-sel-chip a { color: #fff; font-size: 16px; line-height: 1; padding: 0 6px; text-decoration: none; }
+    .viz-root .viz-sel-limpar { margin-left: auto; font-weight: 600; }
+
     .viz-tip { position: fixed; z-index: 1000; pointer-events: none; background: #16241b; color: #fff; font-size: 13px; line-height: 1.45; padding: 8px 10px; border-radius: 6px; max-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,.2); white-space: pre-line; }
     @media (max-width: 991px) { .viz-root .viz-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 767px) {
         .viz-root .viz-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .viz-root .viz-barras { grid-template-columns: minmax(90px, 120px) minmax(0, 1fr) 44px; }
+        .viz-root .viz-barras { grid-template-columns: minmax(90px, 120px) minmax(0, 1fr) max-content; }
     }
 </style>
+
+<div class="viz-tip" id="vizTip" hidden></div>
+<script>
+    // Dica ao passar o mouse sobre barras e colunas ([data-tip])
+    $(function () {
+        var dica = $('#vizTip');
+        $(document).on('mousemove', '[data-tip]', function (e) {
+            dica.text($(this).attr('data-tip')).prop('hidden', false)
+                .css({ left: Math.min(e.clientX + 14, window.innerWidth - 300), top: e.clientY + 14 });
+        }).on('mouseleave', '[data-tip]', function () {
+            dica.prop('hidden', true);
+        });
+    });
+</script>

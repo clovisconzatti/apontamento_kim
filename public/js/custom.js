@@ -412,6 +412,10 @@ $(document).ready(function(){
         var fazenda            = $(this).find('select#fazenda').val();
         var uf                 = $(this).find('select#uf').val();
         var obs                = $(this).find('input#obs').val();
+        var ativo              = $(this).find('select#ativo').val();
+        var tipo               = $(this).find('select#tipo').val();
+        var saldo_inicial      = $(this).find('input#saldo_inicial').val();
+        var data_saldo_inicial = $(this).find('input#data_saldo_inicial').val();
 
         /********************************************************************************************* */
         if(!tanque ){
@@ -427,6 +431,10 @@ $(document).ready(function(){
                 ,'fazenda'          : fazenda
                 ,'uf'               : uf
                 ,'obs'              : obs
+                ,'ativo'            : ativo
+                ,'tipo'             : tipo
+                ,'saldo_inicial'    : saldo_inicial
+                ,'data_saldo_inicial' : data_saldo_inicial
 
             }
         grava(dados,route,type,origem);
@@ -968,6 +976,74 @@ $(document).ready(function(){
         }else{
             linha.find('select').val('').trigger('chosen:updated');
             linha.find('input').val('');
+        }
+    })
+
+/**********************gravar compra de combustível **************************************************/
+    $(document).on('submit', 'form#cadastro-compra_combustivel', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var data                = $(this).find('input#data').val();
+        var fornecedor          = $(this).find('select#fornecedor').val();
+        var nr_nf               = $(this).find('input#nr_nf').val();
+        var combustivel         = $(this).find('select#combustivel').val();
+        var tanque              = $(this).find('select#tanque').val();
+        var litros              = $(this).find('input#litros').val();
+        var valor_total         = $(this).find('input#valor_total').val();
+
+
+/********************************************************************************************* */
+        if(!data || !fornecedor || !combustivel || !tanque || !litros || !valor_total){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'data'                  : data
+                ,'fornecedor'           : fornecedor
+                ,'nr_nf'                : nr_nf
+                ,'combustivel'          : combustivel
+                ,'tanque'               : tanque
+                ,'litros'               : litros
+                ,'valor_total'          : valor_total
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar ajuste de saldo de combustível **************************************************/
+    $(document).on('submit', 'form#cadastro-ajuste_combustivel', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var data                = $(this).find('input#data').val();
+        var tanque              = $(this).find('select#tanque').val();
+        var quantidade          = $(this).find('input#quantidade').val();
+        var tipo                = $(this).find('input[name="tipo"]:checked').val();
+
+
+/********************************************************************************************* */
+        if(!data || !tanque || !quantidade || !tipo){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'data'                  : data
+                ,'tanque'               : tanque
+                ,'quantidade'           : quantidade
+                ,'tipo'                 : tipo
+            }
+        grava(dados,route,type,origem);
         }
     })
 

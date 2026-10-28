@@ -9,9 +9,6 @@
         $escala = max(1.2, min(1.5, collect($linhas)->max('usado') ?? 0));
         $posicao = fn($fracao) => round(min(max($fracao, 0), $escala) / $escala * 100, 2);
 
-        $maxMes = max(1, collect($porMes)->max('quantidade'));
-        $mesMaior = collect($porMes)->search(fn($m) => $m['quantidade'] === $maxMes);
-
         $icones = ['vencida' => 'fas fa-exclamation-circle', 'proxima' => 'fas fa-exclamation-triangle', 'em_dia' => 'fas fa-check-circle'];
 
         // Linha da planilha: amarelo cada vez mais forte na faixa de atenção; vermelho quando vencida
@@ -114,21 +111,10 @@
         <div class="viz-card">
             <h4>Revisões lançadas por mês</h4>
             <p class="viz-sub">Últimos 12 meses{{ $filtros['equipamento'] || $filtros['tipo_revisao'] ? ', com os filtros atuais' : '' }}.</p>
-            <div class="viz-colunas">
-                @foreach ($porMes as $i => $mes)
-                    <div class="viz-coluna" data-tip="{{ $mes['rotulo'] }}: {{ $mes['quantidade'] }} {{ $mes['quantidade'] == 1 ? 'revisão' : 'revisões' }}">
-                        @if ($mes['quantidade'] && ($i === $mesMaior || $i === count($porMes) - 1))
-                            <span class="cap">{{ $mes['quantidade'] }}</span>
-                        @endif
-                        <div class="fill" style="height: {{ round($mes['quantidade'] / $maxMes * 85, 2) }}%;"></div>
-                    </div>
-                @endforeach
-            </div>
-            <div class="viz-meses">
-                @foreach ($porMes as $mes)
-                    <span>{{ $mes['rotulo'] }}</span>
-                @endforeach
-            </div>
+            @include('partials.grafico-colunas', [
+                'itens'   => collect($porMes)->map(fn($m) => ['rotulo' => $m['rotulo'], 'valor' => $m['quantidade']])->all(),
+                'formato' => fn($v) => $v.($v == 1 ? ' revisão' : ' revisões'),
+            ])
         </div>
 
         {{-- Planilha de acompanhamento --}}
@@ -175,17 +161,4 @@
         </div>
     </div>
 
-    <div class="viz-tip" id="vizTip" hidden></div>
-    <script>
-        // Dica ao passar o mouse sobre barras e colunas
-        $(function () {
-            var dica = $('#vizTip');
-            $(document).on('mousemove', '[data-tip]', function (e) {
-                dica.text($(this).attr('data-tip')).prop('hidden', false)
-                    .css({ left: Math.min(e.clientX + 14, window.innerWidth - 300), top: e.clientY + 14 });
-            }).on('mouseleave', '[data-tip]', function () {
-                dica.prop('hidden', true);
-            });
-        });
-    </script>
 @endsection

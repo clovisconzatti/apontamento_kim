@@ -9,9 +9,9 @@
             </td>
             <td width="20%" align="center">
                 <h3>
-                    <a class="cor-digiliza" href="{{route('painel.consumo_maquina')}}" title="Diesel e lubrificantes por máquina, com os filtros atuais">
-                        <i class="fas fa-chart-bar"></i>&nbsp;&nbsp;&nbsp;
-                        <span>Consumo por máquina</span>
+                    <a class="cor-digiliza" href="{{route('painel.consumo_medio')}}" title="Consumo médio (L/h) de cada máquina pelos abastecimentos">
+                        <i class="fas fa-tachometer-alt"></i>&nbsp;&nbsp;&nbsp;
+                        <span>Consumo médio</span>
                     </a>
                 </h3>
             </td>

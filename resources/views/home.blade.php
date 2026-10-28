@@ -18,6 +18,8 @@
     </span>
 </div>
 
+@include('partials.saldo-tanques')
+
 <div class="row mt-4">
     @foreach ($indicadores as $indicador)
         <div class="col-12 col-sm-6 col-lg-3 mb-3">

@@ -53,6 +53,33 @@
                     <option value="PR">PR</option>
                 </select>
             </div>
+            <div class="form-group col-md-1">
+                Ativo:
+                <select class="form-control limpar" name="ativo" id="ativo">
+                    <option value="Sim" selected>Sim</option>
+                    <option value="Nao">Não</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-3">
+                Tipo:
+                <select class="form-control limpar" name="tipo" id="tipo">
+                    <option value="proprio" selected>Tanque próprio (entra no saldo)</option>
+                    <option value="posto">Posto externo (sem saldo)</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                Saldo inicial (litros):
+                <input class="form-control" type="number" step="any" name="saldo_inicial" id="saldo_inicial" value="">
+            </div>
+            <div class="form-group col-md-2">
+                Data do saldo inicial:
+                <input class="form-control" type="date" name="data_saldo_inicial" id="data_saldo_inicial" value="">
+            </div>
+            <div class="form-group col-md-5 align-self-end">
+                <small class="text-muted">O saldo inicial é somado a todos os lançamentos do tanque; a data registra quando ele foi informado.</small>
+            </div>
             <div class="form-group col-md-12">
                 Observação:
                 <input class="form-control" type="text" name="obs" id="obs"  value="" >

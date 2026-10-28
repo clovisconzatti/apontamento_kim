@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SaldoCombustivel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,9 @@ class HomeController extends Controller
             ],
         ];
 
+        // Saldo dos tanques próprios ativos (fica em destaque no topo do painel)
+        $saldosTanques = SaldoCombustivel::saldos()->filter(fn($t) => $t->ativo)->values();
+
         // Atalhos agrupados pelas seções do menu do usuário
         $secoes = [];
         $secaoAtual = 'Acesso rápido';
@@ -80,6 +84,6 @@ class HomeController extends Controller
             return (stripos($b, 'apontamento') !== false) <=> (stripos($a, 'apontamento') !== false);
         });
 
-        return view('home', compact('indicadores', 'secoes'));
+        return view('home', compact('indicadores', 'secoes', 'saldosTanques'));
     }
 }
