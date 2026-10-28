@@ -126,7 +126,7 @@
         }
         function mostraSaldo() {
             var s = saldoSistema();
-            $('#saldo_sistema').val($('#tanque').val() ? (s === null ? 'Posto externo: sem saldo' : numero.format(s) + ' L') : '');
+            $('#saldo_sistema').val($('#tanque').val() ? (s === null ? 'Sem saldo (posto externo ou comboio inativo)' : numero.format(s) + ' L') : '');
             calculaMedicao();
         }
         function calculaMedicao() {

@@ -18,7 +18,13 @@
         </div>
         <br/>
     @endif
-    <h3 class=""><i class="fas fa-gas-pump"></i></i> Alteração de Comboio</h3>
+    <h3 class=""><i class="fas fa-gas-pump"></i> Alteração de Comboio
+        @if ($comboios->ativo === 'Nao')
+            <span class="badge" style="background: #b3261e; color: #fff; font-size: 14px; vertical-align: middle;"><i class="fas fa-times-circle"></i> Inativo</span>
+        @else
+            <span class="badge" style="background: #0b5a2a; color: #fff; font-size: 14px; vertical-align: middle;"><i class="fas fa-check-circle"></i> Ativo</span>
+        @endif
+    </h3>
     <form action="" id="cadastro-comboio" nome="cadastro-comboio" method="post">
         @csrf
         @method('patch')

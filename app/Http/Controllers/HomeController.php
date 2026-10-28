@@ -66,7 +66,7 @@ class HomeController extends Controller
         ];
 
         // Saldo dos tanques próprios ativos (fica em destaque no topo do painel)
-        $saldosTanques = SaldoCombustivel::saldos()->filter(fn($t) => $t->ativo)->values();
+        $saldosTanques = SaldoCombustivel::saldos();
 
         // Atalhos agrupados pelas seções do menu do usuário
         $secoes = [];

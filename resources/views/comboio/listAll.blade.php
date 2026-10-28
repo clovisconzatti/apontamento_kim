@@ -37,8 +37,14 @@
         </thead>
         <tbody>
             @foreach ($comboios as $comboio)
-                <tr>
-                    <td align="">{{ $comboio->tanque }}  </td>
+                {{-- Comboio inativo: linha esmaecida e selo ao lado do nome --}}
+                <tr @if ($comboio->ativo === 'Nao') style="opacity: .6; background: #f3f3f3;" title="Comboio inativo: não entra no saldo de combustível" @endif>
+                    <td align="">
+                        {{ $comboio->tanque }}
+                        @if ($comboio->ativo === 'Nao')
+                            <span class="badge" style="background: #b3261e; color: #fff; font-weight: 600; margin-left: 4px;">Inativo</span>
+                        @endif
+                    </td>
                     <td align="">{{ $comboio->capacidade }}  </td>
                     <td align="">{{ $comboio->fazenda }}  </td>
                     <td align="">{{ $comboio->uf }}  </td>

@@ -56,7 +56,7 @@ class painelSaldoCombustivelController extends PainelBase
         $fim = $filtros['dtFinal'] ?: date('Y-m-d');
         $todos = SaldoCombustivel::movimentos($fim);
         $tanques = SaldoCombustivel::saldos($fim, $todos)
-                        ->filter(fn($t) => $filtros['tanque'] ? $t->id == $filtros['tanque'] : $t->ativo)
+                        ->filter(fn($t) => !$filtros['tanque'] || $t->id == $filtros['tanque'])
                         ->values();
         $ids = $tanques->pluck('id')->all();
         $periodos = $this->periodos($filtros, $todos->where('data', '>=', $inicio)->pluck('data')->all());

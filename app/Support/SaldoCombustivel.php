@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
  *   − abastecimento na Informação Diária (Tanque de Origem)
  *   + ajuste Sobra                                         − ajuste Falta
  * O saldo inicial entra antes de todos os movimentos; a data do saldo inicial é só o registro de quando foi informado.
- * Postos externos não têm saldo: são só origem de combustível.
+ * Só tanques próprios ativos: postos externos (só origem de combustível) e comboios inativos não têm saldo.
  */
 class SaldoCombustivel
 {
@@ -36,12 +36,13 @@ class SaldoCombustivel
         'ok'          => ['nome' => 'Normal',               'cor' => '#0ca30c', 'icone' => 'fas fa-check-circle'],
     ];
 
-    // Tanques próprios com o cadastro do saldo inicial: [id => objeto]
+    // Tanques próprios ativos com o cadastro do saldo inicial: [id => objeto] (comboio inativo não entra no saldo)
     public static function tanques()
     {
         return DB::table('comboio')
                     ->whereNull('deleted_at')
                     ->where(fn($q) => $q->whereNull('tipo')->orWhere('tipo', '<>', 'posto'))
+                    ->where(fn($q) => $q->whereNull('ativo')->orWhere('ativo', '<>', 'Nao'))
                     ->orderBy('tanque')
                     ->get(['id', 'tanque', 'capacidade', 'ativo', 'saldo_inicial', 'data_saldo_inicial'])
                     ->keyBy('id');
