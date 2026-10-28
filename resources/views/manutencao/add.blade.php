@@ -88,7 +88,7 @@
         </div>
         <div class="row">
             <div class="form-group col-md-3">
-                Custo da Manutenção
+                Custo de Manutenção Terceiros
                 <input class="form-control" type="number" step="any" name="custo" id="custo"  value="" >
             </div>
             <div class="form-group col-md-3">

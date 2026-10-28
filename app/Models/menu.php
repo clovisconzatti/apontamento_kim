@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class menu extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     public $timestamps = false;
     protected $fillable= [
         'id'

@@ -26,6 +26,8 @@ use App\Http\Controllers\tipo\tipoController;
 use App\Http\Controllers\tipo_combustivel\tipo_combustivelController;
 use App\Http\Controllers\tipo_manutencao\tipo_manutencaoController;
 use App\Http\Controllers\transferencia\transferenciaController;
+use App\Http\Controllers\tipo_revisao\tipo_revisaoController;
+use App\Http\Controllers\revisao\revisaoController;
 use Illuminate\Support\Facades\Auth;
 
 Auth::routes();
@@ -281,6 +283,22 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('manutencao/store',[manutencaoController::class,'store'])->name('manutencao.store');
         Route::patch('manutencao/edit/{manutencao}',[manutencaoController::class,'edit'])->name('manutencao.edit');
         Route::delete('manutencao/destroy/{manutencao}',[manutencaoController::class,'destroy'])->name('manutencao.destroy');
+    });
+ /********************************** tipo de revisão ***************************************************************/
+    Route::group(['namespace' => 'tipo_revisao'], function () {
+        Route::get('tipo_revisao',[tipo_revisaoController::class,'listAll'])->name('tipo_revisao.listAll');
+        Route::get('tipo_revisao/novo',[tipo_revisaoController::class,'formAdd'])->name('tipo_revisao.formAdd');
+        Route::get('tipo_revisao/editar/{tipo_revisao}',[tipo_revisaoController::class,'formEdit'])->name('tipo_revisao.formEdit');
+        Route::post('tipo_revisao/store',[tipo_revisaoController::class,'store'])->name('tipo_revisao.store');
+        Route::patch('tipo_revisao/edit/{tipo_revisao}',[tipo_revisaoController::class,'edit'])->name('tipo_revisao.edit');
+    });
+ /********************************** revisão ***************************************************************/
+    Route::group(['namespace' => 'revisao'], function () {
+        Route::get('revisao',[revisaoController::class,'listAll'])->name('revisao.listAll');
+        Route::get('revisao/novo',[revisaoController::class,'formAdd'])->name('revisao.formAdd');
+        Route::get('revisao/editar/{revisao}',[revisaoController::class,'formEdit'])->name('revisao.formEdit');
+        Route::post('revisao/store',[revisaoController::class,'store'])->name('revisao.store');
+        Route::patch('revisao/edit/{revisao}',[revisaoController::class,'edit'])->name('revisao.edit');
     });
 
 });

@@ -92,10 +92,11 @@ class MenuController extends Controller
                     END AS selecionado
 
                 FROM menu
-                LEFT JOIN menuUsuario ON menuUsuario.menuId = menu.id AND menuUsuario.usuarioId = $usuario
+                LEFT JOIN menuUsuario ON menuUsuario.menuId = menu.id AND menuUsuario.usuarioId = ?
+                WHERE menu.deleted_at IS NULL
                 order by menu.ordem
         ";
-        $itens = DB::select($sql);
+        $itens = DB::select($sql, [$usuario]);
         $menuDisponivel=[];
         foreach($itens as $item)
         {

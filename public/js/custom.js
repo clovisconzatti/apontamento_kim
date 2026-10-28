@@ -936,6 +936,81 @@ $(document).ready(function(){
         }
     })
 
+/**********************gravar tipo de revisão **************************************************/
+    $(document).on('submit', 'form#cadastro-tipo_revisao', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var descricao           = $(this).find('input#descricao').val();
+        var intervalo           = $(this).find('input#intervalo').val();
+        var obs                 = $(this).find('input#obs').val();
+
+
+/********************************************************************************************* */
+        if(!descricao || !intervalo){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'descricao'             : descricao
+                ,'intervalo'            : intervalo
+                ,'obs'                  : obs
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar revisão **************************************************/
+    $(document).on('submit', 'form#cadastro-revisao', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var data                = $(this).find('input#data').val();
+        var equipamento         = $(this).find('select#equipamento').val();
+        var horimetro_atual     = $(this).find('input#horimetro_atual').val();
+        var tipo_revisao        = $(this).find('select#tipo_revisao').val();
+        var nr_os               = $(this).find('input#nr_os').val();
+        var obs                 = $(this).find('input#obs').val();
+
+        // Linhas de peças e lubrificantes (as vazias o servidor ignora)
+        var itens = { 'pecas': [], 'lubrificantes': [] };
+        $(this).find('tr.linha-item').each(function(){
+            itens[$(this).data('grupo')].push({
+                'id'            : $(this).find('select.item-id').val()
+                ,'quantidade'   : $(this).find('input.item-quantidade').val()
+            });
+        });
+
+
+/********************************************************************************************* */
+        if(!data || !equipamento || !horimetro_atual || !tipo_revisao){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            var dados= {
+                'data'                  : data
+                ,'equipamento'          : equipamento
+                ,'horimetro_atual'      : horimetro_atual
+                ,'tipo_revisao'         : tipo_revisao
+                ,'nr_os'                : nr_os
+                ,'obs'                  : obs
+                ,'pecas'                : itens.pecas
+                ,'lubrificantes'        : itens.lubrificantes
+            }
+        grava(dados,route,type,origem);
+        }
+    })
+
 /************************checa km / hora anterior ***********************************************************/
     // Uma única consulta devolve o último km e a última hora do equipamento
     $(document).on('change','select#placa, input#data',function(event){
