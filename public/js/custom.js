@@ -266,7 +266,7 @@ $(document).ready(function(){
         var origem = $(this).find('#origem').val();
 
         var data                = $(this).find('input#data').val();
-        var origem              = $(this).find('select#origem').val();
+        var origemTanque        = $(this).find('select#origem').val();
         var destino             = $(this).find('select#destino').val();
         var litros              = $(this).find('input#litros').val();
         var nr_doc              = $(this).find('input#nr_doc').val();
@@ -284,7 +284,7 @@ $(document).ready(function(){
 
 
         /********************************************************************************************* */
-        if(!data || !combustivel || !origem || !litros ){
+        if(!data || !combustivel || !origemTanque || !litros ){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
                 type: 'error',
@@ -293,7 +293,7 @@ $(document).ready(function(){
         }else{
             var dados= {
                 'data'                  : data
-                ,'origem'               : origem
+                ,'origem'               : origemTanque
                 ,'destino'              : destino
                 ,'litros'               : litros
                 ,'nr_doc'               : nr_doc
@@ -879,6 +879,9 @@ $(document).ready(function(){
         var carg_julieta            = $(this).find('input#carg_julieta').val();
         var carg_truck              = $(this).find('input#carg_truck').val();
         var carg_bitrem             = $(this).find('input#carg_bitrem').val();
+        var descarg_julieta         = $(this).find('input#descarg_julieta').val();
+        var descarg_truck           = $(this).find('input#descarg_truck').val();
+        var descarg_bitrem          = $(this).find('input#descarg_bitrem').val();
 
 
 /********************************************************************************************* */
@@ -924,6 +927,9 @@ $(document).ready(function(){
                 ,'carg_julieta'             : carg_julieta
                 ,'carg_truck'               : carg_truck
                 ,'carg_bitrem'              : carg_bitrem
+                ,'descarg_julieta'          : descarg_julieta
+                ,'descarg_truck'            : descarg_truck
+                ,'descarg_bitrem'           : descarg_bitrem
             }
         grava(dados,route,type,origem);
         // console.log(dados,route,type,origem);

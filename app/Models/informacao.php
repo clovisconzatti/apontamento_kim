@@ -44,6 +44,9 @@ class informacao extends Model
         , 'carg_julieta'
         , 'carg_truck'
         , 'carg_bitrem'
+        , 'descarg_julieta'
+        , 'descarg_truck'
+        , 'descarg_bitrem'
     ];
     protected $primaryKey = 'id';
     protected $table = 'informacao';

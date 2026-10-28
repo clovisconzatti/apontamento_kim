@@ -94,7 +94,7 @@ class manutencaoController extends Controller
             ]);
             $manutencao->save();
         }catch(\Exception $e){
-            return response()->json($manutencao);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
     }
@@ -131,7 +131,7 @@ class manutencaoController extends Controller
 
             $manutencao->save();
         }catch(\Exception $e){
-            return response()->json($manutencao);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
     }

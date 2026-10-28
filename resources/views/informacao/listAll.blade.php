@@ -2,9 +2,17 @@
 @section('content')
     <table class="table table-borderless table-advance table-condensed">
         <tr>
-            <td width="80%">
+            <td width="60%">
                 <h3>
                     <i class="fas fa-tree"></i> Informações Diárias
+                </h3>
+            </td>
+            <td width="20%" align="center">
+                <h3>
+                    <a class="cor-digiliza" href="{{route('informacao.consumo')}}" title="Diesel e lubrificantes por máquina, com os filtros atuais">
+                        <i class="fas fa-chart-bar"></i>&nbsp;&nbsp;&nbsp;
+                        <span>Consumo por máquina</span>
+                    </a>
                 </h3>
             </td>
             <td width="20%" align="center">

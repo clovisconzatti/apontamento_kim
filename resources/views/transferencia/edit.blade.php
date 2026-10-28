@@ -29,7 +29,7 @@
         <div class="row">
             <div class="form-group col-md-3">
                 * Data:
-                <input class="form-control" type="date" name="data" id="data"  value="{{ date('Y-m-d') }}">
+                <input class="form-control" type="date" name="data" id="data"  value="{{ $transferencia->data }}">
             </div>
             <div class="form-group col-md-3">
                 * Origem:

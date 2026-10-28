@@ -18,9 +18,10 @@ use Illuminate\Validation\ValidationException;
 
 class informacaoController extends Controller
 {
-    public function listAll(Request $request ){
-
-        $camposFiltro = [
+    // Campos do filtro, compartilhados pela listagem e pelo relatório de consumo
+    private function camposFiltro()
+    {
+        return [
             'dtInicial'   => ['label' => 'Data inicial', 'tipo' => 'data', 'col' => 2],
             'dtFinal'     => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'fazenda'     => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 4, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
@@ -31,7 +32,13 @@ class informacaoController extends Controller
             'clima'       => ['label' => 'Clima', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('clima', 'clima')],
             'terreno'     => ['label' => 'Terreno', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('terreno', 'terreno')],
             'busca'       => ['label' => 'Nº NF', 'tipo' => 'texto', 'col' => 4],
+            'lubrificante'=> ['label' => 'Lubrificante', 'tipo' => 'select', 'col' => 4, 'opcoes' => $this->opcoesTabela('lubrificante', 'lubrificante')],
         ];
+    }
+
+    // Lê os filtros da sessão e monta a consulta de informacao já filtrada
+    private function consultaFiltrada(Request $request, array $camposFiltro, &$filtros)
+    {
         // Padrão: mês atual (a tabela é grande; evita carregar todo o histórico)
         $filtros = $this->lerFiltros($request, 'informacao', $camposFiltro, [
             'dtInicial' => date('Y-m-01'),
@@ -41,15 +48,24 @@ class informacaoController extends Controller
         $query = informacao::query();
         $this->filtrarPeriodo($query, $filtros, 'informacao.data');
         $this->filtrarIgual($query, $filtros, [
-            'fazenda'     => 'informacao.fazenda',
-            'equipamento' => 'informacao.equipamento',
-            'colaborador' => 'informacao.colaborador',
-            'atividade'   => 'informacao.atividade',
-            'corte'       => 'informacao.corte',
-            'clima'       => 'informacao.clima',
-            'terreno'     => 'informacao.terreno',
+            'fazenda'      => 'informacao.fazenda',
+            'equipamento'  => 'informacao.equipamento',
+            'colaborador'  => 'informacao.colaborador',
+            'atividade'    => 'informacao.atividade',
+            'corte'        => 'informacao.corte',
+            'clima'        => 'informacao.clima',
+            'terreno'      => 'informacao.terreno',
+            'lubrificante' => 'informacao.tipo_lubrificante',
         ]);
         $this->filtrarTexto($query, $filtros['busca'], ['informacao.nr_nf']);
+
+        return $query;
+    }
+
+    public function listAll(Request $request ){
+
+        $camposFiltro = $this->camposFiltro();
+        $query = $this->consultaFiltrada($request, $camposFiltro, $filtros);
 
         $informacoes = $query->leftJoin('fazenda','fazenda.id','informacao.fazenda')
                                     ->leftJoin('equipamento','equipamento.id','informacao.equipamento')
@@ -97,10 +113,62 @@ class informacaoController extends Controller
                                         , 'informacao.carg_julieta'
                                         , 'informacao.carg_truck'
                                         , 'informacao.carg_bitrem'
+                                        , 'informacao.descarg_julieta'
+                                        , 'informacao.descarg_truck'
+                                        , 'informacao.descarg_bitrem'
                                         ]);
         $totalRegistros = $informacoes->count();
 
         return view('informacao.listAll' , compact('informacoes', 'camposFiltro', 'filtros', 'totalRegistros'));
+    }
+
+    // Relatório de consumo (diesel e lubrificantes) por máquina, com os mesmos filtros da listagem
+    public function consumo(Request $request)
+    {
+        $camposFiltro = $this->camposFiltro();
+        $query = $this->consultaFiltrada($request, $camposFiltro, $filtros);
+
+        // Horas trabalhadas: só conta lançamentos com horímetro coerente (entre 0 e 24h no dia);
+        // acima disso é erro de digitação e aparece na lista de suspeitos para correção
+        $diferenca = 'informacao.horimetro_final - informacao.horimetro_inicial';
+        $horas = "CASE WHEN $diferenca BETWEEN 0 AND 24 THEN $diferenca ELSE 0 END";
+
+        $suspeitos = (clone $query)->leftJoin('equipamento','equipamento.id','informacao.equipamento')
+                                    ->whereRaw("$diferenca > 24")
+                                    ->orderBy('informacao.data', 'DESC')
+                                    ->get([
+                                        'informacao.id'
+                                        ,'informacao.data'
+                                        ,'equipamento.equipamento'
+                                        ,'informacao.horimetro_inicial'
+                                        ,'informacao.horimetro_final'
+                                    ]);
+
+        $maquinas = (clone $query)->leftJoin('equipamento','equipamento.id','informacao.equipamento')
+                                    ->groupBy('informacao.equipamento', 'equipamento.equipamento')
+                                    ->orderBy('equipamento.equipamento')
+                                    ->selectRaw("equipamento.equipamento
+                                                ,COUNT(*) as registros
+                                                ,SUM($horas) as horas
+                                                ,SUM(COALESCE(informacao.qnt_diesel,0)) as diesel
+                                                ,SUM(COALESCE(informacao.qnt_lubrificante,0)) as lubrificante")
+                                    ->get();
+
+        $lubrificantes = (clone $query)->leftJoin('equipamento','equipamento.id','informacao.equipamento')
+                                    ->join('lubrificante','lubrificante.id','informacao.tipo_lubrificante')
+                                    ->where('informacao.qnt_lubrificante', '>', 0)
+                                    ->groupBy('informacao.equipamento', 'equipamento.equipamento', 'lubrificante.lubrificante')
+                                    ->orderBy('equipamento.equipamento')
+                                    ->orderBy('lubrificante.lubrificante')
+                                    ->selectRaw('equipamento.equipamento
+                                                ,lubrificante.lubrificante
+                                                ,COUNT(*) as registros
+                                                ,SUM(informacao.qnt_lubrificante) as quantidade')
+                                    ->get();
+
+        $totalRegistros = $maquinas->sum('registros');
+
+        return view('informacao.consumo', compact('maquinas', 'lubrificantes', 'suspeitos', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
     public function formAdd()
@@ -156,10 +224,13 @@ class informacaoController extends Controller
                 , "carg_julieta"                => $request->carg_julieta
                 , "carg_truck"                  => $request->carg_truck
                 , "carg_bitrem"                 => $request->carg_bitrem
+                , "descarg_julieta"             => $request->descarg_julieta
+                , "descarg_truck"               => $request->descarg_truck
+                , "descarg_bitrem"              => $request->descarg_bitrem
             ]);
             $informacao->save();
         }catch(\Exception $e){
-            return response()->json($e);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
     }
@@ -233,9 +304,12 @@ class informacaoController extends Controller
             $informacao->carg_julieta		        = $request->carg_julieta;
             $informacao->carg_truck		            = $request->carg_truck;
             $informacao->carg_bitrem		        = $request->carg_bitrem;
+            $informacao->descarg_julieta		    = $request->descarg_julieta;
+            $informacao->descarg_truck		        = $request->descarg_truck;
+            $informacao->descarg_bitrem		        = $request->descarg_bitrem;
             $informacao->save();
         }catch(\Exception $e){
-            return response()->json($informacao);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
     }

@@ -98,7 +98,7 @@ class transferenciaController extends Controller
             ]);
             $transferencia->save();
         }catch(\Exception $e){
-            return response()->json($transferencia);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
     }
@@ -122,7 +122,6 @@ class transferenciaController extends Controller
             $transferencia->origem              = $request->origem;
             $transferencia->destino		        = $request->destino;
             $transferencia->litros		        = $request->litros;
-            $transferencia->fornecedor	        = $request->fornecedor;
             $transferencia->nr_doc		        = $request->nr_doc;
             $transferencia->combustivel         = $request->combustivel;
             $transferencia->horimetro           = $request->horimetro;
@@ -134,7 +133,7 @@ class transferenciaController extends Controller
             $transferencia->tanque              = $request->tanque;
             $transferencia->save();
         }catch(\Exception $e){
-            return response()->json($transferencia);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
     }

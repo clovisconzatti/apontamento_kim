@@ -266,6 +266,7 @@ Route::group(['middleware' => ['auth']], function () {
  /********************************** informacao diária ***************************************************************/
     Route::group(['namespace' => 'informacao'], function () {
         Route::get('informacao',[informacaoController::class,'listAll'])->name('informacao.listAll');
+        Route::get('informacao/consumo',[informacaoController::class,'consumo'])->name('informacao.consumo');
         Route::get('informacao/novo',[informacaoController::class,'formAdd'])->name('informacao.formAdd');
         Route::get('informacao/editar/{informacao}',[informacaoController::class,'formEdit'])->name('informacao.formEdit');
         Route::post('informacao/store',[informacaoController::class,'store'])->name('informacao.store');
