@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\painel;
 
 use App\Http\Controllers\Controller;
+use App\Support\ConsumoAbastecimento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -128,100 +129,10 @@ abstract class PainelBase extends Controller
                     ->all();
     }
 
-    // Um intervalo entre abastecimentos acima disso não serve de referência (provável horímetro digitado errado)
-    const INTERVALO_MAXIMO = 300;
-
-    /**
-     * Consumo pelos abastecimentos (tanque cheio): litros abastecidos ÷ horas desde o abastecimento anterior.
-     * Para cada máquina, em ordem de data: compara o horímetro do abastecimento com o do abastecimento anterior que
-     * tenha horímetro (sem horímetro, procura na data anterior; os litros dele somam no intervalo seguinte).
-     * Mesmo horímetro da referência: os litros seguem para o próximo intervalo (não é erro).
-     * Horímetro menor que a referência ou mais de INTERVALO_MAXIMO acima dela vai para a conferência e fica como
-     * "candidata": se o próximo seguir a referência, era erro de digitação; se seguir a candidata, o horímetro
-     * mudou de patamar (troca de painel, lançamento de outra máquina) e a candidata passa a ser a referência.
-     * Considera todo o histórico até $ate (o abastecimento anterior pode ser de antes do período filtrado).
-     *
-     * Devolve ['intervalos' => [id do abastecimento => [litros, horas, data_ref, horimetro_ref, horimetro]],
-     *          'conferir'   => [[id, data, maquina, litros, horimetro, horimetro_ref, data_ref], ...]]
-     */
+    // Consumo pelos abastecimentos: ver App\Support\ConsumoAbastecimento (mesma conta da listagem da Informação Diária)
     protected function intervalosConsumo($ate)
     {
-        $abastecimentos = DB::table('informacao')
-                            ->leftJoin('equipamento', 'equipamento.id', 'informacao.equipamento')
-                            ->whereNull('informacao.deleted_at')
-                            ->where('informacao.qnt_diesel', '>', 0)
-                            ->where('informacao.equipamento', '>', 0)
-                            ->when($ate, fn($q) => $q->where('informacao.data', '<=', $ate))
-                            ->orderBy('informacao.equipamento')
-                            ->orderBy('informacao.data')
-                            ->orderByRaw('informacao.horimetro_abastecimento IS NULL, informacao.horimetro_abastecimento, informacao.id')
-                            ->get([
-                                'informacao.id', 'informacao.data', 'informacao.equipamento', 'informacao.qnt_diesel',
-                                'informacao.horimetro_abastecimento',
-                                DB::raw("COALESCE(equipamento.equipamento, equipamento.placa) as maquina"),
-                            ]);
-
-        $intervalos = [];
-        $conferir = [];
-        $maquina = null;
-        $valido = fn($horas) => $horas > 0 && $horas <= self::INTERVALO_MAXIMO;
-
-        foreach ($abastecimentos as $a) {
-            if ($a->equipamento !== $maquina) {
-                $maquina = $a->equipamento;
-                $referencia = null;  // último horímetro aceito
-                $litros = 0;         // litros abastecidos depois da referência
-                $candidata = null;   // leitura fora da sequência, à espera de confirmação
-                $litrosCandidata = 0;
-            }
-            if ($referencia) {
-                $litros += (float) $a->qnt_diesel;
-            }
-            if ($candidata) {
-                $litrosCandidata += (float) $a->qnt_diesel;
-            }
-            $horimetro = $a->horimetro_abastecimento > 0 ? (float) $a->horimetro_abastecimento : null;
-            if (is_null($horimetro)) {
-                continue; // sem horímetro: os litros seguem para o próximo intervalo
-            }
-            if (!$referencia) {
-                $referencia = ['data' => $a->data, 'horimetro' => $horimetro];
-                continue;
-            }
-            if ($horimetro == $referencia['horimetro']) {
-                continue; // mesmo horímetro do anterior (abasteceu sem trabalhar): os litros seguem para o próximo intervalo
-            }
-
-            $horas = $horimetro - $referencia['horimetro'];
-            if ($valido($horas)) {
-                // Segue a sequência: fecha o intervalo; se havia candidata, ela era só um erro de digitação
-                $intervalos[$a->id] = [
-                    'litros' => $litros, 'horas' => $horas, 'data_ref' => $referencia['data'],
-                    'horimetro_ref' => $referencia['horimetro'], 'horimetro' => $horimetro,
-                ];
-            } elseif ($candidata && $valido($horimetro - $candidata['horimetro'])) {
-                // Segue a candidata: o horímetro mudou de patamar de verdade; a candidata vira a referência
-                $intervalos[$a->id] = [
-                    'litros' => $litrosCandidata, 'horas' => $horimetro - $candidata['horimetro'], 'data_ref' => $candidata['data'],
-                    'horimetro_ref' => $candidata['horimetro'], 'horimetro' => $horimetro,
-                ];
-            } else {
-                // Fora da sequência: vai para a conferência e fica como candidata; a referência continua a mesma
-                $conferir[] = [
-                    'id' => $a->id, 'data' => $a->data, 'maquina' => $a->maquina, 'litros' => (float) $a->qnt_diesel,
-                    'horimetro' => $horimetro, 'horimetro_ref' => $referencia['horimetro'], 'data_ref' => $referencia['data'],
-                ];
-                $candidata = ['data' => $a->data, 'horimetro' => $horimetro];
-                $litrosCandidata = 0;
-                continue;
-            }
-            $referencia = ['data' => $a->data, 'horimetro' => $horimetro];
-            $litros = 0;
-            $candidata = null;
-            $litrosCandidata = 0;
-        }
-
-        return ['intervalos' => $intervalos, 'conferir' => $conferir];
+        return ConsumoAbastecimento::intervalos($ate);
     }
 
     // Planilha CSV que o Excel abre direto (separador ";" e acentos corretos)

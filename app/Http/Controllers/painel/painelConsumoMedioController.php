@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
  * Painel de Operações · Consumo Médio por máquina
  *
  * Pelos abastecimentos: litros abastecidos ÷ (horímetro deste abastecimento − horímetro do abastecimento anterior).
- * Sem horímetro no abastecimento anterior, procura na data anterior (ver PainelBase::intervalosConsumo).
+ * Sem horímetro no abastecimento anterior, procura na data anterior (ver App\Support\ConsumoAbastecimento).
  */
 class painelConsumoMedioController extends PainelBase
 {

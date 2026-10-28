@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
  * Painel de Operações · Consumo de Combustível
  *
  * Diesel lançado na Informação Diária (Total Diesel). O consumo em L/h é calculado pelos abastecimentos
- * (ver PainelBase::intervalosConsumo) e comparado com a faixa consumo mínimo / máximo do cadastro do equipamento.
+ * (ver App\Support\ConsumoAbastecimento) e comparado com a faixa consumo mínimo / máximo do cadastro do equipamento.
  */
 class painelCombustivelController extends PainelBase
 {

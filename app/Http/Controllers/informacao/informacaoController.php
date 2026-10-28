@@ -13,6 +13,7 @@ use App\Models\fazenda;
 use App\Models\informacao;
 use App\Models\lubrificante;
 use App\Models\terreno;
+use App\Support\ConsumoAbastecimento;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -81,6 +82,8 @@ class informacaoController extends Controller
                                     ->get([
                                         'informacao.id'
                                         ,'informacao.data'
+                                        ,'informacao.equipamento as equipamento_id'
+                                        ,'equipamento.placa'
                                         ,'fazenda.fazenda'
                                         , 'equipamento.equipamento'
                                         , 'atividade.atividade'
@@ -119,7 +122,16 @@ class informacaoController extends Controller
                                         ]);
         $totalRegistros = $informacoes->count();
 
-        return view('informacao.listAll' , compact('informacoes', 'camposFiltro', 'filtros', 'totalRegistros'));
+        // Variação do horímetro desde o abastecimento anterior e média de consumo (L/h), nas linhas com horímetro de abastecimento.
+        // Mesma conta do painel Consumo Médio; o abastecimento anterior pode ser de antes do período filtrado.
+        $comHorimetro = $informacoes->filter(fn($i) => $i->horimetro_abastecimento > 0 && $i->qnt_diesel > 0);
+        $consumo = $comHorimetro->count()
+            ? ConsumoAbastecimento::intervalos($filtros['dtFinal'], $comHorimetro->pluck('equipamento_id')->unique()->values()->all())
+            : ['intervalos' => [], 'conferir' => [], 'sem_intervalo' => []];
+        // Detalhe dos horímetros "a conferir" desta página, para a janela de correção
+        $problemas = collect($consumo['conferir'])->keyBy('id')->only($comHorimetro->pluck('id')->all())->all();
+
+        return view('informacao.listAll' , compact('informacoes', 'consumo', 'problemas', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
 

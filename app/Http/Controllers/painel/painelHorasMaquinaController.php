@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
  * Horas trabalhadas por equipamento pelo horímetro da Informação Diária (final - inicial).
  * Diferença negativa ou acima de 24h num lançamento é tratada como erro de digitação:
  * fica fora dos totais e vai para a lista "a conferir".
- * Consumo (L/h) pelos abastecimentos, igual ao painel Consumo Médio (ver PainelBase::intervalosConsumo).
+ * Consumo (L/h) pelos abastecimentos, igual ao painel Consumo Médio (ver App\Support\ConsumoAbastecimento).
  */
 class painelHorasMaquinaController extends PainelBase
 {

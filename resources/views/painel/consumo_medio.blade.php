@@ -142,7 +142,7 @@
         @if (count($conferir))
             <div class="viz-card">
                 <h4 style="color: #b3261e;"><i class="fas fa-exclamation-triangle"></i> Horímetros de abastecimento a conferir ({{ count($conferir) }})</h4>
-                <p class="viz-sub">O horímetro é menor que o do abastecimento anterior, ou mais de 300 h acima dele: provável erro de digitação. Não entrou na conta.</p>
+                <p class="viz-sub">O horímetro não segue a sequência da máquina (menor que o anterior, mais de 300 h acima dele, ou os abastecimentos seguintes não seguem este): provável erro de digitação. Não entrou na conta.</p>
                 <div class="viz-tabela-box">
                     <table class="viz-tabela">
                         <thead>
@@ -154,8 +154,8 @@
                                     <td class="text-center">{{ date('d/m/Y', strtotime($c['data'])) }}</td>
                                     <td>{{ $c['maquina'] }}</td>
                                     <td class="num"><b>{{ $n($c['horimetro'], 2) }}</b></td>
-                                    <td class="num">{{ $n($c['horimetro_ref'], 2) }}</td>
-                                    <td class="text-center">{{ date('d/m/Y', strtotime($c['data_ref'])) }}</td>
+                                    <td class="num">{{ is_null($c['horimetro_ref']) ? '–' : $n($c['horimetro_ref'], 2) }}@if (($c['tipo'] ?? '') === 'seguintes')<span class="viz-origem">o seguinte ({{ $n($c['horimetro_seg'], 2) }} em {{ date('d/m/Y', strtotime($c['data_seg'])) }}) não segue este</span>@endif</td>
+                                    <td class="text-center">{{ $c['data_ref'] ? date('d/m/Y', strtotime($c['data_ref'])) : '–' }}</td>
                                     <td class="num">{{ $n($c['litros'], 0) }} L</td>
                                     <td class="text-center"><a class="btn btn-outline-info btn-sm" href="{{ route('informacao.formEdit', $c['id']) }}"><i class="far fa-edit"></i> Editar</a></td>
                                 </tr>
