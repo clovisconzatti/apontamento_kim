@@ -17,6 +17,11 @@ class revisao extends Model
         , 'intervalo_revisao'
         , 'proxima_revisao'
         , 'nr_os'
+        , 'hora_inicial'
+        , 'hora_final'
+        , 'custo_terceiro'
+        , 'custo_hora'
+        , 'custo_deslocamento'
         , 'horimetro_proxima'
         , 'obs'
 

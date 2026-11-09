@@ -27,10 +27,14 @@
     <table class="table table-bordered table-condensed table-striped fonte-10">
         <thead>
             <tr>
-                <th width="9%" class="text-center">Data</th>
-                <th width="19%">Equipamento</th>
-                <th width="15%">Revisão Atual</th>
-                <th width="8%">Nº OS</th>
+                <th width="8%" class="text-center">Data</th>
+                <th width="14%">Equipamento</th>
+                <th width="12%">Revisão Atual</th>
+                <th width="6%">Nº OS</th>
+                <th width="8%" class="text-center text-nowrap">Horário</th>
+                <th width="7%" class="text-right text-nowrap">Custo terceiro</th>
+                <th width="7%" class="text-right text-nowrap">Custo horas</th>
+                <th width="7%" class="text-right text-nowrap">Deslocamento</th>
                 <th width="10%" class="text-right text-nowrap">Horímetro atual</th>
                 <th width="8%" class="text-right text-nowrap">Intervalo</th>
                 <th width="15%">Próxima Revisão</th>
@@ -45,6 +49,19 @@
                     <td class="align-middle">{{ $revisao->placa }}{{ $revisao->equipamento ? ' - '.$revisao->equipamento : '' }}</td>
                     <td class="align-middle">{{ $revisao->tipo_revisao }}</td>
                     <td class="align-middle">{{ $revisao->nr_os }}</td>
+                    <td align="center" class="align-middle text-nowrap">
+                        {{ $revisao->hora_inicial ? substr($revisao->hora_inicial, 0, 5) : '' }}{{ $revisao->hora_inicial || $revisao->hora_final ? ' – ' : '' }}{{ $revisao->hora_final ? substr($revisao->hora_final, 0, 5) : '' }}
+                    </td>
+                    <td align="right" class="align-middle text-nowrap">{{ is_null($revisao->custo_terceiro) ? '' : 'R$ '.number_format($revisao->custo_terceiro, 2, ',', '.') }}</td>
+                    @php
+                        $horasRevisao = \App\Support\CustoHoras::horas($revisao->hora_inicial, $revisao->hora_final);
+                        $custoHoras = \App\Support\CustoHoras::custo($revisao->hora_inicial, $revisao->hora_final, $revisao->custo_hora);
+                    @endphp
+                    <td align="right" class="align-middle text-nowrap"
+                        title="{{ is_null($custoHoras) ? '' : \App\Support\CustoHoras::formatar($horasRevisao).' × R$ '.number_format($revisao->custo_hora, 2, ',', '.').'/h' }}">
+                        {{ is_null($custoHoras) ? '' : 'R$ '.number_format($custoHoras, 2, ',', '.') }}
+                    </td>
+                    <td align="right" class="align-middle text-nowrap">{{ is_null($revisao->custo_deslocamento) ? '' : 'R$ '.number_format($revisao->custo_deslocamento, 2, ',', '.') }}</td>
                     <td align="right" class="align-middle text-nowrap">{{ $horimetro($revisao->horimetro_atual) }}</td>
                     <td align="right" class="align-middle text-nowrap">{{ is_null($revisao->intervalo_horas) ? '' : $horimetro($revisao->intervalo_horas).' h' }}</td>
                     <td class="align-middle">{{ $revisao->proxima_revisao }}</td>
@@ -66,7 +83,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" class="text-center text-muted">Nenhuma revisão encontrada para os filtros selecionados.</td>
+                    <td colspan="13" class="text-center text-muted">Nenhuma revisão encontrada para os filtros selecionados.</td>
                 </tr>
             @endforelse
         </tbody>

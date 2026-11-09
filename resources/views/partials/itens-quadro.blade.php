@@ -2,12 +2,14 @@
     Quadro de itens com quantidade (peças, lubrificantes): linhas lançadas + botão "+" que acrescenta outra.
     Variáveis: $grupo (nome enviado ao servidor, ex.: pecas), $titulo, $rotulo, $botao,
                $opcoes ([id => texto]) e $linhas ([['id' => , 'quantidade' => ], ...]; vazio = uma linha em branco).
+    Opcional: $semQuantidade = true para uma lista só de itens (sem a coluna Quantidade).
     Precisa estar dentro de um elemento .info-form (estilo) e de um form cujo handler use coletaItens() do custom.js.
 --}}
+@php $semQuantidade = $semQuantidade ?? false; @endphp
 <div class="info-quadro">
     <h5>{{ $titulo }}</h5>
     <table>
-        <thead><tr><th>{{ $rotulo }}</th><th style="width: 30%;">Quantidade</th><th style="width: 1%;"></th></tr></thead>
+        <thead><tr><th>{{ $rotulo }}</th>@unless ($semQuantidade)<th style="width: 30%;">Quantidade</th>@endunless<th style="width: 1%;"></th></tr></thead>
         <tbody id="itens-{{ $grupo }}">
             @forelse ($linhas as $linha)
                 @include('partials.item-linha', ['id' => $linha['id'], 'quantidade' => $linha['quantidade']])

@@ -11,9 +11,11 @@
             @endforeach
         </select>
     </td>
+    @unless ($semQuantidade ?? false)
     <td>
         <input class="form-control item-quantidade" type="number" step="any" min="0" value="{{ $quantidade }}" aria-label="Quantidade de {{ mb_strtolower($rotulo) }}">
     </td>
+    @endunless
     <td class="text-center">
         <button type="button" class="btn btn-outline-danger btn-sm item-remover" title="Remover linha" aria-label="Remover linha">
             <span class="fas fa-times"></span>

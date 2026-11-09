@@ -816,7 +816,8 @@ $(document).ready(function(){
         var horimetro           = $(this).find('input#horimetro').val();
         var tipo_manutencao     = $(this).find('select#tipo_manutencao').val();
         var custo               = $(this).find('input#custo').val();
-        var manutencao_diaria   = $(this).find('input#manutencao_diaria').val();
+        var custo_hora          = $(this).find('input#custo_hora').val();
+        var custo_deslocamento  = $(this).find('input#custo_deslocamento').val();
         var situacao            = $(this).find('select#situacao').val();
         var obs                 = $(this).find('input#obs').val();
         var itens               = coletaItens(this);
@@ -841,7 +842,8 @@ $(document).ready(function(){
                 ,'horimetro'            : horimetro
                 ,'tipo_manutencao'      : tipo_manutencao
                 ,'custo'                : custo
-                ,'manutencao_diaria'    : manutencao_diaria
+                ,'custo_hora'           : custo_hora
+                ,'custo_deslocamento'   : custo_deslocamento
                 ,'situacao'             : situacao
                 ,'obs'                  : obs
                 ,'pecas'                : itens.pecas || []
@@ -1060,6 +1062,8 @@ $(document).ready(function(){
         var intervalo           = $(this).find('input#intervalo').val();
         var obs                 = $(this).find('input#obs').val();
 
+        var itens               = coletaItens(this);
+
 
 /********************************************************************************************* */
         if(!descricao || !intervalo){
@@ -1073,8 +1077,31 @@ $(document).ready(function(){
                 'descricao'             : descricao
                 ,'intervalo'            : intervalo
                 ,'obs'                  : obs
+                ,'servicos'             : itens.servicos || []
+                ,'pecas'                : itens.pecas || []
+                ,'lubrificantes'        : itens.lubrificantes || []
             }
         grava(dados,route,type,origem);
+        }
+    })
+
+/**********************gravar serviço de revisão **************************************************/
+    $(document).on('submit', 'form#cadastro-servico_revisao', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var servico             = $(this).find('input#servico').val();
+
+        if(!servico){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            grava({'servico' : servico},route,type,origem);
         }
     })
 
@@ -1112,6 +1139,11 @@ $(document).ready(function(){
         var intervalo_revisao   = $(this).find('select#intervalo_revisao').val();
         var proxima_revisao     = $(this).find('select#proxima_revisao').val();
         var nr_os               = $(this).find('input#nr_os').val();
+        var hora_inicial        = $(this).find('input#hora_inicial').val();
+        var hora_final          = $(this).find('input#hora_final').val();
+        var custo_terceiro      = $(this).find('input#custo_terceiro').val();
+        var custo_hora          = $(this).find('input#custo_hora').val();
+        var custo_deslocamento  = $(this).find('input#custo_deslocamento').val();
         var obs                 = $(this).find('input#obs').val();
 
         var itens               = coletaItens(this);
@@ -1133,6 +1165,11 @@ $(document).ready(function(){
                 ,'intervalo_revisao'    : intervalo_revisao
                 ,'proxima_revisao'      : proxima_revisao
                 ,'nr_os'                : nr_os
+                ,'hora_inicial'         : hora_inicial
+                ,'hora_final'           : hora_final
+                ,'custo_terceiro'       : custo_terceiro
+                ,'custo_hora'           : custo_hora
+                ,'custo_deslocamento'   : custo_deslocamento
                 ,'obs'                  : obs
                 ,'pecas'                : itens.pecas || []
                 ,'lubrificantes'        : itens.lubrificantes || []

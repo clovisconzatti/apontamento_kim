@@ -21,6 +21,8 @@ class manutencao extends Model
         , 'tipo_manutencao'
         , 'custo'
         , 'manutencao_diaria'
+        , 'custo_hora'
+        , 'custo_deslocamento'
         , 'situacao'
         , 'obs'
 

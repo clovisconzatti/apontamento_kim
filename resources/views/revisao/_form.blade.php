@@ -84,6 +84,29 @@
                 <small class="text-muted" id="calculoProxima">Horímetro atual + intervalo de revisão</small>
             </div>
         </div>
+        <div class="info-grid info-g4">
+            <div class="info-campo"><label for="hora_inicial">Hora início revisão</label>
+                <input class="form-control" type="time" name="hora_inicial" id="hora_inicial" value="{{ $v('hora_inicial') ? substr($v('hora_inicial'), 0, 5) : '' }}">
+            </div>
+            <div class="info-campo"><label for="hora_final">Hora final revisão</label>
+                <input class="form-control" type="time" name="hora_final" id="hora_final" value="{{ $v('hora_final') ? substr($v('hora_final'), 0, 5) : '' }}">
+            </div>
+            <div class="info-campo"><label for="custo_hora">Custo hora (R$/h)</label>
+                <input class="form-control" type="number" step="0.01" min="0" name="custo_hora" id="custo_hora" value="{{ $v('custo_hora') }}" placeholder="0,00">
+            </div>
+            <div class="info-campo"><label for="custoHorasCalc">Custo das horas trabalhadas</label>
+                <input class="form-control" type="text" id="custoHorasCalc" value="" readonly tabindex="-1" style="background: #fff4c2; font-weight: 700;">
+                <small class="text-muted" id="custoHorasNota"></small>
+            </div>
+        </div>
+        <div class="info-grid info-g4">
+            <div class="info-campo"><label for="custo_terceiro">Custo de terceiro (R$)</label>
+                <input class="form-control" type="number" step="0.01" min="0" name="custo_terceiro" id="custo_terceiro" value="{{ $v('custo_terceiro') }}" placeholder="0,00">
+            </div>
+            <div class="info-campo"><label for="custo_deslocamento">Custo de deslocamento (R$)</label>
+                <input class="form-control" type="number" step="0.01" min="0" name="custo_deslocamento" id="custo_deslocamento" value="{{ $v('custo_deslocamento') }}" placeholder="0,00">
+            </div>
+        </div>
         <div class="info-grid">
             <div class="info-campo"><label for="obs">Observação</label>
                 <input class="form-control" type="text" maxlength="255" name="obs" id="obs" value="{{ $v('obs') }}" placeholder="Serviços executados, peças trocadas, pendências…">
@@ -155,3 +178,4 @@
 
     });
 </script>
+@include('partials.custo-horas')

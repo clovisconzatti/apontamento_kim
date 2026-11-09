@@ -91,9 +91,18 @@
                 Custo de Manutenção Terceiros
                 <input class="form-control" type="number" step="any" name="custo" id="custo"  value="{{ $manutencao->custo }}" >
             </div>
-            <div class="form-group col-md-3">
-                Manutenção Diária
-                <input class="form-control" type="number" step="any" name="manutencao_diaria" id="manutencao_diaria"  value="{{ $manutencao->manutencao_diaria }}" >
+            <div class="form-group col-md-2">
+                Custo Hora (R$/h)
+                <input class="form-control" type="number" step="0.01" min="0" name="custo_hora" id="custo_hora"  value="{{ $manutencao->custo_hora }}" >
+            </div>
+            <div class="form-group col-md-2">
+                Custo das Horas Trabalhadas
+                <input class="form-control" type="text" id="custoHorasCalc" value="" readonly tabindex="-1" style="background: #fff4c2; font-weight: 700;">
+                <small class="text-muted" id="custoHorasNota"></small>
+            </div>
+            <div class="form-group col-md-2">
+                Custo de Deslocamento
+                <input class="form-control" type="number" step="0.01" min="0" name="custo_deslocamento" id="custo_deslocamento"  value="{{ $manutencao->custo_deslocamento }}" >
             </div>
             <div class="form-group col-md-3">
                 Situação da Manutenção
@@ -108,6 +117,15 @@
                 Observação
                 <input class="form-control" type="text" name="obs" id="obs"  value="{{ $manutencao->obs }}" >
             </div>
+            @if ((float) $manutencao->manutencao_diaria != 0)
+                {{-- Campo antigo, substituído pelo Custo Hora: o valor lançado fica guardado e só é mostrado --}}
+                <div class="form-group col-md-12">
+                    <small class="text-muted">
+                        <span class="fas fa-info-circle"></span>
+                        Manutenção Diária lançada antes do Custo Hora: <b>R$ {{ number_format($manutencao->manutencao_diaria, 2, ',', '.') }}</b> (mantida como estava)
+                    </small>
+                </div>
+            @endif
         </div>
         @include('partials.estilo-formulario')
         <div class="row info-form">
@@ -145,5 +163,6 @@
 
         });
     </script>
+    @include('partials.custo-horas')
 
 @endsection

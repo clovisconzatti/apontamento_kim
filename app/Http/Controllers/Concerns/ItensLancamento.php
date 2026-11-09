@@ -28,9 +28,9 @@ trait ItensLancamento
         return lubrificante::orderBy('lubrificante')->pluck('lubrificante', 'id')->all();
     }
 
-    // Ignora as linhas vazias e exige item do cadastro + quantidade maior que zero.
+    // Ignora as linhas vazias e exige item do cadastro + quantidade maior que zero ($comQuantidade = false: só o item).
     // Os erros vão para $erros (para ValidationException); devolve [['id' => , 'quantidade' => ], ...]
-    protected function lerItens($linhas, string $tabela, string $nome, string $campo, array &$erros): array
+    protected function lerItens($linhas, string $tabela, string $nome, string $campo, array &$erros, bool $comQuantidade = true): array
     {
         $itens = [];
         $linha = 0;
@@ -43,6 +43,8 @@ trait ItensLancamento
             }
             if ($id === '' || !DB::table($tabela)->where('id', $id)->whereNull('deleted_at')->exists()) {
                 $erros[$campo.'.'.$linha.'.id'] = $nome.' da linha '.$linha.': selecione um item do cadastro.';
+            } elseif (!$comQuantidade) {
+                $itens[] = ['id' => (int) $id, 'quantidade' => null];
             } elseif (!is_numeric($quantidade) || (float) $quantidade <= 0) {
                 $erros[$campo.'.'.$linha.'.quantidade'] = $nome.' da linha '.$linha.': informe uma quantidade maior que zero.';
             } else {

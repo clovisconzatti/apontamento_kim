@@ -24,9 +24,12 @@
     <table class="table table-bordered table-condensed table-striped">
         <thead>
             <tr>
-                <th width="40%">Tipo de Revisão</th>
+                <th width="30%">Tipo de Revisão</th>
                 <th width="15%" class="text-right">KM/Horas Revisão</th>
-                <th width="35%">Observação</th>
+                <th width="8%" class="text-right">Serviços</th>
+                <th width="8%" class="text-right">Peças</th>
+                <th width="9%" class="text-right">Lubrificantes</th>
+                <th width="20%">Observação</th>
                 <th width="10%" class="text-center">Ação</th>
             </tr>
         </thead>
@@ -39,6 +42,9 @@
                             {{ rtrim(rtrim(number_format($tipo_revisao->intervalo, 2, ',', '.'), '0'), ',') }}
                         @endif
                     </td>
+                    <td align="right" class="align-middle">{{ $tipo_revisao->servicos_count }}</td>
+                    <td align="right" class="align-middle">{{ $tipo_revisao->pecas_count }}</td>
+                    <td align="right" class="align-middle">{{ $tipo_revisao->lubrificantes_count }}</td>
                     <td class="align-middle">{{ $tipo_revisao->obs }}</td>
                     <td align="center" class="align-middle">
                         <div class="btn-group">
@@ -57,7 +63,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center text-muted">Nenhum tipo de revisão cadastrado.</td>
+                    <td colspan="7" class="text-center text-muted">Nenhum tipo de revisão cadastrado.</td>
                 </tr>
             @endforelse
         </tbody>

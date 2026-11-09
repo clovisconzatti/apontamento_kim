@@ -91,9 +91,18 @@
                 Custo de Manutenção Terceiros
                 <input class="form-control" type="number" step="any" name="custo" id="custo"  value="" >
             </div>
-            <div class="form-group col-md-3">
-                Manutenção Diária
-                <input class="form-control" type="number" step="any" name="manutencao_diaria" id="manutencao_diaria"  value="" >
+            <div class="form-group col-md-2">
+                Custo Hora (R$/h)
+                <input class="form-control" type="number" step="0.01" min="0" name="custo_hora" id="custo_hora"  value="" >
+            </div>
+            <div class="form-group col-md-2">
+                Custo das Horas Trabalhadas
+                <input class="form-control" type="text" id="custoHorasCalc" value="" readonly tabindex="-1" style="background: #fff4c2; font-weight: 700;">
+                <small class="text-muted" id="custoHorasNota"></small>
+            </div>
+            <div class="form-group col-md-2">
+                Custo de Deslocamento
+                <input class="form-control" type="number" step="0.01" min="0" name="custo_deslocamento" id="custo_deslocamento"  value="" >
             </div>
             <div class="form-group col-md-3">
                 Situação da Manutenção
@@ -144,5 +153,6 @@
 
         })
     </script>
+    @include('partials.custo-horas')
 
 @endsection

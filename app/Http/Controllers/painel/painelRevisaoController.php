@@ -5,6 +5,7 @@ namespace App\Http\Controllers\painel;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Painel de Operações · Revisões
@@ -73,6 +74,24 @@ class painelRevisaoController extends Controller
         $situacoes = self::SITUACOES;
 
         return view('painel.revisoes_lista', compact('linhas', 'situacao', 'situacoes', 'abas', 'lista'));
+    }
+
+    // Ordem de serviço para a oficina (página de impressão; o navegador salva em PDF), uma folha por equipamento,
+    // com os serviços e as peças da próxima revisão e os campos de assinatura.
+    // ?equipamento=ID imprime só aquele equipamento; sem ele, imprime todos com os filtros atuais do painel.
+    public function ordemServico(Request $request)
+    {
+        $filtros = $this->lerFiltros(new Request(), 'painel_revisoes', $this->camposFiltro());
+        if ($request->filled('equipamento')) {
+            $filtros = ['equipamento' => (int) $request->equipamento, 'tipo_equipamento' => null, 'tipo_revisao' => null, 'situacao' => null];
+        } elseif ($request->filled('situacao') && isset(self::SITUACOES[$request->situacao])) {
+            // Lista de trabalho (vencidas, próximas, em dia): todos daquela situação, sem os outros filtros
+            $filtros = ['equipamento' => null, 'tipo_equipamento' => null, 'tipo_revisao' => null, 'situacao' => $request->situacao];
+        }
+        $linhas = $this->filtrarSituacao($this->linhas($filtros), $filtros['situacao']);
+        $situacoes = self::SITUACOES;
+
+        return view('painel.revisoes_ordem', compact('linhas', 'situacoes'));
     }
 
     // Planilha (CSV para Excel) com os mesmos filtros da tela
@@ -147,6 +166,7 @@ class painelRevisaoController extends Controller
         }
 
         $atuais = $this->horimetrosAtuais($revisoes->pluck('equipamento_id')->all());
+        $itens = $this->itensTipoRevisao($revisoes->map(fn($r) => $r->proxima_revisao ?: $r->tipo_revisao)->unique()->filter()->values()->all());
 
         $linhas = [];
         foreach ($revisoes as $r) {
@@ -200,6 +220,10 @@ class painelRevisaoController extends Controller
                 'usado'        => $intervalo > 0 ? ($atual - (float) $r->horimetro_atual) / $intervalo : 0, // fração do intervalo já rodada
                 'situacao'     => $situacao,
                 'intensidade'  => $intensidade,
+                // Serviços e peças cadastrados no Tipo de Revisão da próxima revisão
+                'servicos'     => $itens[$r->proxima_revisao ?: $r->tipo_revisao]['servicos'] ?? [],
+                'pecas'        => $itens[$r->proxima_revisao ?: $r->tipo_revisao]['pecas'] ?? [],
+                'lubrificantes' => $itens[$r->proxima_revisao ?: $r->tipo_revisao]['lubrificantes'] ?? [],
             ];
         }
 
@@ -208,6 +232,44 @@ class painelRevisaoController extends Controller
         usort($linhas, fn($a, $b) => [$ordem[$a['situacao']], $a['falta']] <=> [$ordem[$b['situacao']], $b['falta']]);
 
         return $linhas;
+    }
+
+    // Serviços e peças do cadastro de cada Tipo de Revisão:
+    // [tipo => ['servicos' => [nome, ...], 'pecas' => [['peca' => nome, 'codigo' => , 'quantidade' => ], ...],
+    //          'lubrificantes' => [['lubrificante' => nome, 'quantidade' => ], ...]]]
+    private function itensTipoRevisao(array $tipos)
+    {
+        if (!$tipos) {
+            return [];
+        }
+        $itens = [];
+        DB::table('tipo_revisao_servico')
+            ->join('servico_revisao', 'servico_revisao.id', 'tipo_revisao_servico.servico')
+            ->whereIn('tipo_revisao_servico.tipo_revisao_id', $tipos)
+            ->orderBy('tipo_revisao_servico.id')
+            ->get(['tipo_revisao_servico.tipo_revisao_id', 'servico_revisao.servico'])
+            ->each(function ($s) use (&$itens) {
+                $itens[$s->tipo_revisao_id]['servicos'][] = $s->servico;
+            });
+        DB::table('tipo_revisao_peca')
+            ->join('peca', 'peca.id', 'tipo_revisao_peca.peca')
+            ->whereIn('tipo_revisao_peca.tipo_revisao_id', $tipos)
+            ->orderBy('tipo_revisao_peca.id')
+            ->get(['tipo_revisao_peca.tipo_revisao_id', 'peca.peca', 'peca.cod_cargo', 'tipo_revisao_peca.quantidade'])
+            ->each(function ($p) use (&$itens) {
+                $itens[$p->tipo_revisao_id]['pecas'][] = ['peca' => $p->peca, 'codigo' => $p->cod_cargo, 'quantidade' => (float) $p->quantidade];
+            });
+        if (Schema::hasTable('tipo_revisao_lubrificante')) { // criada pela migration 2026_11_09_150000
+            DB::table('tipo_revisao_lubrificante')
+                ->join('lubrificante', 'lubrificante.id', 'tipo_revisao_lubrificante.lubrificante')
+                ->whereIn('tipo_revisao_lubrificante.tipo_revisao_id', $tipos)
+                ->orderBy('tipo_revisao_lubrificante.id')
+                ->get(['tipo_revisao_lubrificante.tipo_revisao_id', 'lubrificante.lubrificante', 'tipo_revisao_lubrificante.quantidade'])
+                ->each(function ($o) use (&$itens) {
+                    $itens[$o->tipo_revisao_id]['lubrificantes'][] = ['lubrificante' => $o->lubrificante, 'quantidade' => (float) $o->quantidade];
+                });
+        }
+        return $itens;
     }
 
     // Horímetro do dia mais recente da Informação Diária de cada equipamento (o maior lançado naquele dia)

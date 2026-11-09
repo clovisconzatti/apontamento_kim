@@ -47,6 +47,11 @@ class revisaoController extends Controller
                                         ,'proxima.descricao as proxima_revisao'
                                         ,'intervalo_revisao.horas as intervalo_horas'
                                         ,'revisao.nr_os'
+                                        ,'revisao.hora_inicial'
+                                        ,'revisao.hora_final'
+                                        ,'revisao.custo_terceiro'
+                                        ,'revisao.custo_hora'
+                                        ,'revisao.custo_deslocamento'
                                         ,'revisao.horimetro_atual'
                                         ,'revisao.horimetro_proxima'
                                     ]);
@@ -85,6 +90,11 @@ class revisaoController extends Controller
                     ,"intervalo_revisao"    => $request->intervalo_revisao
                     ,"proxima_revisao"      => $request->proxima_revisao
                     ,"nr_os"                => $request->nr_os
+                    ,"hora_inicial"         => $request->hora_inicial ?: null
+                    ,"hora_final"           => $request->hora_final ?: null
+                    ,"custo_terceiro"       => $this->valor($request->custo_terceiro)
+                    ,"custo_hora"           => $this->valor($request->custo_hora)
+                    ,"custo_deslocamento"   => $this->valor($request->custo_deslocamento)
                     ,"horimetro_proxima"    => $this->proximaRevisao($request, $intervalo)
                     ,"obs"                  => $request->obs
                 ]);
@@ -120,6 +130,11 @@ class revisaoController extends Controller
                 $revisao->intervalo_revisao     = $request->intervalo_revisao;
                 $revisao->proxima_revisao       = $request->proxima_revisao;
                 $revisao->nr_os                 = $request->nr_os;
+                $revisao->hora_inicial          = $request->hora_inicial ?: null;
+                $revisao->hora_final            = $request->hora_final ?: null;
+                $revisao->custo_terceiro        = $this->valor($request->custo_terceiro);
+                $revisao->custo_hora            = $this->valor($request->custo_hora);
+                $revisao->custo_deslocamento    = $this->valor($request->custo_deslocamento);
                 $revisao->horimetro_proxima     = $this->proximaRevisao($request, $intervalo);
                 $revisao->obs                   = $request->obs;
                 $revisao->save();
@@ -156,8 +171,21 @@ class revisaoController extends Controller
             'intervalo_revisao' => 'required|integer|exists:intervalo_revisao,id,deleted_at,NULL',
             'proxima_revisao'   => 'required|integer|exists:tipo_revisao,id',
             'nr_os'             => 'nullable|max:30',
+            'hora_inicial'      => ['nullable', 'regex:/^\d{2}:\d{2}(:\d{2})?$/'],
+            'hora_final'        => ['nullable', 'regex:/^\d{2}:\d{2}(:\d{2})?$/'],
+            'custo_terceiro'    => 'nullable|numeric|min:0',
+            'custo_hora'        => 'nullable|numeric|min:0',
+            'custo_deslocamento' => 'nullable|numeric|min:0',
             'obs'               => 'nullable|max:255',
         ], [
+            'hora_inicial.regex'       => 'Informe a hora de início da revisão no formato hh:mm.',
+            'hora_final.regex'         => 'Informe a hora final da revisão no formato hh:mm.',
+            'custo_terceiro.numeric'   => 'O custo de terceiro deve ser um valor numérico.',
+            'custo_terceiro.min'       => 'O custo de terceiro não pode ser negativo.',
+            'custo_hora.numeric'       => 'O custo hora deve ser um valor numérico.',
+            'custo_hora.min'           => 'O custo hora não pode ser negativo.',
+            'custo_deslocamento.numeric' => 'O custo de deslocamento deve ser um valor numérico.',
+            'custo_deslocamento.min'     => 'O custo de deslocamento não pode ser negativo.',
             'data.required'            => 'Informe a data da revisão.',
             'equipamento.required'     => 'Selecione o veículo/equipamento.',
             'equipamento.exists'       => 'Selecione o veículo/equipamento.',
@@ -181,6 +209,12 @@ class revisaoController extends Controller
         }
 
         return [intervalo_revisao::find($request->intervalo_revisao), $pecas, $lubrificantes];
+    }
+
+    // Valor em R$ opcional: vazio grava nulo
+    private function valor($valor)
+    {
+        return $valor === null || $valor === '' ? null : (float) $valor;
     }
 
     // Horímetro da próxima revisão = horímetro atual + horas do intervalo de revisão.

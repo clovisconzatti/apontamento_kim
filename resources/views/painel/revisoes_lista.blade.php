@@ -30,9 +30,16 @@
                 <small>Painel de Operações · Revisões</small>
                 <h3><i class="{{ $icones[$situacao] }}"></i> {{ ['vencida' => 'Revisões vencidas', 'proxima' => 'Revisões próximas', 'em_dia' => 'Revisões em dia'][$situacao] }}</h3>
             </div>
-            <a class="btn btn-outline-secondary" href="{{ route('painel.revisoes') }}">
-                <span class="fas fa-arrow-left"></span> Voltar ao painel
-            </a>
+            <div>
+                @if (count($linhas))
+                    <a class="btn btn-outline-success" href="{{ route('painel.revisoes.ordem', ['situacao' => $situacao]) }}" target="_blank" rel="noopener">
+                        <span class="fas fa-file-pdf"></span> Imprimir ordens de serviço (PDF)
+                    </a>
+                @endif
+                <a class="btn btn-outline-secondary" href="{{ route('painel.revisoes') }}">
+                    <span class="fas fa-arrow-left"></span> Voltar ao painel
+                </a>
+            </div>
         </div>
 
         {{-- Abas para trocar de situação --}}
@@ -90,10 +97,21 @@
                             <small>Horímetro da própria revisão: não há apontamento de horímetro mais novo.</small>
                         @endif
 
-                        <a class="btn btn-sm {{ $e['botao'] }}"
-                           href="{{ route('revisao.formAdd', ['equipamento' => $l['equipamento_id'], 'tipo_revisao' => $l['tipo_revisao_id'], 'intervalo_revisao' => $l['intervalo_revisao_id'], 'horimetro_atual' => $l['atual']]) }}">
-                            <span class="fas fa-plus"></span> Lançar revisão
-                        </a>
+                        <div style="font-size: 13px;">
+                            <span style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; opacity: .8;">Serviços, peças e lubrificantes da próxima revisão</span>
+                            @include('painel.revisoes_itens', ['l' => $l])
+                        </div>
+
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            <a class="btn btn-sm {{ $e['botao'] }}"
+                               href="{{ route('revisao.formAdd', ['equipamento' => $l['equipamento_id'], 'tipo_revisao' => $l['tipo_revisao_id'], 'intervalo_revisao' => $l['intervalo_revisao_id'], 'horimetro_atual' => $l['atual']]) }}">
+                                <span class="fas fa-plus"></span> Lançar revisão
+                            </a>
+                            <a class="btn btn-sm {{ $e['botao'] }}" target="_blank" rel="noopener"
+                               href="{{ route('painel.revisoes.ordem', ['equipamento' => $l['equipamento_id']]) }}">
+                                <span class="fas fa-print"></span> Ordem de serviço
+                            </a>
+                        </div>
                     </article>
                 @endforeach
             </div>

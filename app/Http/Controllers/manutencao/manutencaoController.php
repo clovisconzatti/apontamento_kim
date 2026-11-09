@@ -92,7 +92,8 @@ class manutencaoController extends Controller
                 , "horimetro"                   => $request->horimetro
                 , "tipo_manutencao"             => $request->tipo_manutencao
                 , "custo"                       => $request->custo
-                , "manutencao_diaria"           => $request->manutencao_diaria
+                , "custo_hora"                  => $this->valor($request->custo_hora)
+                , "custo_deslocamento"          => $this->valor($request->custo_deslocamento)
                 , "situacao"                    => $request->situacao
                 , "obs"                         => $request->obs
             ]);
@@ -136,7 +137,9 @@ class manutencaoController extends Controller
             $manutencao->horimetro		            = $request->horimetro;
             $manutencao->tipo_manutencao		    = $request->tipo_manutencao;
             $manutencao->custo			            = $request->custo;
-            $manutencao->manutencao_diaria		    = $request->manutencao_diaria;
+            // manutencao_diaria (campo antigo) não é mais alterado: o valor já lançado fica como estava
+            $manutencao->custo_hora		            = $this->valor($request->custo_hora);
+            $manutencao->custo_deslocamento		    = $this->valor($request->custo_deslocamento);
             $manutencao->situacao		            = $request->situacao;
             $manutencao->obs		                = $request->obs;
 
@@ -151,6 +154,16 @@ class manutencaoController extends Controller
     // Linhas de peças e lubrificantes enviadas pela tela (as vazias são ignoradas): [peças, lubrificantes]
     private function validarItens(Request $request)
     {
+        $request->validate([
+            'custo_hora'         => 'nullable|numeric|min:0',
+            'custo_deslocamento' => 'nullable|numeric|min:0',
+        ], [
+            'custo_hora.numeric'         => 'O custo hora deve ser um valor numérico.',
+            'custo_hora.min'             => 'O custo hora não pode ser negativo.',
+            'custo_deslocamento.numeric' => 'O custo de deslocamento deve ser um valor numérico.',
+            'custo_deslocamento.min'     => 'O custo de deslocamento não pode ser negativo.',
+        ]);
+
         $erros = [];
         $pecas = $this->lerItens($request->input('pecas'), 'peca', 'Peça', 'pecas', $erros);
         $lubrificantes = $this->lerItens($request->input('lubrificantes'), 'lubrificante', 'Lubrificante', 'lubrificantes', $erros);
@@ -158,6 +171,12 @@ class manutencaoController extends Controller
             throw ValidationException::withMessages($erros);
         }
         return [$pecas, $lubrificantes];
+    }
+
+    // Valor em R$ opcional: vazio grava nulo
+    private function valor($valor)
+    {
+        return $valor === null || $valor === '' ? null : (float) $valor;
     }
 
     // Substitui as peças e os lubrificantes da manutenção pelas linhas enviadas

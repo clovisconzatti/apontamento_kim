@@ -28,6 +28,7 @@ use App\Http\Controllers\tipo_manutencao\tipo_manutencaoController;
 use App\Http\Controllers\transferencia\transferenciaController;
 use App\Http\Controllers\tipo_revisao\tipo_revisaoController;
 use App\Http\Controllers\intervalo_revisao\intervalo_revisaoController;
+use App\Http\Controllers\servico_revisao\servico_revisaoController;
 use App\Http\Controllers\compra_combustivel\compra_combustivelController;
 use App\Http\Controllers\ajuste_combustivel\ajuste_combustivelController;
 use App\Http\Controllers\revisao\revisaoController;
@@ -301,6 +302,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::redirect('painel/consumo-maquina', 'painel/consumo-medio');
     Route::get('painel/revisoes',[painelRevisaoController::class,'index'])->name('painel.revisoes');
     Route::get('painel/revisoes/exportar',[painelRevisaoController::class,'exportar'])->name('painel.revisoes.exportar');
+    Route::get('painel/revisoes/ordem-servico',[painelRevisaoController::class,'ordemServico'])->name('painel.revisoes.ordem');
+    Route::get('painel/manutencoes',[\App\Http\Controllers\painel\painelManutencaoController::class,'index'])->name('painel.manutencao');
+    Route::get('painel/manutencoes/exportar',[\App\Http\Controllers\painel\painelManutencaoController::class,'exportar'])->name('painel.manutencao.exportar');
     Route::get('painel/horas-homem',[painelHorasHomemController::class,'index'])->name('painel.horas_homem');
     Route::get('painel/horas-homem/exportar',[painelHorasHomemController::class,'exportar'])->name('painel.horas_homem.exportar');
     Route::get('painel/horas-maquina',[painelHorasMaquinaController::class,'index'])->name('painel.horas_maquina');
@@ -351,6 +355,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('intervalo_revisao/editar/{intervalo_revisao}',[intervalo_revisaoController::class,'formEdit'])->name('intervalo_revisao.formEdit');
         Route::post('intervalo_revisao/store',[intervalo_revisaoController::class,'store'])->name('intervalo_revisao.store');
         Route::patch('intervalo_revisao/edit/{intervalo_revisao}',[intervalo_revisaoController::class,'edit'])->name('intervalo_revisao.edit');
+    });
+ /********************************** serviços de revisão ***************************************************************/
+    Route::group(['namespace' => 'servico_revisao'], function () {
+        Route::get('servico_revisao',[servico_revisaoController::class,'listAll'])->name('servico_revisao.listAll');
+        Route::get('servico_revisao/novo',[servico_revisaoController::class,'formAdd'])->name('servico_revisao.formAdd');
+        Route::get('servico_revisao/editar/{servico_revisao}',[servico_revisaoController::class,'formEdit'])->name('servico_revisao.formEdit');
+        Route::post('servico_revisao/store',[servico_revisaoController::class,'store'])->name('servico_revisao.store');
+        Route::patch('servico_revisao/edit/{servico_revisao}',[servico_revisaoController::class,'edit'])->name('servico_revisao.edit');
     });
  /********************************** revisão ***************************************************************/
     Route::group(['namespace' => 'revisao'], function () {

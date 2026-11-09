@@ -1,12 +1,14 @@
 {{--
     Formulário do Tipo de Revisão (inclusão e alteração).
-    Variáveis: $tipo_revisao (null na inclusão), $route, $type.
+    Variáveis: $tipo_revisao (null na inclusão), $route, $type, $opcoesServicos, $opcoesPecas, $opcoesLubrificantes,
+               $linhasServicos, $linhasPecas e $linhasLubrificantes (só na alteração).
 --}}
 @php
     $tipo_revisao = $tipo_revisao ?? null;
 @endphp
+@include('partials.estilo-formulario')
 <h3 class=""><i class="fas fa-clipboard-check"></i> Tipo de Revisão</h3>
-<form action="" id="cadastro-tipo_revisao" nome="cadastro-tipo_revisao" method="post">
+<form action="" id="cadastro-tipo_revisao" nome="cadastro-tipo_revisao" method="post" class="info-form">
     @csrf
     @method('patch')
     <input type="hidden" name="route" id="route" value="{{ $route }}">
@@ -28,6 +30,14 @@
             <label for="obs">Observação:</label>
             <input class="form-control" type="text" maxlength="255" name="obs" id="obs" value="{{ optional($tipo_revisao)->obs }}">
         </div>
+    </div>
+    <div class="info-grid info-g2 mb-3">
+        @include('partials.itens-quadro', ['grupo' => 'servicos', 'titulo' => 'Serviços da revisão', 'rotulo' => 'Serviço', 'botao' => 'Adicionar serviço',
+                                           'opcoes' => $opcoesServicos, 'linhas' => $linhasServicos ?? [], 'semQuantidade' => true])
+        @include('partials.itens-quadro', ['grupo' => 'pecas', 'titulo' => 'Peças', 'rotulo' => 'Peça', 'botao' => 'Adicionar peça',
+                                           'opcoes' => $opcoesPecas, 'linhas' => $linhasPecas ?? [], 'semQuantidade' => false])
+        @include('partials.itens-quadro', ['grupo' => 'lubrificantes', 'titulo' => 'Óleo lubrificante', 'rotulo' => 'Lubrificante', 'botao' => 'Adicionar lubrificante',
+                                           'opcoes' => $opcoesLubrificantes, 'linhas' => $linhasLubrificantes ?? [], 'semQuantidade' => false])
     </div>
     <div class="row">
         <div class="form-group col-md-3">

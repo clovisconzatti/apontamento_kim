@@ -31,9 +31,15 @@
                 <small>Painel de Operações</small>
                 <h3><i class="fas fa-calendar-check"></i> Revisões</h3>
             </div>
-            <a class="btn btn-success" href="{{ route('painel.revisoes.exportar') }}">
-                <span class="fas fa-file-excel"></span> Exportar planilha
-            </a>
+            <div>
+                <a class="btn btn-outline-success" href="{{ route('painel.revisoes.ordem') }}" target="_blank" rel="noopener"
+                   title="Ordem de serviço da próxima revisão de cada equipamento listado, com serviços, peças e assinaturas">
+                    <span class="fas fa-file-pdf"></span> Imprimir ordens de serviço (PDF)
+                </a>
+                <a class="btn btn-success" href="{{ route('painel.revisoes.exportar') }}">
+                    <span class="fas fa-file-excel"></span> Exportar planilha
+                </a>
+            </div>
         </div>
 
         @include('partials.filtros')
@@ -133,6 +139,8 @@
                             <th class="text-right">Hora/KM próx. revisão</th>
                             <th class="text-right">Falta</th>
                             <th>Situação</th>
+                            <th>Serviços, peças e lubrificantes da próxima revisão</th>
+                            <th class="text-center">OS</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -151,10 +159,18 @@
                                 <td class="num">{{ $n($l['proxima']) }}</td>
                                 <td class="num"><b>{{ $l['falta'] > 0 ? $n($l['falta']) : '−'.$n(-$l['falta']) }}</b></td>
                                 <td><span class="viz-selo"><i class="{{ $icones[$l['situacao']] }}"></i> {{ $situacoes[$l['situacao']] }}</span></td>
+                                <td style="min-width: 220px;">@include('painel.revisoes_itens', ['l' => $l])</td>
+                                <td class="text-center">
+                                    <a class="btn btn-sm {{ $l['situacao'] === 'vencida' ? 'btn-light' : 'btn-outline-success' }}" target="_blank" rel="noopener"
+                                       href="{{ route('painel.revisoes.ordem', ['equipamento' => $l['equipamento_id']]) }}"
+                                       title="Imprimir / salvar em PDF a ordem de serviço de {{ $l['equipamento'] }}" aria-label="Imprimir ordem de serviço de {{ $l['equipamento'] }}">
+                                        <span class="fas fa-print"></span>
+                                    </a>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center text-muted">Nenhuma revisão encontrada para os filtros selecionados.</td>
+                                <td colspan="10" class="text-center text-muted">Nenhuma revisão encontrada para os filtros selecionados.</td>
                             </tr>
                         @endforelse
                     </tbody>
