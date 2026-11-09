@@ -19,6 +19,7 @@ class EquipamentoController extends Controller
             'atividade' => ['label' => 'Atividade', 'tipo' => 'select', 'opcoes' => $this->opcoesTabela('atividade', 'atividade')],
             'operacao'  => ['label' => 'Operação', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('operacao', 'operacao')],
             'ativo'     => ['label' => 'Ativo', 'tipo' => 'select', 'col' => 2, 'opcoes' => ['Sim' => 'Sim', 'Nao' => 'Não']],
+            'controla_media' => ['label' => 'Controla Média', 'tipo' => 'select', 'col' => 2, 'opcoes' => ['Sim' => 'Sim', 'Nao' => 'Não']],
             'uf'        => ['label' => 'UF', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesDistintas('equipamento', 'uf')],
         ];
         $filtros = $this->lerFiltros($request, 'equipamento', $camposFiltro);
@@ -32,6 +33,7 @@ class EquipamentoController extends Controller
             'atividade' => 'equipamento.atividade',
             'operacao'  => 'equipamento.operacao',
             'ativo'     => 'equipamento.ativo',
+            'controla_media' => 'equipamento.controla_media',
             'uf'        => 'equipamento.uf',
         ]);
 
@@ -51,6 +53,7 @@ class EquipamentoController extends Controller
                                         ,'operacao.operacao'
                                         ,'equipamento.consumo_minimo'
                                         ,'equipamento.consumo_maximo'
+                                        ,'equipamento.controla_media'
                                     ]);
         $totalRegistros = $equipamentos->count();
 
@@ -81,6 +84,7 @@ class EquipamentoController extends Controller
                 ,"operacao"         => $request->operacao
                 ,"consumo_minimo"   => $request->consumo_minimo
                 ,"consumo_maximo"   => $request->consumo_maximo
+                ,"controla_media"   => $request->controla_media === 'Nao' ? 'Nao' : 'Sim'
             ]);
             $equipamento->save();
         }catch(\Exception $e){
@@ -115,6 +119,7 @@ class EquipamentoController extends Controller
             $equipamento->operacao		    = $request->operacao;
             $equipamento->consumo_minimo	= $request->consumo_minimo;
             $equipamento->consumo_maximo	= $request->consumo_maximo;
+            $equipamento->controla_media	= $request->controla_media === 'Nao' ? 'Nao' : 'Sim';
             $equipamento->save();
         }catch(\Exception $e){
             return response()->json($equipamento);

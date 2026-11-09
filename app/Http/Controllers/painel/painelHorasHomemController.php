@@ -68,14 +68,14 @@ class painelHorasHomemController extends PainelBase
 
     private function camposFiltro()
     {
-        return [
+        return $this->comPeriodo([
             'dtInicial'   => ['label' => 'Data inicial', 'tipo' => 'data', 'col' => 2],
             'dtFinal'     => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'fazenda'     => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
             'equipamento' => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
             'tipo_equipamento' => $this->campoTipoEquipamento(),
             'colaborador' => ['label' => 'Colaborador', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('colaborador', 'colaborador')],
-        ];
+        ]);
     }
 
     // Lançamentos com colaborador, hora inicial e final, dentro dos filtros

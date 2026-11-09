@@ -99,6 +99,13 @@
                 Consumo Máximo:
                 <input class="form-control" type="number" step="any" name="consumo_maximo" id="consumo_maximo" value="{{$equipamento->consumo_maximo}}" >
             </div>
+            <div class="form-group col-md-2" title="Não: o equipamento fica fora do cálculo e dos avisos da média de consumo">
+                Controla Média:
+                <select class="form-control" name="controla_media" id="controla_media">
+                    <option value="Sim" {{ $equipamento->controla_media !== 'Nao' ? 'selected' : '' }}>Sim</option>
+                    <option value="Nao" {{ $equipamento->controla_media === 'Nao' ? 'selected' : '' }}>Não</option>
+                </select>
+            </div>
         </div>
 
         <div class="row">

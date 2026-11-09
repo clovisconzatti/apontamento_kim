@@ -84,13 +84,13 @@ class painelRevisaoController extends Controller
         $num = fn($v) => is_null($v) ? '' : number_format($v, 2, ',', '');
         $saida = fopen('php://temp', 'r+');
         fwrite($saida, "\xEF\xBB\xBF"); // BOM: o Excel abre os acentos corretamente
-        fputcsv($saida, ['Equipamento', 'Tipo da última revisão', 'Data da última revisão', 'Nº OS', 'Hora/KM atual',
-                         'Data do apontamento', 'Hora/KM próx. revisão', 'Falta', 'Intervalo', 'Situação'], ';');
+        fputcsv($saida, ['Equipamento', 'Última revisão', 'Data da última revisão', 'Nº OS', 'Hora/KM atual',
+                         'Data do apontamento', 'Próxima revisão', 'Hora/KM próx. revisão', 'Falta', 'Intervalo', 'Situação'], ';');
         foreach ($linhas as $l) {
             fputcsv($saida, [
                 $l['equipamento'], $l['tipo'], date('d/m/Y', strtotime($l['data_revisao'])), $l['nr_os'],
                 $num($l['atual']), $l['data_atual'] ? date('d/m/Y', strtotime($l['data_atual'])) : '',
-                $num($l['proxima']), $num($l['falta']), $num($l['intervalo']), self::SITUACOES[$l['situacao']],
+                $l['proxima_tipo'], $num($l['proxima']), $num($l['falta']), $num($l['intervalo']), self::SITUACOES[$l['situacao']],
             ], ';');
         }
         rewind($saida);
@@ -108,7 +108,7 @@ class painelRevisaoController extends Controller
         return [
             'equipamento'  => ['label' => 'Equipamento', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
             'tipo_equipamento' => $this->campoTipoEquipamento(3),
-            'tipo_revisao' => ['label' => 'Tipo da última revisão', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('tipo_revisao', 'descricao')],
+            'tipo_revisao' => ['label' => 'Última revisão', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('tipo_revisao', 'descricao')],
             'situacao'     => ['label' => 'Situação', 'tipo' => 'select', 'col' => 2, 'opcoes' => self::SITUACOES],
         ];
     }
@@ -128,6 +128,7 @@ class painelRevisaoController extends Controller
         $revisoes = DB::table('revisao')
                         ->leftJoin('equipamento', 'equipamento.id', 'revisao.equipamento')
                         ->leftJoin('tipo_revisao', 'tipo_revisao.id', 'revisao.tipo_revisao')
+                        ->leftJoin('tipo_revisao as proxima', 'proxima.id', 'revisao.proxima_revisao')
                         ->whereNull('revisao.deleted_at')
                         ->when($filtros['equipamento'], fn($q, $v) => $q->where('revisao.equipamento', $v))
                         ->when(!empty($filtros['tipo_equipamento']), fn($q) => $this->filtrarTipoEquipamento($q, $filtros, 'revisao.equipamento'))
@@ -137,6 +138,7 @@ class painelRevisaoController extends Controller
                             'revisao.id', 'revisao.equipamento as equipamento_id', 'revisao.data', 'revisao.nr_os',
                             'revisao.tipo_revisao', 'revisao.horimetro_atual', 'revisao.horimetro_proxima',
                             'equipamento.placa', 'equipamento.equipamento', 'tipo_revisao.descricao as tipo',
+                            'revisao.proxima_revisao', 'revisao.intervalo_revisao', 'proxima.descricao as proxima_tipo',
                         ])
                         ->unique('equipamento_id');
 
@@ -181,9 +183,12 @@ class painelRevisaoController extends Controller
 
             $linhas[] = [
                 'equipamento_id'  => $r->equipamento_id,
-                'tipo_revisao_id' => $r->tipo_revisao,
+                // "Lançar revisão" já abre com a próxima revisão prevista (ou a mesma, nas antigas sem próxima) e o mesmo intervalo
+                'tipo_revisao_id'      => $r->proxima_revisao ?: $r->tipo_revisao,
+                'intervalo_revisao_id' => $r->intervalo_revisao,
                 'equipamento'  => trim($r->placa.($r->equipamento ? ' - '.$r->equipamento : '')),
                 'tipo'         => $r->tipo,
+                'proxima_tipo' => $r->proxima_tipo,
                 'data_revisao' => $r->data,
                 'nr_os'        => $r->nr_os,
                 'atual'        => $atual,

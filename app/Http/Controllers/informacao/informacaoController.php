@@ -86,6 +86,9 @@ class informacaoController extends Controller
                                         ,'equipamento.placa'
                                         ,'fazenda.fazenda'
                                         , 'equipamento.equipamento'
+                                        , 'equipamento.consumo_minimo'
+                                        , 'equipamento.consumo_maximo'
+                                        , 'equipamento.controla_media'
                                         , 'atividade.atividade'
                                         , 'colaborador.colaborador'
                                         , 'informacao.hora_inicial'
@@ -196,7 +199,7 @@ class informacaoController extends Controller
         }catch(\Exception $e){
             return response()->json(['message' => $e->getMessage()], 500);
         }
-        return response()->json('success');
+        return $this->respostaGravacao($informacao->id);
     }
 
     public function formEdit($id)
@@ -275,10 +278,23 @@ class informacaoController extends Controller
         }catch(\Exception $e){
             return response()->json(['message' => $e->getMessage()], 500);
         }
-        return response()->json('success');
+        return $this->respostaGravacao($id);
     }
 
     /*********************************** auxiliares ***********************************/
+
+    // Já gravado: se a média de consumo deste abastecimento ficou fora da faixa do cadastro do equipamento,
+    // devolve o aviso junto (a tela mostra antes de sair). Falha no cálculo não atrapalha a gravação.
+    private function respostaGravacao($id)
+    {
+        try {
+            $aviso = ConsumoAbastecimento::avisoFaixa($id);
+        } catch (\Throwable $e) {
+            report($e);
+            $aviso = null;
+        }
+        return response()->json($aviso ? ['status' => 'success', 'aviso' => $aviso] : 'success');
+    }
 
     // Horímetro final não pode ser menor que o inicial, e o inicial não pode ser menor
     // que o final do apontamento anterior do mesmo equipamento (dias anteriores ou mesmo dia).

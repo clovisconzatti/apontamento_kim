@@ -14,6 +14,8 @@ class revisao extends Model
         , 'equipamento'
         , 'horimetro_atual'
         , 'tipo_revisao'
+        , 'intervalo_revisao'
+        , 'proxima_revisao'
         , 'nr_os'
         , 'horimetro_proxima'
         , 'obs'

@@ -181,6 +181,7 @@ $(document).ready(function(){
         var operacao            = $(this).find('select#operacao').val();
         var consumo_minimo      = $(this).find('input#consumo_minimo').val();
         var consumo_maximo      = $(this).find('input#consumo_maximo').val();
+        var controla_media      = $(this).find('select#controla_media').val();
 
 
         /********************************************************************************************* */
@@ -204,6 +205,7 @@ $(document).ready(function(){
                 ,'operacao'         : operacao
                 ,'consumo_minimo'   : consumo_minimo
                 ,'consumo_maximo'   : consumo_maximo
+                ,'controla_media'   : controla_media
             }
             // console.log(dados,route,type,origem);
             grava(dados,route,type,origem);
@@ -1076,6 +1078,26 @@ $(document).ready(function(){
         }
     })
 
+/**********************gravar intervalo de revisão **************************************************/
+    $(document).on('submit', 'form#cadastro-intervalo_revisao', function(event){
+        event.preventDefault()
+        var route = $(this).find('input#route').val();
+        var type = $(this).find('input#type').val();
+        var origem = $(this).find('#origem').val();
+
+        var horas               = $(this).find('input#horas').val();
+
+        if(!horas){
+            Swal({
+                title: 'Preencha todos os campos obrigatório',
+                type: 'error',
+                timer:3000
+            })
+        }else{
+            grava({'horas' : horas},route,type,origem);
+        }
+    })
+
 /**********************gravar revisão **************************************************/
     $(document).on('submit', 'form#cadastro-revisao', function(event){
         event.preventDefault()
@@ -1087,6 +1109,8 @@ $(document).ready(function(){
         var equipamento         = $(this).find('select#equipamento').val();
         var horimetro_atual     = $(this).find('input#horimetro_atual').val();
         var tipo_revisao        = $(this).find('select#tipo_revisao').val();
+        var intervalo_revisao   = $(this).find('select#intervalo_revisao').val();
+        var proxima_revisao     = $(this).find('select#proxima_revisao').val();
         var nr_os               = $(this).find('input#nr_os').val();
         var obs                 = $(this).find('input#obs').val();
 
@@ -1094,7 +1118,7 @@ $(document).ready(function(){
 
 
 /********************************************************************************************* */
-        if(!data || !equipamento || !horimetro_atual || !tipo_revisao){
+        if(!data || !equipamento || !horimetro_atual || !tipo_revisao || !intervalo_revisao || !proxima_revisao){
             Swal({
                 title: 'Preencha todos os campos obrigatório',
                 type: 'error',
@@ -1106,6 +1130,8 @@ $(document).ready(function(){
                 ,'equipamento'          : equipamento
                 ,'horimetro_atual'      : horimetro_atual
                 ,'tipo_revisao'         : tipo_revisao
+                ,'intervalo_revisao'    : intervalo_revisao
+                ,'proxima_revisao'      : proxima_revisao
                 ,'nr_os'                : nr_os
                 ,'obs'                  : obs
                 ,'pecas'                : itens.pecas || []

@@ -1,13 +1,15 @@
 {{--
     Formulário da Revisão (inclusão e alteração).
-    Variáveis: $revisao (null na inclusão), $route, $type, $equipamentos, $tipos_revisao, $opcoesPecas, $opcoesLubrificantes,
-               $linhasPecas e $linhasLubrificantes (só na alteração).
+    Variáveis: $revisao (null na inclusão), $route, $type, $equipamentos, $tipos_revisao, $intervalos_revisao, $opcoesPecas,
+               $opcoesLubrificantes, $linhasPecas e $linhasLubrificantes (só na alteração).
     Os id/name dos campos são lidos pelo custom.js (form#cadastro-revisao): não renomear.
+    "Revisão Atual" é o campo tipo_revisao; "Próxima Revisão" (proxima_revisao) também é um tipo de revisão.
 --}}
 @php
     $revisao = $revisao ?? null;
-    // Na inclusão, o Painel de Revisões pode já mandar equipamento, tipo e horímetro (?equipamento=&tipo_revisao=&horimetro_atual=)
-    $preenchidos = ['equipamento', 'tipo_revisao', 'horimetro_atual'];
+    // Na inclusão, o Painel de Revisões pode já mandar equipamento, revisão, intervalo e horímetro
+    // (?equipamento=&tipo_revisao=&intervalo_revisao=&horimetro_atual=)
+    $preenchidos = ['equipamento', 'tipo_revisao', 'intervalo_revisao', 'horimetro_atual'];
     $v   = fn($campo) => $revisao ? $revisao->$campo : (in_array($campo, $preenchidos) ? request($campo) : null);
     $sel = fn($campo, $id) => (string) $v($campo) !== '' && $v($campo) == $id ? 'selected' : '';
 @endphp
@@ -48,20 +50,38 @@
             </div>
         </div>
         <div class="info-grid info-g3">
+            <div class="info-campo"><label for="tipo_revisao">Revisão Atual <b>*</b></label>
+                <select class="form-control limpar" name="tipo_revisao" id="tipo_revisao">
+                    <option value="">Selecione</option>
+                    @foreach ($tipos_revisao as $tipo)
+                        <option value="{{ $tipo->id }}" {{ $sel('tipo_revisao', $tipo->id) }}>{{ $tipo->descricao }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="info-campo"><label for="horimetro_atual">Horímetro atual <b>*</b></label>
                 <input class="form-control" type="number" step="any" min="0" name="horimetro_atual" id="horimetro_atual" value="{{ $v('horimetro_atual') }}">
             </div>
-            <div class="info-campo"><label for="tipo_revisao">Tipo da revisão <b>*</b></label>
-                <select class="form-control limpar" name="tipo_revisao" id="tipo_revisao">
-                    <option value="" data-intervalo="">Selecione</option>
+            <div class="info-campo"><label for="intervalo_revisao">Intervalo de Revisão <b>*</b></label>
+                <select class="form-control limpar" name="intervalo_revisao" id="intervalo_revisao">
+                    <option value="" data-horas="">Selecione</option>
+                    @foreach ($intervalos_revisao as $intervalo)
+                        <option value="{{ $intervalo->id }}" data-horas="{{ $intervalo->horas }}" {{ $sel('intervalo_revisao', $intervalo->id) }}>{{ rtrim(rtrim(number_format($intervalo->horas, 2, ',', '.'), '0'), ',') }} h</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="info-grid info-g3">
+            <div class="info-campo"><label for="proxima_revisao">Próxima Revisão <b>*</b></label>
+                <select class="form-control limpar" name="proxima_revisao" id="proxima_revisao">
+                    <option value="">Selecione</option>
                     @foreach ($tipos_revisao as $tipo)
-                        <option value="{{ $tipo->id }}" data-intervalo="{{ $tipo->intervalo }}" {{ $sel('tipo_revisao', $tipo->id) }}>{{ $tipo->descricao }}</option>
+                        <option value="{{ $tipo->id }}" {{ $sel('proxima_revisao', $tipo->id) }}>{{ $tipo->descricao }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="info-campo"><label for="horimetro_proxima">Horímetro próx. revisão</label>
                 <input class="form-control" type="text" id="horimetro_proxima" value="" readonly tabindex="-1" style="background: #fff4c2; font-weight: 700;">
-                <small class="text-muted" id="calculoProxima">Horímetro atual + KM/Horas do tipo da revisão</small>
+                <small class="text-muted" id="calculoProxima">Horímetro atual + intervalo de revisão</small>
             </div>
         </div>
         <div class="info-grid">
@@ -107,14 +127,14 @@
         }
         function calculaProxima() {
             var atual = parseFloat($('#horimetro_atual').val());
-            var intervalo = parseFloat($('#tipo_revisao option:selected').data('intervalo'));
+            var intervalo = parseFloat($('#intervalo_revisao option:selected').data('horas'));
 
             if (!isNaN(atual) && !isNaN(intervalo)) {
                 $('#horimetro_proxima').val(numero(atual + intervalo));
-                $('#calculoProxima').text(numero(atual) + ' + ' + numero(intervalo) + ' do tipo da revisão');
+                $('#calculoProxima').text(numero(atual) + ' + ' + numero(intervalo) + ' h de intervalo');
             } else {
                 $('#horimetro_proxima').val('');
-                $('#calculoProxima').text('Horímetro atual + KM/Horas do tipo da revisão');
+                $('#calculoProxima').text('Horímetro atual + intervalo de revisão');
             }
 
             var partes = [];
@@ -124,12 +144,13 @@
             if ($('#tipo_revisao').val()) {
                 partes.push($('#tipo_revisao option:selected').text());
             }
-            if ($('#horimetro_proxima').val()) {
-                partes.push('próxima em ' + $('#horimetro_proxima').val());
+            if ($('#proxima_revisao').val() || $('#horimetro_proxima').val()) {
+                partes.push('próxima: ' + ($('#proxima_revisao').val() ? $('#proxima_revisao option:selected').text() : '')
+                    + ($('#horimetro_proxima').val() ? ' em ' + $('#horimetro_proxima').val() : ''));
             }
             $('#resumoLancamento').text(partes.join(' · '));
         }
-        $(document).on('input change', '#horimetro_atual, #tipo_revisao, #equipamento', calculaProxima);
+        $(document).on('input change', '#horimetro_atual, #tipo_revisao, #intervalo_revisao, #proxima_revisao, #equipamento', calculaProxima);
         calculaProxima();
 
     });

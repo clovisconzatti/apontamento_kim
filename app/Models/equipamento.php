@@ -22,6 +22,7 @@ class equipamento extends Model
         , 'operacao'
         , 'consumo_minimo'
         , 'consumo_maximo'
+        , 'controla_media'
         , 'placa'
 
 

@@ -126,9 +126,10 @@
                     <thead>
                         <tr>
                             <th>Equipamento</th>
-                            <th>Tipo da revisão</th>
+                            <th>Última revisão</th>
                             <th class="text-center">Data da última revisão</th>
                             <th class="text-right">Hora/KM atual</th>
+                            <th>Próxima revisão</th>
                             <th class="text-right">Hora/KM próx. revisão</th>
                             <th class="text-right">Falta</th>
                             <th>Situação</th>
@@ -146,13 +147,14 @@
                                         {{ $l['origem_atual'] === 'revisao' ? 'da revisão (sem apontamento de horímetro mais novo)' : 'apontado em '.date('d/m/Y', strtotime($l['data_atual'])) }}
                                     </span>
                                 </td>
+                                <td>{{ $l['proxima_tipo'] }}</td>
                                 <td class="num">{{ $n($l['proxima']) }}</td>
                                 <td class="num"><b>{{ $l['falta'] > 0 ? $n($l['falta']) : '−'.$n(-$l['falta']) }}</b></td>
                                 <td><span class="viz-selo"><i class="{{ $icones[$l['situacao']] }}"></i> {{ $situacoes[$l['situacao']] }}</span></td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted">Nenhuma revisão encontrada para os filtros selecionados.</td>
+                                <td colspan="8" class="text-center text-muted">Nenhuma revisão encontrada para os filtros selecionados.</td>
                             </tr>
                         @endforelse
                     </tbody>

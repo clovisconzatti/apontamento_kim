@@ -59,6 +59,9 @@
                             <div>
                                 <h4 class="viz-item-nome">{{ $l['equipamento'] }}</h4>
                                 <div class="viz-item-tipo">{{ $l['tipo'] }} · última em {{ date('d/m/Y', strtotime($l['data_revisao'])) }}{{ $l['nr_os'] ? ' · OS '.$l['nr_os'] : '' }}</div>
+                                @if ($l['proxima_tipo'])
+                                    <div class="viz-item-tipo">Próxima: <b>{{ $l['proxima_tipo'] }}</b></div>
+                                @endif
                             </div>
                             <span class="viz-selo"><i class="{{ $icones[$l['situacao']] }}"></i> {{ $situacoes[$l['situacao']] }}</span>
                         </div>
@@ -88,7 +91,7 @@
                         @endif
 
                         <a class="btn btn-sm {{ $e['botao'] }}"
-                           href="{{ route('revisao.formAdd', ['equipamento' => $l['equipamento_id'], 'tipo_revisao' => $l['tipo_revisao_id'], 'horimetro_atual' => $l['atual']]) }}">
+                           href="{{ route('revisao.formAdd', ['equipamento' => $l['equipamento_id'], 'tipo_revisao' => $l['tipo_revisao_id'], 'intervalo_revisao' => $l['intervalo_revisao_id'], 'horimetro_atual' => $l['atual']]) }}">
                             <span class="fas fa-plus"></span> Lançar revisão
                         </a>
                     </article>

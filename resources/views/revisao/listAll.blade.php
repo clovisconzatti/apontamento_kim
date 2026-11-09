@@ -27,13 +27,15 @@
     <table class="table table-bordered table-condensed table-striped fonte-10">
         <thead>
             <tr>
-                <th width="10%" class="text-center">Data</th>
-                <th width="24%">Equipamento</th>
-                <th width="22%">Tipo da Revisão</th>
-                <th width="10%">Nº OS</th>
-                <th width="12%" class="text-right text-nowrap">Horímetro atual</th>
-                <th width="13%" class="text-right text-nowrap">Próx. revisão</th>
-                <th width="9%" class="text-center">Ação</th>
+                <th width="9%" class="text-center">Data</th>
+                <th width="19%">Equipamento</th>
+                <th width="15%">Revisão Atual</th>
+                <th width="8%">Nº OS</th>
+                <th width="10%" class="text-right text-nowrap">Horímetro atual</th>
+                <th width="8%" class="text-right text-nowrap">Intervalo</th>
+                <th width="15%">Próxima Revisão</th>
+                <th width="9%" class="text-right text-nowrap">Horímetro próx. revisão</th>
+                <th width="7%" class="text-center">Ação</th>
             </tr>
         </thead>
         <tbody>
@@ -44,6 +46,8 @@
                     <td class="align-middle">{{ $revisao->tipo_revisao }}</td>
                     <td class="align-middle">{{ $revisao->nr_os }}</td>
                     <td align="right" class="align-middle text-nowrap">{{ $horimetro($revisao->horimetro_atual) }}</td>
+                    <td align="right" class="align-middle text-nowrap">{{ is_null($revisao->intervalo_horas) ? '' : $horimetro($revisao->intervalo_horas).' h' }}</td>
+                    <td class="align-middle">{{ $revisao->proxima_revisao }}</td>
                     <td align="right" class="align-middle text-nowrap"><b>{{ $horimetro($revisao->horimetro_proxima) }}</b></td>
                     <td align="center" class="align-middle">
                         <div class="btn-group">
@@ -62,7 +66,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center text-muted">Nenhuma revisão encontrada para os filtros selecionados.</td>
+                    <td colspan="9" class="text-center text-muted">Nenhuma revisão encontrada para os filtros selecionados.</td>
                 </tr>
             @endforelse
         </tbody>

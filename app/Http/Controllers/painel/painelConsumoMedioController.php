@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\painel;
 
+use App\Support\ConsumoAbastecimento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -70,10 +71,12 @@ class painelConsumoMedioController extends PainelBase
     }
 
     // Abastecimentos (com diesel) sem horímetro de abastecimento, dentro dos filtros da tela
+    // (só de equipamentos que controlam média: nos outros o horímetro não faz falta para o consumo)
     private function semHorimetroQuery(array $filtros)
     {
         $query = DB::table('informacao')
                     ->leftJoin('equipamento', 'equipamento.id', 'informacao.equipamento')
+                    ->tap(fn($q) => ConsumoAbastecimento::filtrarControlaMedia($q))
                     ->whereNull('informacao.deleted_at')
                     ->where('informacao.qnt_diesel', '>', 0)
                     ->where('informacao.equipamento', '>', 0)
@@ -106,14 +109,14 @@ class painelConsumoMedioController extends PainelBase
 
     private function camposFiltro()
     {
-        return [
+        return $this->comPeriodo([
             'dtInicial'   => ['label' => 'Data inicial', 'tipo' => 'data', 'col' => 2],
             'dtFinal'     => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'fazenda'     => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
             'equipamento' => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
             'tipo_equipamento' => $this->campoTipoEquipamento(),
             'tanque'      => ['label' => 'Tanque de origem', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('comboio', 'tanque')],
-        ];
+        ]);
     }
 
     // Um intervalo de consumo por linha (o abastecimento que fecha o intervalo), dentro dos filtros

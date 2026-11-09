@@ -4,6 +4,7 @@ namespace App\Http\Controllers\revisao;
 
 use App\Http\Controllers\Controller;
 use App\Models\equipamento;
+use App\Models\intervalo_revisao;
 use App\Models\revisao;
 use App\Models\tipo_revisao;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ class revisaoController extends Controller
             'dtInicial'    => ['label' => 'Data inicial', 'tipo' => 'data', 'col' => 2],
             'dtFinal'      => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'equipamento'  => ['label' => 'Equipamento', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
-            'tipo_revisao' => ['label' => 'Tipo de revisão', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('tipo_revisao', 'descricao')],
+            'tipo_revisao' => ['label' => 'Revisão atual', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('tipo_revisao', 'descricao')],
             'busca'        => ['label' => 'Nº OS', 'tipo' => 'texto', 'col' => 2],
         ];
         $filtros = $this->lerFiltros($request, 'revisao', $camposFiltro);
@@ -33,6 +34,8 @@ class revisaoController extends Controller
 
         $revisoes = $query->leftJoin('equipamento','equipamento.id','revisao.equipamento')
                                     ->leftJoin('tipo_revisao','tipo_revisao.id','revisao.tipo_revisao')
+                                    ->leftJoin('tipo_revisao as proxima','proxima.id','revisao.proxima_revisao')
+                                    ->leftJoin('intervalo_revisao','intervalo_revisao.id','revisao.intervalo_revisao')
                                     ->orderBy('revisao.data', 'DESC')
                                     ->orderBy('revisao.id', 'DESC')
                                     ->get([
@@ -41,6 +44,8 @@ class revisaoController extends Controller
                                         ,'equipamento.placa'
                                         ,'equipamento.equipamento'
                                         ,'tipo_revisao.descricao as tipo_revisao'
+                                        ,'proxima.descricao as proxima_revisao'
+                                        ,'intervalo_revisao.horas as intervalo_horas'
                                         ,'revisao.nr_os'
                                         ,'revisao.horimetro_atual'
                                         ,'revisao.horimetro_proxima'
@@ -56,6 +61,7 @@ class revisaoController extends Controller
         return [
             'equipamentos'   => equipamento::orderby('equipamento')->get(),
             'tipos_revisao'  => tipo_revisao::orderby('descricao')->get(),
+            'intervalos_revisao' => intervalo_revisao::orderby('horas')->get(),
             'opcoesPecas'          => $this->opcoesPecas(),
             'opcoesLubrificantes'  => $this->opcoesLubrificantes(),
         ];
@@ -68,16 +74,18 @@ class revisaoController extends Controller
 
     public function store(Request $request)
     {
-        [$tipo, $pecas, $lubrificantes] = $this->validar($request);
+        [$intervalo, $pecas, $lubrificantes] = $this->validar($request);
         try{
-            DB::transaction(function () use ($request, $tipo, $pecas, $lubrificantes) {
+            DB::transaction(function () use ($request, $intervalo, $pecas, $lubrificantes) {
                 $revisao = new revisao([
                     "data"                  => $request->data
                     ,"equipamento"          => $request->equipamento
                     ,"horimetro_atual"      => $request->horimetro_atual
                     ,"tipo_revisao"         => $request->tipo_revisao
+                    ,"intervalo_revisao"    => $request->intervalo_revisao
+                    ,"proxima_revisao"      => $request->proxima_revisao
                     ,"nr_os"                => $request->nr_os
-                    ,"horimetro_proxima"    => $this->proximaRevisao($request, $tipo)
+                    ,"horimetro_proxima"    => $this->proximaRevisao($request, $intervalo)
                     ,"obs"                  => $request->obs
                 ]);
                 $revisao->save();
@@ -101,16 +109,18 @@ class revisaoController extends Controller
 
     public function edit($id, Request $request)
     {
-        [$tipo, $pecas, $lubrificantes] = $this->validar($request);
+        [$intervalo, $pecas, $lubrificantes] = $this->validar($request);
         try{
-            DB::transaction(function () use ($id, $request, $tipo, $pecas, $lubrificantes) {
+            DB::transaction(function () use ($id, $request, $intervalo, $pecas, $lubrificantes) {
                 $revisao = revisao::findOrFail($id);
                 $revisao->data                  = $request->data;
                 $revisao->equipamento           = $request->equipamento;
                 $revisao->horimetro_atual       = $request->horimetro_atual;
                 $revisao->tipo_revisao          = $request->tipo_revisao;
+                $revisao->intervalo_revisao     = $request->intervalo_revisao;
+                $revisao->proxima_revisao       = $request->proxima_revisao;
                 $revisao->nr_os                 = $request->nr_os;
-                $revisao->horimetro_proxima     = $this->proximaRevisao($request, $tipo);
+                $revisao->horimetro_proxima     = $this->proximaRevisao($request, $intervalo);
                 $revisao->obs                   = $request->obs;
                 $revisao->save();
                 $this->gravarItens($revisao, $pecas, $lubrificantes);
@@ -135,24 +145,30 @@ class revisaoController extends Controller
         }
     }
 
-    // Valida os campos e devolve [tipo de revisão, peças, lubrificantes]
+    // Valida os campos e devolve [intervalo de revisão, peças, lubrificantes]
     private function validar(Request $request)
     {
         $request->validate([
-            'data'            => 'required|date',
-            'equipamento'     => 'required|integer|exists:equipamento,id',
-            'horimetro_atual' => 'required|numeric|min:0',
-            'tipo_revisao'    => 'required|integer|exists:tipo_revisao,id',
-            'nr_os'           => 'nullable|max:30',
-            'obs'             => 'nullable|max:255',
+            'data'              => 'required|date',
+            'equipamento'       => 'required|integer|exists:equipamento,id',
+            'horimetro_atual'   => 'required|numeric|min:0',
+            'tipo_revisao'      => 'required|integer|exists:tipo_revisao,id',
+            'intervalo_revisao' => 'required|integer|exists:intervalo_revisao,id,deleted_at,NULL',
+            'proxima_revisao'   => 'required|integer|exists:tipo_revisao,id',
+            'nr_os'             => 'nullable|max:30',
+            'obs'               => 'nullable|max:255',
         ], [
             'data.required'            => 'Informe a data da revisão.',
             'equipamento.required'     => 'Selecione o veículo/equipamento.',
             'equipamento.exists'       => 'Selecione o veículo/equipamento.',
             'horimetro_atual.required' => 'Informe o horímetro atual.',
             'horimetro_atual.numeric'  => 'O horímetro atual deve ser um número.',
-            'tipo_revisao.required'    => 'Selecione o tipo da revisão.',
-            'tipo_revisao.exists'      => 'Selecione o tipo da revisão.',
+            'tipo_revisao.required'    => 'Selecione a revisão atual.',
+            'tipo_revisao.exists'      => 'Selecione a revisão atual.',
+            'intervalo_revisao.required' => 'Selecione o intervalo de revisão.',
+            'intervalo_revisao.exists'   => 'Selecione o intervalo de revisão.',
+            'proxima_revisao.required'   => 'Selecione a próxima revisão.',
+            'proxima_revisao.exists'     => 'Selecione a próxima revisão.',
             'nr_os.max'                => 'O número da OS pode ter no máximo 30 caracteres.',
             'obs.max'                  => 'A observação pode ter no máximo 255 caracteres.',
         ]);
@@ -164,13 +180,13 @@ class revisaoController extends Controller
             throw ValidationException::withMessages($erros);
         }
 
-        return [tipo_revisao::find($request->tipo_revisao), $pecas, $lubrificantes];
+        return [intervalo_revisao::find($request->intervalo_revisao), $pecas, $lubrificantes];
     }
 
-    // Horímetro da próxima revisão = horímetro atual + KM/Horas do tipo de revisão.
+    // Horímetro da próxima revisão = horímetro atual + horas do intervalo de revisão.
     // Calculado aqui também: o valor da tela é só uma prévia.
-    private function proximaRevisao(Request $request, $tipo)
+    private function proximaRevisao(Request $request, $intervalo)
     {
-        return (float) $request->horimetro_atual + (float) optional($tipo)->intervalo;
+        return (float) $request->horimetro_atual + (float) optional($intervalo)->horas;
     }
 }

@@ -160,12 +160,7 @@ function grava(dados,route,type,origem){
         url:url+route,
         success: function(result)
         {
-            if(result=="success"){
-                Swal({
-                    title: title,
-                    type: 'success',
-                    timer:3000
-                })
+            var sair = function(){
                 if(type!='POST'){
                     window.location.replace(url+'/'+origem);
                 }else{
@@ -173,6 +168,27 @@ function grava(dados,route,type,origem){
                     $('select').trigger('chosen:updated');
                     window.location.reload();
                 }
+            };
+            if(result=="success"){
+                Swal({
+                    title: title,
+                    type: 'success',
+                    timer:3000
+                })
+                sair();
+            }else if(result && result.status=="success"){
+                // Gravou, mas com um aviso (ex.: média de consumo fora da faixa do cadastro do equipamento):
+                // mostra e só sai da tela depois do OK
+                Swal({
+                    title: title,
+                    html: '<div style="background:#fff8e1;border-left:5px solid #f9a825;color:#5d4200;'
+                        + 'padding:12px 14px;margin:10px 0;text-align:left;font-size:17px;line-height:1.5;border-radius:4px">'
+                        + $('<div>').text(result.aviso).html()
+                        + '</div>',
+                    type: 'warning',
+                    width: 640,
+                    confirmButtonText: 'OK'
+                }).then(sair);
             }
         },
         error: function(xhr)

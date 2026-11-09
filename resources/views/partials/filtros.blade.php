@@ -87,6 +87,27 @@
         try { localStorage.setItem('filtrosAbertos', aberto ? '1' : '0'); } catch (e) {}
     }
 
+    // Painéis com Mês/Ano: escolher mês ou ano preenche as datas; digitar uma data limpa o mês e o ano
+    // (no servidor, o mês/ano têm prioridade sobre as datas)
+    $(function () {
+        var form = $('#painelFiltros form'), mes = form.find('select[name=mes]'), ano = form.find('select[name=ano]');
+        if (!mes.length || !ano.length) { return; }
+        var dtInicial = form.find('input[name=dtInicial]'), dtFinal = form.find('input[name=dtFinal]');
+        var dois = function (n) { return (n < 10 ? '0' : '') + n; };
+
+        mes.add(ano).on('change', function () {
+            var m = parseInt(mes.val(), 10), a = parseInt(ano.val(), 10) || new Date().getFullYear();
+            if (m) {
+                dtInicial.val(a + '-' + dois(m) + '-01');
+                dtFinal.val(a + '-' + dois(m) + '-' + dois(new Date(a, m, 0).getDate()));
+            } else if (ano.val()) {
+                dtInicial.val(a + '-01-01');
+                dtFinal.val(a + '-12-31');
+            }
+        });
+        dtInicial.add(dtFinal).on('change', function () { mes.val(''); ano.val(''); });
+    });
+
     try {
         if (localStorage.getItem('filtrosAbertos') === '1') {
             document.getElementById('painelFiltros').style.display = '';

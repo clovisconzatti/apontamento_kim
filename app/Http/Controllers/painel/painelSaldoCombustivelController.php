@@ -43,11 +43,11 @@ class painelSaldoCombustivelController extends PainelBase
     private function camposFiltro()
     {
         $tanques = SaldoCombustivel::tanques()->pluck('tanque', 'id')->all();
-        return [
+        return $this->comPeriodo([
             'dtInicial' => ['label' => 'Data inicial', 'tipo' => 'data', 'col' => 2],
             'dtFinal'   => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'tanque'    => ['label' => 'Tanque', 'tipo' => 'select', 'col' => 4, 'opcoes' => $tanques],
-        ];
+        ]);
     }
 
     private function fatos(array $filtros)

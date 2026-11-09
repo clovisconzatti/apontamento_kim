@@ -66,7 +66,9 @@
                         $temHorimetro = $informacao->horimetro_abastecimento > 0 && $informacao->qnt_diesel > 0;
                         $intervalo = $consumo['intervalos'][$informacao->id] ?? null;
                         $motivo = $informacao->placa === App\Support\ConsumoAbastecimento::PLACA_TERCEIROS
-                            ? 'terceiro' : ($consumo['sem_intervalo'][$informacao->id] ?? null);
+                            ? 'terceiro'
+                            : (!App\Support\ConsumoAbastecimento::controlaMedia($informacao->controla_media)
+                                ? 'nao_controla' : ($consumo['sem_intervalo'][$informacao->id] ?? null));
                     @endphp
                     <td align="right" class="align-middle text-nowrap">
                         @if ($temHorimetro)
@@ -78,6 +80,8 @@
                             <span title="Desde o abastecimento de {{ date('d/m/Y', strtotime($intervalo['data_ref'])) }} (horímetro {{ $numero($intervalo['horimetro_ref']) }})">{{ $numero($intervalo['horas']) }} h</span>
                         @elseif ($temHorimetro && $motivo === 'terceiro')
                             <span class="text-muted" title="{{ $motivosConsumo['terceiro'] }}">terceiros</span>
+                        @elseif ($temHorimetro && $motivo === 'nao_controla')
+                            <span class="text-muted text-nowrap" title="{{ $motivosConsumo['nao_controla'] }}">não controla</span>
                         @elseif ($temHorimetro && $motivo === 'conferir')
                             <button type="button" class="btn btn-link btn-sm p-0 conferir-abrir" data-id="{{ $informacao->id }}"
                                     title="Ver o problema e corrigir" style="color: #b3261e; font-weight: 600; text-decoration: underline;">
@@ -89,7 +93,22 @@
                     </td>
                     <td align="right" class="align-middle text-nowrap">
                         @if ($temHorimetro && $intervalo)
-                            <b title="{{ $numero($intervalo['litros']) }} L ÷ {{ $numero($intervalo['horas']) }} h">{{ number_format($intervalo['litros'] / $intervalo['horas'], 2, ',', '.') }} L/h</b>
+                            @php
+                                $media = round($intervalo['litros'] / $intervalo['horas'], 2);
+                                $minimo = (float) $informacao->consumo_minimo;
+                                $maximo = (float) $informacao->consumo_maximo;
+                                $faixa = App\Support\ConsumoAbastecimento::foraDaFaixa($media, $minimo, $maximo);
+                            @endphp
+                            <b title="{{ $numero($intervalo['litros']) }} L ÷ {{ $numero($intervalo['horas']) }} h">{{ number_format($media, 2, ',', '.') }} L/h</b>
+                            @if ($faixa === 'abaixo')
+                                <div class="small" style="color: #b3261e;" title="Consumo mínimo no cadastro do equipamento: {{ $numero($minimo) }} L/h">
+                                    <i class="fas fa-arrow-down"></i> abaixo do mínimo ({{ $numero($minimo) }} L/h)
+                                </div>
+                            @elseif ($faixa === 'acima')
+                                <div class="small" style="color: #b3261e;" title="Consumo máximo no cadastro do equipamento: {{ $numero($maximo) }} L/h">
+                                    <i class="fas fa-arrow-up"></i> acima do máximo ({{ $numero($maximo) }} L/h)
+                                </div>
+                            @endif
                         @endif
                     </td>
                     <td align="center" class="align-middle">

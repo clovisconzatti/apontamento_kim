@@ -101,7 +101,7 @@ class painelLubrificanteController extends PainelBase
 
     private function camposFiltro()
     {
-        return [
+        return $this->comPeriodo([
             'dtInicial'    => ['label' => 'Data inicial', 'tipo' => 'data', 'col' => 2],
             'dtFinal'      => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'fazenda'      => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
@@ -109,7 +109,7 @@ class painelLubrificanteController extends PainelBase
             'tipo_equipamento' => $this->campoTipoEquipamento(),
             'lubrificante' => ['label' => 'Lubrificante', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('lubrificante', 'lubrificante')],
             'origem'       => ['label' => 'Lançado em', 'tipo' => 'select', 'col' => 2, 'opcoes' => self::ORIGENS],
-        ];
+        ]);
     }
 
     // Tipos de lubrificante com a cor fixa de cada um (pela ordem do cadastro)

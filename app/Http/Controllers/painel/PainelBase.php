@@ -17,13 +17,55 @@ abstract class PainelBase extends Controller
     const JORNADA_MAXIMA = 16;   // horas homem (hora inicial -> final)
     const HORIMETRO_MAXIMO = 24; // horas de máquina (horímetro final - inicial)
 
-    // Filtros da tela; sem filtro salvo, começa no mês atual
+    const MESES = [1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril', 5 => 'Maio', 6 => 'Junho',
+                   7 => 'Julho', 8 => 'Agosto', 9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro'];
+
+    // Filtros da tela; sem filtro salvo, começa no mês atual.
+    // Mês e/ou Ano escolhidos viram o período (data inicial e final) e têm prioridade sobre as datas digitadas:
+    // mês + ano = aquele mês; só o ano = o ano inteiro; só o mês = aquele mês no ano atual.
     protected function lerFiltrosPainel(Request $request, string $tela, array $campos)
     {
-        return $this->lerFiltros($request, $tela, $campos, [
+        $filtros = $this->lerFiltros($request, $tela, $campos, [
             'dtInicial' => date('Y-m-01'),
             'dtFinal'   => date('Y-m-d'),
         ]);
+
+        $mes = (int) ($filtros['mes'] ?? 0);
+        $ano = (int) ($filtros['ano'] ?? 0);
+        if ($mes >= 1 && $mes <= 12) {
+            $inicio = sprintf('%04d-%02d-01', $ano ?: (int) date('Y'), $mes);
+            $filtros['dtInicial'] = $inicio;
+            $filtros['dtFinal'] = date('Y-m-t', strtotime($inicio));
+        } elseif ($ano > 0) {
+            $filtros['dtInicial'] = $ano.'-01-01';
+            $filtros['dtFinal'] = $ano.'-12-31';
+        }
+        return $filtros;
+    }
+
+    // Campos do filtro com Mês e Ano logo depois da data inicial e final
+    protected function comPeriodo(array $campos)
+    {
+        $periodo = [
+            'mes' => ['label' => 'Mês', 'tipo' => 'select', 'col' => 2, 'opcoes' => self::MESES],
+            'ano' => ['label' => 'Ano', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->anosComLancamento()],
+        ];
+        $resultado = [];
+        foreach ($campos as $nome => $campo) {
+            $resultado[$nome] = $campo;
+            if ($nome === 'dtFinal') {
+                $resultado += $periodo;
+            }
+        }
+        return $resultado + $periodo;
+    }
+
+    // Anos com lançamento na Informação Diária (até o atual), do mais recente para o mais antigo
+    protected function anosComLancamento()
+    {
+        $primeiro = (int) substr((string) DB::table('informacao')->whereNull('deleted_at')->min('data'), 0, 4) ?: (int) date('Y');
+        $anos = range((int) date('Y'), min($primeiro, (int) date('Y')));
+        return array_combine($anos, $anos);
     }
 
     // Duração do lançamento em horas pela hora inicial/final (turno que vira o dia soma 24h)
@@ -120,10 +162,10 @@ abstract class PainelBase extends Controller
         ]);
     }
 
-    // Faixa de consumo (L/h) do cadastro de cada máquina: [nome da máquina => [min, max]]
+    // Faixa de consumo (L/h) do cadastro de cada máquina: [nome da máquina => [min, max]] (só as que controlam média)
     protected function faixasConsumo()
     {
-        return DB::table('equipamento')
+        return ConsumoAbastecimento::filtrarControlaMedia(DB::table('equipamento'))
                     ->where(fn($q) => $q->where('consumo_minimo', '>', 0)->orWhere('consumo_maximo', '>', 0))
                     ->get(['equipamento', 'placa', 'consumo_minimo', 'consumo_maximo'])
                     ->mapWithKeys(fn($e) => [($e->equipamento ?: $e->placa) => [(float) $e->consumo_minimo, (float) ($e->consumo_maximo ?: $e->consumo_minimo)]])

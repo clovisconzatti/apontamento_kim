@@ -35,6 +35,7 @@
                 <th width="10%" data-field="name">Operação</th>
                 <th width="5%" data-field="name">Cons. Minimo</th>
                 <th width="5%" data-field="name">Cons. Máximo</th>
+                <th width="5%" data-field="name">Controla Média</th>
                 <th width="2%" data-field="">Ação</th>
             </tr>
         </thead>
@@ -53,6 +54,7 @@
                     <td>{{ $equipamento->operacao }} </td>
                      <td align="right"> {{ number_format($equipamento->consumo_minimo,2,',','.') }} </td>
                      <td align="right"> {{ number_format($equipamento->consumo_maximo,2,',','.') }} </td>
+                     <td align="center">{{ $equipamento->controla_media === 'Nao' ? 'Não' : 'Sim' }}</td>
 
                     <td align="center">
                         <div class="btn-group-vertical">

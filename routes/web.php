@@ -27,6 +27,7 @@ use App\Http\Controllers\tipo_combustivel\tipo_combustivelController;
 use App\Http\Controllers\tipo_manutencao\tipo_manutencaoController;
 use App\Http\Controllers\transferencia\transferenciaController;
 use App\Http\Controllers\tipo_revisao\tipo_revisaoController;
+use App\Http\Controllers\intervalo_revisao\intervalo_revisaoController;
 use App\Http\Controllers\compra_combustivel\compra_combustivelController;
 use App\Http\Controllers\ajuste_combustivel\ajuste_combustivelController;
 use App\Http\Controllers\revisao\revisaoController;
@@ -36,6 +37,8 @@ use App\Http\Controllers\painel\painelHorasMaquinaController;
 use App\Http\Controllers\painel\painelCombustivelController;
 use App\Http\Controllers\painel\painelLubrificanteController;
 use App\Http\Controllers\painel\painelConsumoMedioController;
+use App\Http\Controllers\painel\painelConsumoForaFaixaController;
+use App\Http\Controllers\painel\painelConsumoProducaoController;
 use App\Http\Controllers\painel\painelSaldoCombustivelController;
 use Illuminate\Support\Facades\Auth;
 
@@ -310,6 +313,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('painel/consumo-medio/exportar',[painelConsumoMedioController::class,'exportar'])->name('painel.consumo_medio.exportar');
     Route::get('painel/consumo-medio/sem-horimetro',[painelConsumoMedioController::class,'semHorimetro'])->name('painel.consumo_medio.sem_horimetro');
     Route::patch('painel/consumo-medio/sem-horimetro/{informacao}',[painelConsumoMedioController::class,'salvarHorimetro'])->name('painel.consumo_medio.salvar_horimetro');
+    Route::get('painel/consumo-fora-faixa',[painelConsumoForaFaixaController::class,'index'])->name('painel.consumo_fora_faixa');
+    Route::get('painel/consumo-fora-faixa/exportar',[painelConsumoForaFaixaController::class,'exportar'])->name('painel.consumo_fora_faixa.exportar');
+    Route::get('painel/consumo-producao',[painelConsumoProducaoController::class,'index'])->name('painel.consumo_producao');
+    Route::get('painel/consumo-producao/exportar',[painelConsumoProducaoController::class,'exportar'])->name('painel.consumo_producao.exportar');
     Route::get('painel/lubrificante',[painelLubrificanteController::class,'index'])->name('painel.lubrificante');
     Route::get('painel/lubrificante/exportar',[painelLubrificanteController::class,'exportar'])->name('painel.lubrificante.exportar');
     Route::get('painel/revisoes/{lista}',[painelRevisaoController::class,'lista'])->where('lista', 'vencidas|proximas|em-dia')->name('painel.revisoes.lista');
@@ -336,6 +343,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('tipo_revisao/editar/{tipo_revisao}',[tipo_revisaoController::class,'formEdit'])->name('tipo_revisao.formEdit');
         Route::post('tipo_revisao/store',[tipo_revisaoController::class,'store'])->name('tipo_revisao.store');
         Route::patch('tipo_revisao/edit/{tipo_revisao}',[tipo_revisaoController::class,'edit'])->name('tipo_revisao.edit');
+    });
+ /********************************** intervalo de revisão ***************************************************************/
+    Route::group(['namespace' => 'intervalo_revisao'], function () {
+        Route::get('intervalo_revisao',[intervalo_revisaoController::class,'listAll'])->name('intervalo_revisao.listAll');
+        Route::get('intervalo_revisao/novo',[intervalo_revisaoController::class,'formAdd'])->name('intervalo_revisao.formAdd');
+        Route::get('intervalo_revisao/editar/{intervalo_revisao}',[intervalo_revisaoController::class,'formEdit'])->name('intervalo_revisao.formEdit');
+        Route::post('intervalo_revisao/store',[intervalo_revisaoController::class,'store'])->name('intervalo_revisao.store');
+        Route::patch('intervalo_revisao/edit/{intervalo_revisao}',[intervalo_revisaoController::class,'edit'])->name('intervalo_revisao.edit');
     });
  /********************************** revisão ***************************************************************/
     Route::group(['namespace' => 'revisao'], function () {

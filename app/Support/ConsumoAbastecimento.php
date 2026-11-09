@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
  * Antes disso, o horímetro do abastecimento é comparado com o horímetro do próprio dia (inicial/final do lançamento):
  * se estiver mais de TOLERANCIA_DIA fora da faixa, vai direto para a conferência (erro de digitação, ex.: 5547 por 554,7).
  * Equipamentos de terceiros (placa TERCEIRO) ficam de fora: o cadastro reúne várias máquinas.
+ * Equipamentos com "Controla Média" = Não no cadastro também ficam de fora (sem média, conferência nem aviso).
  */
 class ConsumoAbastecimento
 {
@@ -31,11 +32,79 @@ class ConsumoAbastecimento
 
     const MOTIVOS = [
         'terceiro' => 'Equipamento de terceiros: o cadastro reúne várias máquinas (cada uma com o seu horímetro), o consumo não é calculado',
+        'nao_controla' => 'O cadastro deste equipamento está com "Controla Média" = Não: o consumo não é calculado',
         'primeiro' => 'Primeiro abastecimento com horímetro desta máquina: ainda não há anterior para comparar',
         'mesmo'    => 'Mesmo horímetro do abastecimento anterior: os litros entram no próximo intervalo',
         'reinicio' => 'A sequência recomeça aqui: o abastecimento anterior tinha o horímetro fora da sequência (está em "conferir")',
         'conferir' => 'Horímetro fora da sequência (menor que o anterior ou mais de 300 h acima): conferir',
     ];
+
+    // "Controla Média" do cadastro do equipamento: só "Nao" desliga (vazio conta como "Sim", o padrão)
+    public static function controlaMedia($valor)
+    {
+        return $valor !== 'Nao';
+    }
+
+    // Filtro de consulta: só equipamentos que controlam média (a consulta precisa ter o join com "equipamento")
+    public static function filtrarControlaMedia($query)
+    {
+        return $query->where(fn($q) => $q->whereNull('equipamento.controla_media')->orWhere('equipamento.controla_media', '<>', 'Nao'));
+    }
+
+    /**
+     * Compara a média (L/h, arredondada em 2 casas como aparece na tela) com a faixa do cadastro do equipamento.
+     * Limite vazio ou zero não é avaliado. Devolve 'abaixo', 'acima' ou null.
+     */
+    public static function foraDaFaixa($media, $minimo, $maximo)
+    {
+        $media = round((float) $media, 2);
+        if ((float) $minimo > 0 && $media < (float) $minimo) {
+            return 'abaixo';
+        }
+        if ((float) $maximo > 0 && $media > (float) $maximo) {
+            return 'acima';
+        }
+        return null;
+    }
+
+    /**
+     * Aviso ao gravar um lançamento: se ele fecha um intervalo de consumo e a média ficou fora da faixa do cadastro
+     * do equipamento, devolve a mensagem; senão, null.
+     */
+    public static function avisoFaixa($id)
+    {
+        $lancamento = DB::table('informacao')
+                        ->join('equipamento', 'equipamento.id', 'informacao.equipamento')
+                        ->where('informacao.id', $id)
+                        ->first(['informacao.data', 'informacao.equipamento', 'equipamento.consumo_minimo', 'equipamento.consumo_maximo',
+                                 'equipamento.controla_media',
+                                 DB::raw("COALESCE(equipamento.equipamento, equipamento.placa) as maquina")]);
+        if (!$lancamento || !self::controlaMedia($lancamento->controla_media)
+            || ((float) $lancamento->consumo_minimo <= 0 && (float) $lancamento->consumo_maximo <= 0)) {
+            return null;
+        }
+
+        $intervalo = self::intervalos($lancamento->data, [$lancamento->equipamento])['intervalos'][$id] ?? null;
+        if (!$intervalo) {
+            return null;
+        }
+
+        $media = round($intervalo['litros'] / $intervalo['horas'], 2);
+        $situacao = self::foraDaFaixa($media, $lancamento->consumo_minimo, $lancamento->consumo_maximo);
+        if (!$situacao) {
+            return null;
+        }
+
+        $num = fn($v) => rtrim(rtrim(number_format((float) $v, 2, ',', '.'), '0'), ',');
+        $limite = $situacao === 'abaixo'
+            ? 'menor que o consumo mínimo ('.$num($lancamento->consumo_minimo).' L/h)'
+            : 'maior que o consumo máximo ('.$num($lancamento->consumo_maximo).' L/h)';
+
+        return 'A média de consumo deste abastecimento ficou em '.number_format($media, 2, ',', '.').' L/h ('
+            .$num($intervalo['litros']).' L ÷ '.$num($intervalo['horas']).' h desde o abastecimento de '
+            .date('d/m/Y', strtotime($intervalo['data_ref'])).'), '.$limite.' informado no cadastro do equipamento '
+            .$lancamento->maquina.'.';
+    }
 
     /**
      * Considera todo o histórico até $ate (o abastecimento anterior pode ser de antes do período filtrado).
@@ -56,6 +125,7 @@ class ConsumoAbastecimento
                             ->where('informacao.qnt_diesel', '>', 0)
                             ->where('informacao.equipamento', '>', 0)
                             ->where(fn($q) => $q->whereNull('equipamento.placa')->orWhere('equipamento.placa', '<>', self::PLACA_TERCEIROS))
+                            ->tap(fn($q) => self::filtrarControlaMedia($q))
                             ->when($ate, fn($q) => $q->where('informacao.data', '<=', $ate))
                             ->when(!is_null($equipamentos), fn($q) => $q->whereIn('informacao.equipamento', $equipamentos))
                             ->orderBy('informacao.equipamento')
