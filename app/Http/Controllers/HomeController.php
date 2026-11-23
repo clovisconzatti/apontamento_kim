@@ -66,7 +66,10 @@ class HomeController extends Controller
         ];
 
         // Saldo dos tanques próprios ativos (fica em destaque no topo do painel)
-        $saldosTanques = SaldoCombustivel::saldos();
+        // O tanque DEVOLUÇÃO fica fora do destaque (continua no painel Saldo de Combustível)
+        $saldosTanques = SaldoCombustivel::saldos()
+                            ->reject(fn($t) => str_starts_with(mb_strtoupper(trim($t->tanque)), 'DEVOLU'))
+                            ->values();
 
         // Atalhos agrupados pelas seções do menu do usuário
         $secoes = [];
