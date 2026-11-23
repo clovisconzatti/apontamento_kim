@@ -57,9 +57,10 @@ trait ItensLancamento
         return $itens;
     }
 
-    // Peças com valores (Manutenção e Revisão). Peça importada da OS que ainda não está no cadastro vem com id "novo",
-    // codigo e descricao: só é cadastrada ao gravar (gravarPecas).
-    protected function lerPecasComValor($linhas, array &$erros): array
+    // Peças e lubrificantes com valores (Manutenção e Revisão). Item da OS que ainda não está no cadastro vem com id "novo",
+    // codigo e descricao: só é cadastrado ao gravar (gravarItensOs). codigo_os = código do produto na OS, para lembrar na
+    // próxima importação se ele é peça ou qual é o lubrificante.
+    protected function lerItensComValor($linhas, string $tabela, string $nome, string $campo, array &$erros): array
     {
         $itens = [];
         $linha = 0;
@@ -69,27 +70,29 @@ trait ItensLancamento
                 $codigo = trim((string) ($dados['codigo'] ?? ''));
                 $descricao = trim((string) ($dados['descricao'] ?? ''));
                 if ($codigo === '' || $descricao === '' || mb_strlen($codigo) > 20) {
-                    $erros['pecas.'.$linha.'.id'] = 'Peça da linha '.$linha.': código ou descrição da OS inválidos.';
+                    $erros[$campo.'.'.$linha.'.id'] = $nome.' da linha '.$linha.': código ou descrição da OS inválidos.';
                     continue;
                 }
                 $quantidade = $dados['quantidade'] ?? '';
                 if (!is_numeric($quantidade) || (float) $quantidade <= 0) {
-                    $erros['pecas.'.$linha.'.quantidade'] = 'Peça da linha '.$linha.': informe uma quantidade maior que zero.';
+                    $erros[$campo.'.'.$linha.'.quantidade'] = $nome.' da linha '.$linha.': informe uma quantidade maior que zero.';
                     continue;
                 }
                 $item = ['id' => null, 'codigo' => $codigo, 'descricao' => $descricao, 'quantidade' => (float) $quantidade];
             } else {
                 $errosLinha = [];
-                $lidos = $this->lerItens([$dados], 'peca', 'Peça', 'pecas', $errosLinha);
+                $lidos = $this->lerItens([$dados], $tabela, $nome, $campo, $errosLinha);
                 foreach ($errosLinha as $chave => $mensagem) {
-                    $erros[str_replace('pecas.1.', 'pecas.'.$linha.'.', $chave)] = str_replace('da linha 1:', 'da linha '.$linha.':', $mensagem);
+                    $erros[str_replace($campo.'.1.', $campo.'.'.$linha.'.', $chave)] = str_replace('da linha 1:', 'da linha '.$linha.':', $mensagem);
                 }
                 if (!$lidos) {
                     continue;
                 }
                 $item = $lidos[0];
             }
-            $itens[] = $item + $this->lerValores($dados, ['valor_unitario', 'desconto', 'valor_total'], 'Peça da linha '.$linha, 'pecas.'.$linha, $erros);
+            $codigoOs = trim((string) ($dados['codigo_os'] ?? ''));
+            $itens[] = $item + ['codigo_os' => mb_strlen($codigoOs) <= 20 ? $codigoOs : '']
+                     + $this->lerValores($dados, ['valor_unitario', 'desconto', 'valor_total'], $nome.' da linha '.$linha, $campo.'.'.$linha, $erros);
         }
         return $itens;
     }
@@ -163,16 +166,17 @@ trait ItensLancamento
         return Schema::hasTable($lancamento->getTable().'_servico') ? $lancamento->servicos : [];
     }
 
-    // Sem a migration valores_itens_os não dá para gravar: avisa antes de mexer no lançamento
+    // Sem as migrations da importação da OS não dá para gravar: avisa antes de mexer no lançamento
     protected function exigirTabelasOs(string $tabela)
     {
-        if (!Schema::hasTable($tabela.'_servico') || !Schema::hasColumn($tabela.'_peca', 'valor_total')) {
+        if (!Schema::hasTable($tabela.'_servico') || !Schema::hasColumn($tabela.'_peca', 'valor_total')
+            || !Schema::hasColumn($tabela.'_lubrificante', 'valor_total') || !Schema::hasTable('lubrificante_os')) {
             throw ValidationException::withMessages(['pecas' => 'Falta atualizar o banco de dados (php artisan migrate): nada foi gravado.']);
         }
     }
 
-    // Peças e serviços da Manutenção/Revisão (cadastra as peças novas da OS)
-    protected function gravarPecasServicos($lancamento, array $pecas, array $servicos)
+    // Peças, lubrificantes e serviços da Manutenção/Revisão (cadastra os itens novos da OS)
+    protected function gravarItensOs($lancamento, array $pecas, array $lubrificantes, array $servicos)
     {
         $this->trocarLinhas($lancamento->pecas(), array_map(fn($p) => [
             'peca'           => $p['id'] ?? ImportacaoOs::pecaPorCodigo($p['codigo'], $p['descricao']),
@@ -181,7 +185,25 @@ trait ItensLancamento
             'desconto'       => $p['desconto'],
             'valor_total'    => $p['valor_total'],
         ], $pecas));
+        foreach ($lubrificantes as $n => $p) {
+            $lubrificantes[$n]['id'] = $p['id'] ?? ImportacaoOs::lubrificantePorNome($p['descricao']);
+        }
+        $this->trocarLinhas($lancamento->lubrificantes(), array_map(fn($p) => [
+            'lubrificante'   => $p['id'],
+            'quantidade'     => $p['quantidade'],
+            'valor_unitario' => $p['valor_unitario'],
+            'desconto'       => $p['desconto'],
+            'valor_total'    => $p['valor_total'],
+        ], $lubrificantes));
         $this->trocarLinhas($lancamento->servicos(), $servicos);
+
+        // Memória da importação: código da OS => lubrificante escolhido (ou nulo, quando foi devolvido para as peças)
+        foreach ($pecas as $p) {
+            ImportacaoOs::lembrar($p['codigo_os'], null);
+        }
+        foreach ($lubrificantes as $p) {
+            ImportacaoOs::lembrar($p['codigo_os'] ?: ($p['codigo'] ?? ''), $p['id']);
+        }
     }
 
     // Linhas já gravadas no formato do partial: $relacao = $modelo->pecas, $coluna = 'peca'

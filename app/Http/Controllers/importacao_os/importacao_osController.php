@@ -16,23 +16,19 @@ class importacao_osController extends Controller
             'veiculo'   => 'nullable|string|max:60',
             'odometro'  => 'nullable|numeric',
             'data'      => 'nullable|date_format:Y-m-d',
-            'codigos'   => 'nullable|array|max:500',
-            'codigos.*' => 'string|max:30',
+            'produtos'             => 'nullable|array|max:500',
+            'produtos.*.codigo'    => 'required|string|max:30',
+            'produtos.*.descricao' => 'required|string|max:255',
             'tela'      => 'required|in:manutencao,revisao',
             'id'        => 'nullable|integer',
         ]);
 
-        $cadastro = ImportacaoOs::pecasPorCodigo();
-        $pecas = [];
-        foreach ((array) $request->codigos as $codigo) {
-            $pecas[] = ['codigo' => $codigo, 'id' => $cadastro[ImportacaoOs::chaveCodigo($codigo)] ?? null];
-        }
         $equipamento = ImportacaoOs::equipamento($request->veiculo);
 
         return response()->json([
             'equipamento' => $equipamento,
             'horimetro'   => ImportacaoOs::horimetro($request->odometro, $equipamento, $request->data),
-            'pecas'       => $pecas,
+            'pecas'       => ImportacaoOs::classificar((array) $request->produtos),
             'ja_lancada'  => ImportacaoOs::jaLancada($request->numero, $request->tela, $request->id),
         ]);
     }

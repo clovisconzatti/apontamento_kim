@@ -26,7 +26,15 @@
             <input class="form-control" data-campo="valor_total" type="number" step="0.01" min="0" value="{{ $linha['valor_total'] ?? '' }}" aria-label="Valor total">
         </td>
     @endif
-    <td class="text-center">
+    <td class="text-center text-nowrap">
+        @if ($comValores ?? false)
+            {{-- os-pdf.js: peça <-> óleo lubrificante (no óleo, só aparece em linha vinda da OS) --}}
+            <button type="button" class="btn btn-outline-secondary btn-sm item-mover" {!! $grupo === 'lubrificantes' ? 'style="display: none;"' : '' !!}
+                    title="{{ $grupo === 'lubrificantes' ? 'Não é óleo: mover para Peças' : 'É óleo: mover para Óleo lubrificante' }}"
+                    aria-label="{{ $grupo === 'lubrificantes' ? 'Mover para Peças' : 'Mover para Óleo lubrificante' }}">
+                <span class="fas {{ $grupo === 'lubrificantes' ? 'fa-cog' : 'fa-tint' }}"></span>
+            </button>
+        @endif
         <button type="button" class="btn btn-outline-danger btn-sm item-remover" title="Remover linha" aria-label="Remover linha">
             <span class="fas fa-times"></span>
         </button>

@@ -13,6 +13,9 @@ class revisao_lubrificante extends Model
         , 'revisao_id'
         , 'lubrificante'
         , 'quantidade'
+        , 'valor_unitario'
+        , 'desconto'
+        , 'valor_total'
 
     ];
     protected $primaryKey = 'id';

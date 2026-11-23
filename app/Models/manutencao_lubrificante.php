@@ -13,6 +13,9 @@ class manutencao_lubrificante extends Model
         , 'manutencao_id'
         , 'lubrificante'
         , 'quantidade'
+        , 'valor_unitario'
+        , 'desconto'
+        , 'valor_total'
 
     ];
     protected $primaryKey = 'id';

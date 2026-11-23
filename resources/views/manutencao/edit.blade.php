@@ -137,8 +137,8 @@
                 @include('partials.itens-quadro', ['grupo' => 'pecas', 'titulo' => 'Peças utilizadas', 'rotulo' => 'Peça', 'botao' => 'Adicionar peça', 'comValores' => true,
                                                    'opcoes' => $opcoesPecas, 'linhas' => $linhasPecas])
             </div>
-            <div class="form-group col-md-6">
-                @include('partials.itens-quadro', ['grupo' => 'lubrificantes', 'titulo' => 'Óleo lubrificante', 'rotulo' => 'Lubrificante', 'botao' => 'Adicionar lubrificante',
+            <div class="form-group col-md-12">
+                @include('partials.itens-quadro', ['grupo' => 'lubrificantes', 'titulo' => 'Óleo lubrificante', 'rotulo' => 'Lubrificante', 'botao' => 'Adicionar lubrificante', 'comValores' => true,
                                                    'opcoes' => $opcoesLubrificantes, 'linhas' => $linhasLubrificantes])
             </div>
         </div>

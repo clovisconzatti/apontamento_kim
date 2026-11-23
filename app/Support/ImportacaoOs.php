@@ -2,8 +2,11 @@
 
 namespace App\Support;
 
+use App\Models\lubrificante;
 use App\Models\peca;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 /**
  * Importação da Ordem de Serviço em PDF (Manutenção e Revisão). O PDF é lido no navegador (public/js/os-pdf.js);
@@ -36,6 +39,65 @@ class ImportacaoOs
             $id = peca::create(['peca' => mb_substr($descricao, 0, 50), 'cod_cargo' => $codigo])->id;
         }
         return $id;
+    }
+
+    /**
+     * Separa o óleo das peças. Para cada produto da OS ([['codigo', 'descricao'], ...]) devolve
+     * ['codigo', 'id' (peça do cadastro ou null), 'lubrificante' => null (é peça) | 0 (óleo a escolher) | id do lubrificante].
+     * Vale primeiro o que já foi escolhido antes para o código; sem escolha, a descrição.
+     */
+    public static function classificar(array $produtos)
+    {
+        $pecas = self::pecasPorCodigo();
+        $memoria = Schema::hasTable('lubrificante_os') ? DB::table('lubrificante_os')->pluck('lubrificante', 'codigo')->all() : [];
+        $lubrificantes = DB::table('lubrificante')->whereNull('deleted_at')->pluck('lubrificante', 'id')->all();
+
+        return array_map(function ($p) use ($pecas, $memoria, $lubrificantes) {
+            $chave = self::chaveCodigo($p['codigo']);
+            if (array_key_exists($chave, $memoria)) {
+                // Lubrificante lembrado que saiu do cadastro: escolher de novo
+                $lubrificante = $memoria[$chave] === null ? null : (isset($lubrificantes[$memoria[$chave]]) ? (int) $memoria[$chave] : 0);
+            } else {
+                $lubrificante = self::pareceLubrificante($p['descricao']) ? self::mesmaViscosidade($p['descricao'], $lubrificantes) : null;
+            }
+            return ['codigo' => $p['codigo'], 'id' => $pecas[$chave] ?? null, 'lubrificante' => $lubrificante];
+        }, $produtos);
+    }
+
+    // Óleo, graxa, fluido ou aditivo pela descrição (filtro de óleo, bomba de óleo etc. são peças)
+    public static function pareceLubrificante($descricao)
+    {
+        $d = Str::upper(Str::ascii((string) $descricao));
+        if (preg_match('/FILTRO|BOMBA|TAMPA|RETENTOR|SENSOR|MANG|VARETA|CARTER|BUJAO|BOIA|ANEL|VEDA|JUNTA|RESERVATORIO|ENGRAX|BICO/', $d)) {
+            return false;
+        }
+        return (bool) preg_match('/^(OLEO|GRAXA|LUBRIF|FLUIDO|ADITIVO|LIQ\w*\.? *(DE +)?ARREF)|\b(0|5|10|15|20|25)W[- ]?(20|30|40|50|60)\b/', $d);
+    }
+
+    // Lubrificante do cadastro com a mesma viscosidade (ex.: 15W40), se for um só; senão 0 (a escolher)
+    private static function mesmaViscosidade($descricao, array $lubrificantes)
+    {
+        $grau = fn($t) => preg_match('/\b(0|5|10|15|20|25)W[- ]?(20|30|40|50|60)\b/', Str::upper((string) $t), $m) ? $m[1].'W'.$m[2] : null;
+        $procurado = $grau($descricao);
+        $iguais = $procurado ? array_keys(array_filter($lubrificantes, fn($l) => $grau($l) === $procurado)) : [];
+        return count($iguais) === 1 ? (int) $iguais[0] : 0;
+    }
+
+    // Id do lubrificante com este nome; se não existir, cadastra
+    public static function lubrificantePorNome($nome)
+    {
+        $nome = mb_substr(trim((string) $nome), 0, 50);
+        return DB::table('lubrificante')->whereNull('deleted_at')->where('lubrificante', $nome)->value('id')
+            ?: lubrificante::create(['lubrificante' => $nome])->id;
+    }
+
+    // Guarda a escolha para o código ($lubrificante null = é peça)
+    public static function lembrar($codigo, $lubrificante)
+    {
+        if (trim((string) $codigo) === '') {
+            return;
+        }
+        DB::table('lubrificante_os')->updateOrInsert(['codigo' => self::chaveCodigo($codigo)], ['lubrificante' => $lubrificante, 'updated_at' => now()]);
     }
 
     // Equipamento pela placa ou nome; com cadastro repetido, o ativo com mais lançamentos na Informação Diária

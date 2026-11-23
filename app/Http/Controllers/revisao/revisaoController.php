@@ -150,8 +150,7 @@ class revisaoController extends Controller
     // Substitui as peças, os serviços e os lubrificantes da revisão pelas linhas enviadas
     private function gravarItens(revisao $revisao, array $pecas, array $lubrificantes, array $servicos)
     {
-        $this->gravarPecasServicos($revisao, $pecas, $servicos);
-        $this->trocarLinhas($revisao->lubrificantes(), array_map(fn($i) => ['lubrificante' => $i['id'], 'quantidade' => $i['quantidade']], $lubrificantes));
+        $this->gravarItensOs($revisao, $pecas, $lubrificantes, $servicos);
     }
 
     // Valida os campos e devolve [intervalo de revisão, peças, lubrificantes, serviços]
@@ -196,8 +195,8 @@ class revisaoController extends Controller
         ]);
 
         $erros = [];
-        $pecas = $this->lerPecasComValor($request->input('pecas'), $erros);
-        $lubrificantes = $this->lerItens($request->input('lubrificantes'), 'lubrificante', 'Lubrificante', 'lubrificantes', $erros);
+        $pecas = $this->lerItensComValor($request->input('pecas'), 'peca', 'Peça', 'pecas', $erros);
+        $lubrificantes = $this->lerItensComValor($request->input('lubrificantes'), 'lubrificante', 'Lubrificante', 'lubrificantes', $erros);
         $this->exigirTabelasOs('revisao');
         $servicos = $this->lerServicos($request->input('servicos'), $erros);
         if ($erros) {

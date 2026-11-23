@@ -126,7 +126,7 @@
     /********************************************* formulário ***************************************************/
 
     function atualizarTotais() {
-        ['pecas', 'servicos'].forEach(function (grupo) {
+        ['pecas', 'lubrificantes', 'servicos'].forEach(function (grupo) {
             var total = 0, algum = false;
             $('#itens-' + grupo + ' [data-campo=valor_total]').each(function () {
                 var v = parseFloat($(this).val());
@@ -148,6 +148,56 @@
         return linha;
     }
 
+    // Guarda na linha o produto da OS (para mover entre peças e óleo)
+    function marcarOs(linha, p) {
+        linha.data('os', p);
+        linha.find('.item-mover').show();
+    }
+
+    // Código da OS que o servidor deve lembrar (vai no envio pelo data-campo)
+    function lembrarCodigo(linha, codigo) {
+        linha.find('[data-campo=codigo_os]').remove();
+        if (codigo) { $('<input type="hidden" data-campo="codigo_os">').val(codigo).appendTo(linha.find('td').first()); }
+    }
+
+    function preencherValores(linha, p) {
+        linha.find('.item-quantidade').val(p.quantidade);
+        ['valor_unitario', 'desconto', 'valor_total'].forEach(function (c) { linha.find('[data-campo=' + c + ']').val(p[c]); });
+    }
+
+    // Produto da OS na lista de óleo: com o lubrificante já conhecido ou para o usuário escolher
+    function preencherLubrificante(p, usadas) {
+        var linha = $('#itens-lubrificantes tr.linha-item').filter(function () {
+            if (usadas.indexOf(this) >= 0) { return false; }
+            var tr = $(this);
+            if (tr.find('[data-campo=codigo_os]').val()) { return tr.find('[data-campo=codigo_os]').val() === p.codigo; }
+            return p.lubrificante && tr.find('select.item-id').val() === String(p.lubrificante);
+        }).first();
+        if (!linha.length) { linha = novaLinha('lubrificantes'); }
+        usadas.push(linha[0]);
+
+        var select = linha.find('select.item-id');
+        select.find('option[value=novo]').remove();
+        if (p.codigo) {
+            $('<option value="novo">').attr({ 'data-codigo': p.codigo, 'data-descricao': p.descricao })
+                                      .text('Cadastrar: ' + p.descricao).appendTo(select);
+        }
+        if (p.lubrificante) { select.val(p.lubrificante); }
+        select.trigger('chosen:updated');
+        preencherValores(linha, p);
+        lembrarCodigo(linha, p.codigo);
+        linha.find('.os-descricao').remove();
+        $('<small class="text-muted os-descricao">').text('Na OS: ' + p.descricao + (p.codigo ? ' (' + p.codigo + ')' : '')).appendTo(linha.find('td').first());
+        marcarOs(linha, p);
+        return linha;
+    }
+
+    // Limpa ou tira a linha (sempre sobra uma)
+    function tirarLinha(linha) {
+        linha.removeData('os').find('.os-descricao, [data-campo=codigo_os]').remove();
+        linha.find('.item-remover').trigger('click');
+    }
+
     function preencherPeca(p, usadas) {
         var linha = $('#itens-pecas tr.linha-item').filter(function () {
             var op = $(this).find('select.item-id option:selected');
@@ -164,8 +214,9 @@
                                       .text(p.descricao + ' (' + p.codigo + ') · NOVA').appendTo(select);
         }
         select.val(p.id || 'novo').trigger('chosen:updated');
-        linha.find('.item-quantidade').val(p.quantidade);
-        ['valor_unitario', 'desconto', 'valor_total'].forEach(function (c) { linha.find('[data-campo=' + c + ']').val(p[c]); });
+        preencherValores(linha, p);
+        marcarOs(linha, p);
+        return linha;
     }
 
     function preencherServico(s) {
@@ -200,14 +251,30 @@
             vazio('hora_final', fins[fins.length - 1]);
         }
 
-        var usadas = [];
-        os.produtos.forEach(function (p, n) { preencherPeca($.extend({}, p, { id: cadastro.pecas[n].id }), usadas); });
+        var usadas = [], usadasOleo = [], tiradas = 0;
+        os.produtos.forEach(function (p, n) {
+            var c = cadastro.pecas[n];
+            p = $.extend({}, p, { id: c.id, lubrificante: c.lubrificante });
+            if (c.lubrificante === null) { preencherPeca(p, usadas); return; }
+            preencherLubrificante(p, usadasOleo);
+            // Óleo que já estava lançado como peça (importação antiga): sai das peças para não contar duas vezes
+            $('#itens-pecas tr.linha-item').filter(function () {
+                var op = $(this).find('select.item-id option:selected');
+                return c.id ? op.val() === String(c.id) : op.val() === 'novo' && op.attr('data-codigo') === p.codigo;
+            }).first().each(function () { tirarLinha($(this)); tiradas++; });
+        });
+        cadastro.tiradas = tiradas;
         os.servicos.forEach(preencherServico);
         atualizarTotais();
     }
 
     function resumo(os, cadastro, tela) {
-        var novas = cadastro.pecas.filter(function (p) { return !p.id; }).length, avisos = [];
+        var oleos = cadastro.pecas.filter(function (p) { return p.lubrificante !== null; }), avisos = [];
+        var novas = cadastro.pecas.filter(function (p) { return p.lubrificante === null && !p.id; }).length;
+        var aEscolher = oleos.filter(function (p) { return !p.lubrificante; }).length;
+        if (oleos.length) { avisos.push(oleos.length + (oleos.length === 1 ? ' óleo foi separado' : ' óleos foram separados') + ' das peças. Confira o lubrificante e a quantidade (na OS pode estar em baldes ou tambores, e aqui é em litros).'); }
+        if (aEscolher) { avisos.push('Escolha o lubrificante em ' + aEscolher + (aEscolher === 1 ? ' linha' : ' linhas') + ' do quadro Óleo lubrificante: o sistema lembra na próxima OS.'); }
+        if (cadastro.tiradas) { avisos.push(cadastro.tiradas + (cadastro.tiradas === 1 ? ' linha que estava' : ' linhas que estavam') + ' nas peças passou para o óleo.'); }
         if (novas) { avisos.push(novas + (novas === 1 ? ' peça ainda não está' : ' peças ainda não estão') + ' no cadastro (marcadas com NOVA) e ' + (novas === 1 ? 'será cadastrada' : 'serão cadastradas') + ' ao salvar.'); }
         if (os.totalProdutos === null) { avisos.push('O "Total Produtos" não foi encontrado no PDF: confira as peças.'); }
         else if (Math.abs(soma(os.produtos) - os.totalProdutos) > 0.011) { avisos.push('A soma das peças lidas (' + reais(soma(os.produtos)) + ') é diferente do total da OS (' + reais(os.totalProdutos) + '): confira.'); }
@@ -222,7 +289,7 @@
         if (cadastro.ja_lancada.length) { avisos.push('A OS ' + os.numero + ' já está lançada em: ' + cadastro.ja_lancada.join(', ') + '.'); }
 
         return '<div style="margin-top: 10px;"><b style="color: #0b5a2a;"><span class="fas fa-check-circle"></span> OS ' + esc(os.numero) + ' importada:</b> '
-             + os.produtos.length + ' peças (' + reais(soma(os.produtos)) + ') e ' + os.servicos.length + (os.servicos.length === 1 ? ' serviço (' : ' serviços (')
+             + (os.produtos.length - oleos.length) + ' peças' + (oleos.length ? ' e ' + oleos.length + ' de óleo' : '') + ' (' + reais(soma(os.produtos)) + ') e ' + os.servicos.length + (os.servicos.length === 1 ? ' serviço (' : ' serviços (')
              + reais(soma(os.servicos)) + '). Confira e clique em <b>Salvar</b>.</div>'
              + avisos.map(function (a) { return '<div style="color: #8a5a00; margin-top: 4px;"><span class="fas fa-exclamation-triangle"></span> ' + esc(a) + '</div>'; }).join('');
     }
@@ -248,7 +315,7 @@
                     url: caixa.attr('data-rota'), type: 'POST', dataType: 'json', contentType: 'application/json',
                     headers: { 'X-CSRF-TOKEN': caixa.attr('data-token'), Accept: 'application/json' },
                     data: JSON.stringify({ numero: os.numero, veiculo: os.veiculo, odometro: os.odometro, data: os.data || null, tela: tela, id: id || null,
-                                           codigos: os.produtos.map(function (p) { return p.codigo; }) }),
+                                           produtos: os.produtos.map(function (p) { return { codigo: p.codigo, descricao: p.descricao }; }) }),
                     success: ok,
                     error: function () { falha(new Error('Não foi possível consultar o cadastro. Atualize a página e tente de novo.')); }
                 });
@@ -266,16 +333,42 @@
         $('#osArquivo').on('change', function () { if (this.files[0]) { importar(this.files[0]); } });
 
         // Quantidade ou valor unitário alterado: recalcula o total da peça (menos o desconto da OS)
-        $(document).on('input', '#itens-pecas .item-quantidade, #itens-pecas [data-campo=valor_unitario]', function () {
+        $(document).on('input', '#itens-pecas .item-quantidade, #itens-pecas [data-campo=valor_unitario], #itens-lubrificantes .item-quantidade, #itens-lubrificantes [data-campo=valor_unitario]', function () {
             var tr = $(this).closest('tr'), q = parseFloat(tr.find('.item-quantidade').val()), v = parseFloat(tr.find('[data-campo=valor_unitario]').val());
             var desconto = parseFloat(tr.find('[data-campo=desconto]').val()) || 0;
             if (!isNaN(q) && !isNaN(v)) { tr.find('[data-campo=valor_total]').val(Math.max(centavos(q * v - desconto), 0)); }
         });
         // Trocar a peça de uma linha: valores da outra peça não servem
         $(document).on('change', '#itens-pecas select.item-id', function () {
-            $(this).closest('tr').find('[data-campo]').val('');
+            $(this).closest('tr').removeData('os').find('[data-campo]').val('');
         });
-        $(document).on('input change click', '#itens-pecas, #itens-servicos', function () { setTimeout(atualizarTotais, 0); });
+        // Linha limpa pelo x (a última do quadro): não fica nada da OS nela
+        $(document).on('click', '.item-remover', function () {
+            $(this).closest('tr').removeData('os').find('.os-descricao, [data-campo=codigo_os]').remove();
+        });
+        // Mover uma linha entre Peças e Óleo lubrificante
+        $(document).on('click', '.item-mover', function () {
+            var tr = $(this).closest('tr'), op = tr.find('select.item-id option:selected');
+            var p = $.extend({}, tr.data('os') || {});
+            ['valor_unitario', 'desconto', 'valor_total'].forEach(function (c) { p[c] = tr.find('[data-campo=' + c + ']').val(); });
+            p.quantidade = tr.find('.item-quantidade').val();
+            if (tr.data('grupo') === 'pecas') {
+                if (!op.val()) { return; }
+                // Linha que não veio da OS agora: código e nome estão no texto da opção "Peça (código)"
+                var m = op.text().match(/^(.*) \(([^()]+)\)$/);
+                if (!p.codigo) { p.codigo = m ? m[2] : ''; p.descricao = m ? m[1] : op.text(); p.id = op.val(); }
+                p.lubrificante = p.lubrificante || null;
+                tirarLinha(tr);
+                preencherLubrificante(p, []);
+            } else {
+                if (!p.codigo) { return; }
+                tirarLinha(tr);
+                var nova = preencherPeca(p, []);
+                lembrarCodigo(nova, p.codigo);
+            }
+            atualizarTotais();
+        });
+        $(document).on('input change click', '#itens-pecas, #itens-lubrificantes, #itens-servicos', function () { setTimeout(atualizarTotais, 0); });
         atualizarTotais();
     });
 })(window, jQuery);

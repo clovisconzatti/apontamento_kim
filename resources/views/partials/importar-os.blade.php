@@ -8,7 +8,7 @@
      data-pdfjs="{{ asset('js/pdfjs/pdf.min.js') }}" data-worker="{{ asset('js/pdfjs/pdf.worker.min.js') }}">
     <input type="file" id="osArquivo" accept="application/pdf,.pdf" style="display: none;">
     <button type="button" class="btn btn-danger" id="osImportar"><span class="fas fa-file-pdf"></span> Importar OS (PDF)</button>
-    <span class="text-muted" style="margin-left: 8px;">Preenche as peças e os serviços da Ordem de Serviço. Confira e clique em Salvar.</span>
+    <span class="text-muted" style="margin-left: 8px;">Preenche os serviços, as peças e o óleo da Ordem de Serviço. Confira e clique em Salvar.</span>
     <div id="osResultado" aria-live="polite"></div>
 </div>
 <script src="{{ asset('js/os-pdf.js') }}?v={{ filemtime(public_path('js/os-pdf.js')) }}"></script>

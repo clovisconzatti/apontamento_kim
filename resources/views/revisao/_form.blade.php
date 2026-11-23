@@ -122,7 +122,7 @@
             @include('partials.servicos-quadro', ['linhasServicos' => $linhasServicos ?? []])
             @include('partials.itens-quadro', ['grupo' => 'pecas', 'titulo' => 'Peças utilizadas', 'rotulo' => 'Peça', 'botao' => 'Adicionar peça', 'comValores' => true,
                                                'opcoes' => $opcoesPecas, 'linhas' => $linhasPecas ?? []])
-            @include('partials.itens-quadro', ['grupo' => 'lubrificantes', 'titulo' => 'Óleo lubrificante', 'rotulo' => 'Lubrificante', 'botao' => 'Adicionar lubrificante',
+            @include('partials.itens-quadro', ['grupo' => 'lubrificantes', 'titulo' => 'Óleo lubrificante', 'rotulo' => 'Lubrificante', 'botao' => 'Adicionar lubrificante', 'comValores' => true,
                                                'opcoes' => $opcoesLubrificantes, 'linhas' => $linhasLubrificantes ?? []])
         </div>
     </section>

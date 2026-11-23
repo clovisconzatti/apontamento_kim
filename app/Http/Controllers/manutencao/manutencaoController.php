@@ -166,8 +166,8 @@ class manutencaoController extends Controller
         ]);
 
         $erros = [];
-        $pecas = $this->lerPecasComValor($request->input('pecas'), $erros);
-        $lubrificantes = $this->lerItens($request->input('lubrificantes'), 'lubrificante', 'Lubrificante', 'lubrificantes', $erros);
+        $pecas = $this->lerItensComValor($request->input('pecas'), 'peca', 'Peça', 'pecas', $erros);
+        $lubrificantes = $this->lerItensComValor($request->input('lubrificantes'), 'lubrificante', 'Lubrificante', 'lubrificantes', $erros);
         $this->exigirTabelasOs('manutencao');
         $servicos = $this->lerServicos($request->input('servicos'), $erros);
         if ($erros) {
@@ -185,7 +185,6 @@ class manutencaoController extends Controller
     // Substitui as peças, os serviços e os lubrificantes da manutenção pelas linhas enviadas
     private function gravarItens(manutencao $manutencao, array $pecas, array $lubrificantes, array $servicos)
     {
-        $this->gravarPecasServicos($manutencao, $pecas, $servicos);
-        $this->trocarLinhas($manutencao->lubrificantes(), array_map(fn($i) => ['lubrificante' => $i['id'], 'quantidade' => $i['quantidade']], $lubrificantes));
+        $this->gravarItensOs($manutencao, $pecas, $lubrificantes, $servicos);
     }
 }
