@@ -67,6 +67,8 @@ class painelManutencaoController extends PainelBase
             'dtFinal'          => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'equipamento'      => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
             'tipo_equipamento' => $this->campoTipoEquipamento(3),
+            'ano_equipamento' => $this->campoAnoEquipamento(),
+            'cilindros_equipamento' => $this->campoCilindrosEquipamento(),
             'tipo'             => ['label' => 'Preventiva / Corretiva', 'tipo' => 'select', 'col' => 2, 'opcoes' => self::TIPOS],
             'origem'           => ['label' => 'Origem', 'tipo' => 'select', 'col' => 2, 'opcoes' => self::ORIGENS],
         ]);
@@ -76,9 +78,9 @@ class painelManutencaoController extends PainelBase
      * Um lançamento (manutenção ou revisão) por linha, do mais antigo para o mais novo:
      * d (data), origem, tipo (Preventiva/Corretiva), maquina, motivo (tipo de manutenção / revisão), os, hi/hf (horas),
      * h (horas trabalhadas), vh (custo hora) e os custos ct (terceiros), ch (mão de obra), cd (deslocamento),
-     * cm (manutenção diária antiga) e total.
+     * cm (manutenção diária antiga) e total; eq é o id do equipamento. Também usado pelo painel Comparativo.
      */
-    private function lancamentos(array $filtros)
+    public function lancamentos(array $filtros)
     {
         $linhas = [];
         if (($filtros['origem'] ?? null) !== 'Revisão') {
@@ -113,6 +115,7 @@ class painelManutencaoController extends PainelBase
             'd'       => $l->data,
             'origem'  => $origem,
             'tipo'    => $tipo,
+            'eq'      => (int) $l->equipamento_id,
             'maquina' => $l->maquina ?: 'Sem máquina',
             'motivo'  => $motivo,
             'os'      => (string) $l->os,
@@ -134,7 +137,7 @@ class painelManutencaoController extends PainelBase
         $this->filtrarTipoEquipamento($q, $filtros, 'manutencao.equipamento');
 
         return $q->get([
-            'manutencao.id', 'manutencao.data', 'manutencao.hora_inicial', 'manutencao.hora_final', 'manutencao.custo', 'manutencao.manutencao_diaria',
+            'manutencao.id', 'manutencao.equipamento as equipamento_id', 'manutencao.data', 'manutencao.hora_inicial', 'manutencao.hora_final', 'manutencao.custo', 'manutencao.manutencao_diaria',
             'manutencao.ord_servico as os', 'tipo_manutencao.tipo as tipo_nome',
             $this->colunaOpcional('manutencao', 'custo_hora'), $this->colunaOpcional('manutencao', 'custo_deslocamento'),
             DB::raw("COALESCE(equipamento.equipamento, equipamento.placa) as maquina"),
@@ -152,7 +155,7 @@ class painelManutencaoController extends PainelBase
         $this->filtrarTipoEquipamento($q, $filtros, 'revisao.equipamento');
 
         return $q->get([
-            'revisao.id', 'revisao.data', 'revisao.nr_os as os', 'tipo_revisao.descricao as tipo_nome',
+            'revisao.id', 'revisao.equipamento as equipamento_id', 'revisao.data', 'revisao.nr_os as os', 'tipo_revisao.descricao as tipo_nome',
             $this->colunaOpcional('revisao', 'hora_inicial'), $this->colunaOpcional('revisao', 'hora_final'),
             $this->colunaOpcional('revisao', 'custo_terceiro'), $this->colunaOpcional('revisao', 'custo_hora'),
             $this->colunaOpcional('revisao', 'custo_deslocamento'),

@@ -115,3 +115,6 @@
         }
     } catch (e) {}
 </script>
+
+{{-- Filtros aplicados, para o cabeçalho do PDF (painel-pdf.js) --}}
+<script>window.painelFiltrosAtivos = @json($ativos);</script>

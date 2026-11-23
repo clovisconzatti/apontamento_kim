@@ -14,10 +14,12 @@
  *                  dica: (chave, lista, valor) => texto, limite, cor: (chave, lista) => cor,
  *                  partes: lista => [{valor, cor}], referencia: chave => [min, max],
  *                  chaves: [{chave, rotulo, dica}] (colunas: ordem do tempo, inclusive vazios),
+ *                  ordem: 'chave' (barras: ordem alfabética em vez de por valor),
  *                  acumular: true (colunas: cada uma mostra a soma até ela, ex.: saldo),
  *                  ignorar: ['dim', ...] (seleções dessas dimensões não filtram este gráfico)}],
  *   indicadores: [{el, valor: lista => texto}],
  *   tabelas:     [{el (tbody), dim (ou null = uma linha por lançamento), valor: lista => número (ordem),
+ *                  ordem: 'chave' ou lista => texto (ordem alfabética em vez de por valor),
  *                  celulas: (chave, lista) => [{texto|html, classe}], linhas: lista => lista (sem dim),
  *                  rodape: {el, celulas: lista => [...]}, colunas, vazio}]
  * })
@@ -167,7 +169,7 @@
             var lista = r.grupos[chave];
             return { chave: chave, lista: lista, valor: g.valor(lista) || 0 };
         }).filter(function (i) { return i.valor > 0; })
-          .sort(function (a, b) { return b.valor - a.valor; });
+          .sort(function (a, b) { return g.ordem === 'chave' ? a.chave.localeCompare(b.chave, 'pt-BR', { numeric: true }) : b.valor - a.valor; });
 
         // Item selecionado nunca some no "Outros"
         var outros = null;
@@ -270,6 +272,10 @@
             if (t.valor) {
                 linhas.forEach(function (l) { l.valor = t.valor(l.lista) || 0; });
                 linhas = linhas.filter(function (l) { return l.valor > 0; }).sort(function (a, b) { return b.valor - a.valor; });
+            }
+            if (t.ordem) {
+                var chaveOrdem = function (l) { return t.ordem === 'chave' ? l.chave : t.ordem(l.lista); };
+                linhas.sort(function (a, b) { return chaveOrdem(a).localeCompare(chaveOrdem(b), 'pt-BR', { numeric: true }); });
             }
             linhas.forEach(function (l) {
                 var marcada = selecionado === l.chave ? ' class="viz-linha-sel"' : '';

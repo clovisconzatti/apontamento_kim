@@ -91,11 +91,27 @@ trait FiltrosListagem
         return ['label' => 'Tipo de equipamento', 'tipo' => 'select', 'col' => $col, 'opcoes' => $this->opcoesTabela('tipo', 'tipo')];
     }
 
-    // Só os lançamentos de equipamentos do tipo escolhido ($coluna = coluna com o id do equipamento)
+    // Campos "Ano" e "Cilindros" do cadastro do equipamento para o painel de filtros
+    // ("ano_equipamento" e não "ano": "ano" já é o período nos painéis)
+    protected function campoAnoEquipamento(int $col = 2): array
+    {
+        return ['label' => 'Ano do equipamento', 'tipo' => 'select', 'col' => $col,
+                'opcoes' => array_reverse($this->opcoesDistintas('equipamento', 'ano'), true)];
+    }
+
+    protected function campoCilindrosEquipamento(int $col = 2): array
+    {
+        return ['label' => 'Cilindros', 'tipo' => 'select', 'col' => $col, 'opcoes' => $this->opcoesDistintas('equipamento', 'cilindros')];
+    }
+
+    // Só os lançamentos de equipamentos do tipo, ano e cilindros escolhidos ($coluna = coluna com o id do equipamento)
     protected function filtrarTipoEquipamento($query, array $filtros, string $coluna)
     {
-        if (!empty($filtros['tipo_equipamento'])) {
-            $query->whereIn($coluna, DB::table('equipamento')->where('tipo', $filtros['tipo_equipamento'])->select('id'));
+        $mapa = ['tipo_equipamento' => 'tipo', 'ano_equipamento' => 'ano', 'cilindros_equipamento' => 'cilindros'];
+        foreach ($mapa as $campo => $colunaCadastro) {
+            if (!empty($filtros[$campo])) {
+                $query->whereIn($coluna, DB::table('equipamento')->where($colunaCadastro, $filtros[$campo])->select('id'));
+            }
         }
         return $query;
     }

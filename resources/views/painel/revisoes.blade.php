@@ -116,7 +116,7 @@
         {{-- Revisões por mês --}}
         <div class="viz-card">
             <h4>Revisões lançadas por mês</h4>
-            <p class="viz-sub">Últimos 12 meses{{ $filtros['equipamento'] || $filtros['tipo_revisao'] ? ', com os filtros atuais' : '' }}.</p>
+            <p class="viz-sub">Últimos 12 meses{{ $filtros['equipamento'] || $filtros['tipo_equipamento'] || $filtros['ano_equipamento'] || $filtros['cilindros_equipamento'] || $filtros['tipo_revisao'] ? ', com os filtros atuais' : '' }}.</p>
             @include('partials.grafico-colunas', [
                 'itens'   => collect($porMes)->map(fn($m) => ['rotulo' => $m['rotulo'], 'valor' => $m['quantidade']])->all(),
                 'formato' => fn($v) => $v.($v == 1 ? ' revisão' : ' revisões'),
@@ -140,7 +140,7 @@
                             <th class="text-right">Falta</th>
                             <th>Situação</th>
                             <th>Serviços, peças e lubrificantes da próxima revisão</th>
-                            <th class="text-center">OS</th>
+                            <th class="text-center" data-pdf-fora>OS</th>
                         </tr>
                     </thead>
                     <tbody>

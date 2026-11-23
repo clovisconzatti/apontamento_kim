@@ -321,6 +321,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('painel/consumo-fora-faixa/exportar',[painelConsumoForaFaixaController::class,'exportar'])->name('painel.consumo_fora_faixa.exportar');
     Route::get('painel/consumo-producao',[painelConsumoProducaoController::class,'index'])->name('painel.consumo_producao');
     Route::get('painel/consumo-producao/exportar',[painelConsumoProducaoController::class,'exportar'])->name('painel.consumo_producao.exportar');
+    Route::get('painel/comparativo',[\App\Http\Controllers\painel\painelComparativoController::class,'index'])->name('painel.comparativo');
+    Route::get('painel/comparativo/exportar',[\App\Http\Controllers\painel\painelComparativoController::class,'exportar'])->name('painel.comparativo.exportar');
     Route::get('painel/lubrificante',[painelLubrificanteController::class,'index'])->name('painel.lubrificante');
     Route::get('painel/lubrificante/exportar',[painelLubrificanteController::class,'exportar'])->name('painel.lubrificante.exportar');
     Route::get('painel/revisoes/{lista}',[painelRevisaoController::class,'lista'])->where('lista', 'vencidas|proximas|em-dia')->name('painel.revisoes.lista');

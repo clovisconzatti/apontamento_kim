@@ -131,3 +131,13 @@
         });
     });
 </script>
+
+{{-- Botão "Exportar PDF" em cada planilha (painel-pdf.js); dados da empresa em config/empresa.php --}}
+<script>
+    window.painelPdf = {
+        empresa: @json(config('empresa')),
+        logo: @json(asset('img/logo.png')),
+        usuario: @json(optional(auth()->user())->name)
+    };
+</script>
+<script src="{{ asset('js/painel-pdf.js') }}?v={{ filemtime(public_path('js/painel-pdf.js')) }}"></script>

@@ -59,6 +59,8 @@ class painelConsumoProducaoController extends PainelBase
             'dtFinal'     => ['label' => 'Data final', 'tipo' => 'data', 'col' => 2],
             'equipamento' => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
             'tipo_equipamento' => $this->campoTipoEquipamento(3),
+            'ano_equipamento' => $this->campoAnoEquipamento(),
+            'cilindros_equipamento' => $this->campoCilindrosEquipamento(),
         ]);
     }
 

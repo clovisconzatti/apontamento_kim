@@ -127,6 +127,8 @@ class painelRevisaoController extends Controller
         return [
             'equipamento'  => ['label' => 'Equipamento', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
             'tipo_equipamento' => $this->campoTipoEquipamento(3),
+            'ano_equipamento' => $this->campoAnoEquipamento(),
+            'cilindros_equipamento' => $this->campoCilindrosEquipamento(),
             'tipo_revisao' => ['label' => 'Última revisão', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('tipo_revisao', 'descricao')],
             'situacao'     => ['label' => 'Situação', 'tipo' => 'select', 'col' => 2, 'opcoes' => self::SITUACOES],
         ];
@@ -150,7 +152,7 @@ class painelRevisaoController extends Controller
                         ->leftJoin('tipo_revisao as proxima', 'proxima.id', 'revisao.proxima_revisao')
                         ->whereNull('revisao.deleted_at')
                         ->when($filtros['equipamento'], fn($q, $v) => $q->where('revisao.equipamento', $v))
-                        ->when(!empty($filtros['tipo_equipamento']), fn($q) => $this->filtrarTipoEquipamento($q, $filtros, 'revisao.equipamento'))
+                        ->tap(fn($q) => $this->filtrarTipoEquipamento($q, $filtros, 'revisao.equipamento'))
                         ->orderBy('revisao.data', 'DESC')
                         ->orderBy('revisao.id', 'DESC')
                         ->get([
@@ -308,7 +310,7 @@ class painelRevisaoController extends Controller
         return DB::table('equipamento')
                     ->whereNull('deleted_at')
                     ->where(fn($q) => $q->whereNull('ativo')->orWhere('ativo', '<>', 'Nao'))
-                    ->when(!empty($filtros['tipo_equipamento']), fn($q) => $q->where('tipo', $filtros['tipo_equipamento']))
+                    ->tap(fn($q) => $this->filtrarTipoEquipamento($q, $filtros, 'equipamento.id'))
                     ->whereNotExists(function ($q) {
                         $q->select(DB::raw(1))->from('revisao')
                           ->whereColumn('revisao.equipamento', 'equipamento.id')
@@ -325,7 +327,7 @@ class painelRevisaoController extends Controller
                         ->whereNull('deleted_at')
                         ->where('data', '>=', $inicio)
                         ->when($filtros['equipamento'], fn($q, $v) => $q->where('equipamento', $v))
-                        ->when(!empty($filtros['tipo_equipamento']), fn($q) => $this->filtrarTipoEquipamento($q, $filtros, 'revisao.equipamento'))
+                        ->tap(fn($q) => $this->filtrarTipoEquipamento($q, $filtros, 'revisao.equipamento'))
                         ->when($filtros['tipo_revisao'], fn($q, $v) => $q->where('tipo_revisao', $v))
                         ->groupBy(DB::raw("DATE_FORMAT(data, '%Y-%m')"))
                         ->selectRaw("COUNT(*) as total, DATE_FORMAT(data, '%Y-%m') as mes")->pluck('total', 'mes')

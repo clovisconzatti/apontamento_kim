@@ -107,6 +107,8 @@ class painelLubrificanteController extends PainelBase
             'fazenda'      => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
             'equipamento'  => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
             'tipo_equipamento' => $this->campoTipoEquipamento(),
+            'ano_equipamento' => $this->campoAnoEquipamento(),
+            'cilindros_equipamento' => $this->campoCilindrosEquipamento(),
             'lubrificante' => ['label' => 'Lubrificante', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('lubrificante', 'lubrificante')],
             'origem'       => ['label' => 'Lançado em', 'tipo' => 'select', 'col' => 2, 'opcoes' => self::ORIGENS],
         ]);

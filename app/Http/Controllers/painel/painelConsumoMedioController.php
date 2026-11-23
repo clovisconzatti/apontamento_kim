@@ -115,6 +115,8 @@ class painelConsumoMedioController extends PainelBase
             'fazenda'     => ['label' => 'Fazenda', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('fazenda', 'fazenda')],
             'equipamento' => ['label' => 'Máquina', 'tipo' => 'select', 'col' => 2, 'opcoes' => $this->opcoesTabela('equipamento', 'equipamento')],
             'tipo_equipamento' => $this->campoTipoEquipamento(),
+            'ano_equipamento' => $this->campoAnoEquipamento(),
+            'cilindros_equipamento' => $this->campoCilindrosEquipamento(),
             'tanque'      => ['label' => 'Tanque de origem', 'tipo' => 'select', 'col' => 3, 'opcoes' => $this->opcoesTabela('comboio', 'tanque')],
         ]);
     }
