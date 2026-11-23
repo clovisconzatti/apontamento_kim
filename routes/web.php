@@ -288,6 +288,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('informacao/destroy/{informacao}',[informacaoController::class,'destroy'])->name('informacao.destroy');
     });
  /********************************** informação de manutencao ***************************************************************/
+    // Importação da OS em PDF (Manutenção e Revisão): liga os dados do PDF ao cadastro
+    Route::post('importacao_os/conferir',[\App\Http\Controllers\importacao_os\importacao_osController::class,'conferir'])->name('importacao_os.conferir');
     Route::group(['namespace' => 'manutencao'], function () {
         Route::get('manutencao',[manutencaoController::class,'listAll'])->name('manutencao.listAll');
         Route::get('manutencao/novo',[manutencaoController::class,'formAdd'])->name('manutencao.formAdd');

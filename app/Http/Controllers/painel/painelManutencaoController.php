@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Schema;
  * Junta a Manutenção e a Revisão num só painel de custos.
  * - Revisão: sempre preventiva.
  * - Manutenção: pelo "Tipo da Manutenção" lançado (PREVENTIVA ou CORRETIVA); sem tipo, conta como corretiva.
- * Só os custos informados no lançamento (as peças e os óleos lubrificantes ainda não entram):
- *   terceiros + mão de obra (horas trabalhadas × custo hora) + deslocamento + "manutenção diária" (campo antigo da Manutenção).
+ * Custo = soma de tudo o que foi informado no lançamento (os óleos lubrificantes não têm valor e não entram):
+ *   peças + serviços executados (digitados ou importados da OS) + terceiros + mão de obra (horas trabalhadas × custo hora)
+ *   + deslocamento + "manutenção diária" (campo antigo da Manutenção).
  */
 class painelManutencaoController extends PainelBase
 {
@@ -23,6 +24,8 @@ class painelManutencaoController extends PainelBase
 
     // Partes do custo (nome => campo do fato)
     const COMPONENTES = [
+        'Peças'             => 'cp',
+        'Serviços'          => 'cs',
         'Terceiros'         => 'ct',
         'Mão de obra'       => 'ch',
         'Deslocamento'      => 'cd',
@@ -52,11 +55,11 @@ class painelManutencaoController extends PainelBase
 
         return $this->planilha('manutencoes',
             ['Data', 'Origem', 'Tipo', 'Máquina', 'Tipo de manutenção / revisão', 'OS', 'Hora inicial', 'Hora final', 'Horas trabalhadas',
-             'Custo hora (R$/h)', 'Terceiros (R$)', 'Mão de obra (R$)', 'Deslocamento (R$)', 'Manutenção diária (R$)', 'Total (R$)'],
+             'Custo hora (R$/h)', 'Peças (R$)', 'Serviços (R$)', 'Terceiros (R$)', 'Mão de obra (R$)', 'Deslocamento (R$)', 'Manutenção diária (R$)', 'Total (R$)'],
             collect($this->lancamentos($filtros))->map(fn($l) => [
                 date('d/m/Y', strtotime($l['d'])), $l['origem'], $l['tipo'], $l['maquina'], $l['motivo'], $l['os'],
                 $l['hi'], $l['hf'], $num($l['h']), $num($l['vh']),
-                $num($l['ct']), $num($l['ch']), $num($l['cd']), $num($l['cm']), $num($l['total']),
+                $num($l['cp']), $num($l['cs']), $num($l['ct']), $num($l['ch']), $num($l['cd']), $num($l['cm']), $num($l['total']),
             ]));
     }
 
@@ -77,21 +80,23 @@ class painelManutencaoController extends PainelBase
     /**
      * Um lançamento (manutenção ou revisão) por linha, do mais antigo para o mais novo:
      * d (data), origem, tipo (Preventiva/Corretiva), maquina, motivo (tipo de manutenção / revisão), os, hi/hf (horas),
-     * h (horas trabalhadas), vh (custo hora) e os custos ct (terceiros), ch (mão de obra), cd (deslocamento),
+     * h (horas trabalhadas), vh (custo hora) e os custos cp (peças), cs (serviços executados), ct (terceiros), ch (mão de obra), cd (deslocamento),
      * cm (manutenção diária antiga) e total; eq é o id do equipamento. Também usado pelo painel Comparativo.
      */
     public function lancamentos(array $filtros)
     {
         $linhas = [];
         if (($filtros['origem'] ?? null) !== 'Revisão') {
+            $itens = $this->custosItens('manutencao');
             foreach ($this->manutencoes($filtros) as $m) {
                 $tipo = mb_strtoupper((string) $m->tipo_nome) === 'PREVENTIVA' ? 'Preventiva' : 'Corretiva';
-                $linhas[] = $this->linha($m, 'Manutenção', $tipo, $m->tipo_nome ?: 'Sem tipo informado', $m->custo, $m->manutencao_diaria);
+                $linhas[] = $this->linha($m, 'Manutenção', $tipo, $m->tipo_nome ?: 'Sem tipo informado', $m->custo, $m->manutencao_diaria, $itens);
             }
         }
         if (($filtros['origem'] ?? null) !== 'Manutenção') {
+            $itens = $this->custosItens('revisao');
             foreach ($this->revisoes($filtros) as $r) {
-                $linhas[] = $this->linha($r, 'Revisão', 'Preventiva', $r->tipo_nome ?: 'Revisão', $r->custo_terceiro, null);
+                $linhas[] = $this->linha($r, 'Revisão', 'Preventiva', $r->tipo_nome ?: 'Revisão', $r->custo_terceiro, null, $itens);
             }
         }
         if (!empty($filtros['tipo'])) {
@@ -101,10 +106,12 @@ class painelManutencaoController extends PainelBase
         return $linhas;
     }
 
-    private function linha($l, string $origem, string $tipo, string $motivo, $terceiros, $diaria)
+    private function linha($l, string $origem, string $tipo, string $motivo, $terceiros, $diaria, array $itens)
     {
         $horas = CustoHoras::horas($l->hora_inicial, $l->hora_final);
         $valores = [
+            'cp' => round((float) ($itens['pecas'][$l->id] ?? 0), 2),
+            'cs' => round((float) ($itens['servicos'][$l->id] ?? 0), 2),
             'ct' => round((float) $terceiros, 2),
             'ch' => (float) CustoHoras::custo($l->hora_inicial, $l->hora_final, $l->custo_hora),
             'cd' => round((float) $l->custo_deslocamento, 2),
@@ -124,6 +131,18 @@ class painelManutencaoController extends PainelBase
             'h'       => $horas === null ? 0 : round($horas, 3),
             'vh'      => $l->custo_hora === null ? null : (float) $l->custo_hora,
         ] + $valores + ['total' => round(array_sum($valores), 2)];
+    }
+
+    // Valor das peças e dos serviços de cada lançamento: ['pecas' => [id => total], 'servicos' => [id => total]]
+    // (antes da migration valores_itens_os não existem: ficam vazios)
+    private function custosItens(string $tabela)
+    {
+        $soma = fn($itens) => DB::table($itens)->groupBy($tabela.'_id')->selectRaw('SUM(valor_total) as total, '.$tabela.'_id as lancamento')
+                                ->pluck('total', 'lancamento')->all();
+        return [
+            'pecas'    => Schema::hasColumn($tabela.'_peca', 'valor_total') ? $soma($tabela.'_peca') : [],
+            'servicos' => Schema::hasTable($tabela.'_servico') ? $soma($tabela.'_servico') : [],
+        ];
     }
 
     private function manutencoes(array $filtros)

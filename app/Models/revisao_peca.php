@@ -13,6 +13,9 @@ class revisao_peca extends Model
         , 'revisao_id'
         , 'peca'
         , 'quantidade'
+        , 'valor_unitario'
+        , 'desconto'
+        , 'valor_total'
 
     ];
     protected $primaryKey = 'id';

@@ -79,9 +79,9 @@ class revisaoController extends Controller
 
     public function store(Request $request)
     {
-        [$intervalo, $pecas, $lubrificantes] = $this->validar($request);
+        [$intervalo, $pecas, $lubrificantes, $servicos] = $this->validar($request);
         try{
-            DB::transaction(function () use ($request, $intervalo, $pecas, $lubrificantes) {
+            DB::transaction(function () use ($request, $intervalo, $pecas, $lubrificantes, $servicos) {
                 $revisao = new revisao([
                     "data"                  => $request->data
                     ,"equipamento"          => $request->equipamento
@@ -99,7 +99,7 @@ class revisaoController extends Controller
                     ,"obs"                  => $request->obs
                 ]);
                 $revisao->save();
-                $this->gravarItens($revisao, $pecas, $lubrificantes);
+                $this->gravarItens($revisao, $pecas, $lubrificantes, $servicos);
             });
         }catch(\Exception $e){
             return response()->json(['message' => $e->getMessage()], 500);
@@ -114,14 +114,15 @@ class revisaoController extends Controller
             'revisao'              => $revisao,
             'linhasPecas'          => $this->linhasItens($revisao->pecas, 'peca'),
             'linhasLubrificantes'  => $this->linhasItens($revisao->lubrificantes, 'lubrificante'),
+            'linhasServicos'       => $this->linhasServicos($revisao),
         ], $this->listasFormulario()));
     }
 
     public function edit($id, Request $request)
     {
-        [$intervalo, $pecas, $lubrificantes] = $this->validar($request);
+        [$intervalo, $pecas, $lubrificantes, $servicos] = $this->validar($request);
         try{
-            DB::transaction(function () use ($id, $request, $intervalo, $pecas, $lubrificantes) {
+            DB::transaction(function () use ($id, $request, $intervalo, $pecas, $lubrificantes, $servicos) {
                 $revisao = revisao::findOrFail($id);
                 $revisao->data                  = $request->data;
                 $revisao->equipamento           = $request->equipamento;
@@ -138,7 +139,7 @@ class revisaoController extends Controller
                 $revisao->horimetro_proxima     = $this->proximaRevisao($request, $intervalo);
                 $revisao->obs                   = $request->obs;
                 $revisao->save();
-                $this->gravarItens($revisao, $pecas, $lubrificantes);
+                $this->gravarItens($revisao, $pecas, $lubrificantes, $servicos);
             });
         }catch(\Exception $e){
             return response()->json(['message' => $e->getMessage()], 500);
@@ -146,21 +147,14 @@ class revisaoController extends Controller
         return response()->json('success');
     }
 
-    // Substitui as peças e os lubrificantes da revisão pelas linhas enviadas
-    private function gravarItens(revisao $revisao, array $pecas, array $lubrificantes)
+    // Substitui as peças, os serviços e os lubrificantes da revisão pelas linhas enviadas
+    private function gravarItens(revisao $revisao, array $pecas, array $lubrificantes, array $servicos)
     {
-        $revisao->pecas()->delete();
-        foreach ($pecas as $item) {
-            $revisao->pecas()->create(['peca' => $item['id'], 'quantidade' => $item['quantidade']]);
-        }
-
-        $revisao->lubrificantes()->delete();
-        foreach ($lubrificantes as $item) {
-            $revisao->lubrificantes()->create(['lubrificante' => $item['id'], 'quantidade' => $item['quantidade']]);
-        }
+        $this->gravarPecasServicos($revisao, $pecas, $servicos);
+        $this->trocarLinhas($revisao->lubrificantes(), array_map(fn($i) => ['lubrificante' => $i['id'], 'quantidade' => $i['quantidade']], $lubrificantes));
     }
 
-    // Valida os campos e devolve [intervalo de revisão, peças, lubrificantes]
+    // Valida os campos e devolve [intervalo de revisão, peças, lubrificantes, serviços]
     private function validar(Request $request)
     {
         $request->validate([
@@ -202,13 +196,15 @@ class revisaoController extends Controller
         ]);
 
         $erros = [];
-        $pecas = $this->lerItens($request->input('pecas'), 'peca', 'Peça', 'pecas', $erros);
+        $pecas = $this->lerPecasComValor($request->input('pecas'), $erros);
         $lubrificantes = $this->lerItens($request->input('lubrificantes'), 'lubrificante', 'Lubrificante', 'lubrificantes', $erros);
+        $this->exigirTabelasOs('revisao');
+        $servicos = $this->lerServicos($request->input('servicos'), $erros);
         if ($erros) {
             throw ValidationException::withMessages($erros);
         }
 
-        return [intervalo_revisao::find($request->intervalo_revisao), $pecas, $lubrificantes];
+        return [intervalo_revisao::find($request->intervalo_revisao), $pecas, $lubrificantes, $servicos];
     }
 
     // Valor em R$ opcional: vazio grava nulo

@@ -42,7 +42,7 @@
                 <i class="fas fa-info-circle"></i>
                 Cada grupo reúne as máquinas do mesmo <b>tipo</b> e <b>cilindros</b> do cadastro de equipamentos. As contas são as mesmas dos outros
                 painéis; as médias do grupo são ponderadas (total ÷ total). Cadastros de terceiros (placa TERCEIRO) ficam de fora.
-                O custo de manutenção não inclui peças e óleos lubrificantes.
+                O custo de manutenção soma peças, serviços, terceiros, mão de obra e deslocamento (óleos lubrificantes não têm valor e não entram).
             </p>
         </div>
 

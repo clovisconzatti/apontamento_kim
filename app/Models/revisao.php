@@ -34,6 +34,11 @@ class revisao extends Model
         return $this->hasMany(revisao_peca::class, 'revisao_id')->orderBy('id');
     }
 
+    public function servicos()
+    {
+        return $this->hasMany(revisao_servico::class, 'revisao_id')->orderBy('id');
+    }
+
     public function lubrificantes()
     {
         return $this->hasMany(revisao_lubrificante::class, 'revisao_id')->orderBy('id');

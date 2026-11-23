@@ -16,6 +16,8 @@
 
 @include('partials.estilo-formulario')
 
+@include('partials.importar-os', ['tela' => 'revisao', 'id' => $revisao ? $revisao->id : null])
+
 <form action="" id="cadastro-revisao" nome="cadastro-revisao" method="post" class="info-form">
     @csrf
     @method('patch')
@@ -115,9 +117,10 @@
     </section>
 
     <section class="info-card">
-        <div class="info-card-topo"><h4>Peças e lubrificantes</h4></div>
-        <div class="info-grid info-g2">
-            @include('partials.itens-quadro', ['grupo' => 'pecas', 'titulo' => 'Peças utilizadas', 'rotulo' => 'Peça', 'botao' => 'Adicionar peça',
+        <div class="info-card-topo"><h4>Serviços, peças e lubrificantes</h4></div>
+        <div class="info-grid">
+            @include('partials.servicos-quadro', ['linhasServicos' => $linhasServicos ?? []])
+            @include('partials.itens-quadro', ['grupo' => 'pecas', 'titulo' => 'Peças utilizadas', 'rotulo' => 'Peça', 'botao' => 'Adicionar peça', 'comValores' => true,
                                                'opcoes' => $opcoesPecas, 'linhas' => $linhasPecas ?? []])
             @include('partials.itens-quadro', ['grupo' => 'lubrificantes', 'titulo' => 'Óleo lubrificante', 'rotulo' => 'Lubrificante', 'botao' => 'Adicionar lubrificante',
                                                'opcoes' => $opcoesLubrificantes, 'linhas' => $linhasLubrificantes ?? []])

@@ -13,6 +13,9 @@ class manutencao_peca extends Model
         , 'manutencao_id'
         , 'peca'
         , 'quantidade'
+        , 'valor_unitario'
+        , 'desconto'
+        , 'valor_total'
 
     ];
     protected $primaryKey = 'id';

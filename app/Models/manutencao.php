@@ -35,6 +35,11 @@ class manutencao extends Model
         return $this->hasMany(manutencao_peca::class, 'manutencao_id')->orderBy('id');
     }
 
+    public function servicos()
+    {
+        return $this->hasMany(manutencao_servico::class, 'manutencao_id')->orderBy('id');
+    }
+
     public function lubrificantes()
     {
         return $this->hasMany(manutencao_lubrificante::class, 'manutencao_id')->orderBy('id');

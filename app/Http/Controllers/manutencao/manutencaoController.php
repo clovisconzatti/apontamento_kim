@@ -79,7 +79,7 @@ class manutencaoController extends Controller
     }
     public function store(Request $request)
     {
-        [$pecas, $lubrificantes] = $this->validarItens($request);
+        [$pecas, $lubrificantes, $servicos] = $this->validarItens($request);
         try{
             $manutencao = new manutencao([
                 "data"                          => $request->data
@@ -98,7 +98,7 @@ class manutencaoController extends Controller
                 , "obs"                         => $request->obs
             ]);
             $manutencao->save();
-            $this->gravarItens($manutencao, $pecas, $lubrificantes);
+            $this->gravarItens($manutencao, $pecas, $lubrificantes, $servicos);
         }catch(\Exception $e){
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -118,13 +118,14 @@ class manutencaoController extends Controller
         $opcoesLubrificantes   = $this->opcoesLubrificantes();
         $linhasPecas           = $this->linhasItens($manutencao->pecas, 'peca');
         $linhasLubrificantes   = $this->linhasItens($manutencao->lubrificantes, 'lubrificante');
+        $linhasServicos        = $this->linhasServicos($manutencao);
 
-        return view('manutencao.edit' , compact('manutencao', 'colaboradores', 'fazendas', 'equipamentos', 'tipos_manutencao', 'situacoes_manutencao', 'opcoesPecas', 'opcoesLubrificantes', 'linhasPecas', 'linhasLubrificantes' ));
+        return view('manutencao.edit' , compact('manutencao', 'colaboradores', 'fazendas', 'equipamentos', 'tipos_manutencao', 'situacoes_manutencao', 'opcoesPecas', 'opcoesLubrificantes', 'linhasPecas', 'linhasLubrificantes', 'linhasServicos' ));
     }
 
     public function edit($id, Request $request)
     {
-        [$pecas, $lubrificantes] = $this->validarItens($request);
+        [$pecas, $lubrificantes, $servicos] = $this->validarItens($request);
         try{
             $manutencao = manutencao::find($id);
             $manutencao->data		                = $request->data;
@@ -144,14 +145,14 @@ class manutencaoController extends Controller
             $manutencao->obs		                = $request->obs;
 
             $manutencao->save();
-            $this->gravarItens($manutencao, $pecas, $lubrificantes);
+            $this->gravarItens($manutencao, $pecas, $lubrificantes, $servicos);
         }catch(\Exception $e){
             return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json('success');
     }
 
-    // Linhas de peças e lubrificantes enviadas pela tela (as vazias são ignoradas): [peças, lubrificantes]
+    // Linhas enviadas pela tela (as vazias são ignoradas): [peças, lubrificantes, serviços]
     private function validarItens(Request $request)
     {
         $request->validate([
@@ -165,12 +166,14 @@ class manutencaoController extends Controller
         ]);
 
         $erros = [];
-        $pecas = $this->lerItens($request->input('pecas'), 'peca', 'Peça', 'pecas', $erros);
+        $pecas = $this->lerPecasComValor($request->input('pecas'), $erros);
         $lubrificantes = $this->lerItens($request->input('lubrificantes'), 'lubrificante', 'Lubrificante', 'lubrificantes', $erros);
+        $this->exigirTabelasOs('manutencao');
+        $servicos = $this->lerServicos($request->input('servicos'), $erros);
         if ($erros) {
             throw ValidationException::withMessages($erros);
         }
-        return [$pecas, $lubrificantes];
+        return [$pecas, $lubrificantes, $servicos];
     }
 
     // Valor em R$ opcional: vazio grava nulo
@@ -179,17 +182,10 @@ class manutencaoController extends Controller
         return $valor === null || $valor === '' ? null : (float) $valor;
     }
 
-    // Substitui as peças e os lubrificantes da manutenção pelas linhas enviadas
-    private function gravarItens(manutencao $manutencao, array $pecas, array $lubrificantes)
+    // Substitui as peças, os serviços e os lubrificantes da manutenção pelas linhas enviadas
+    private function gravarItens(manutencao $manutencao, array $pecas, array $lubrificantes, array $servicos)
     {
-        $manutencao->pecas()->delete();
-        foreach ($pecas as $item) {
-            $manutencao->pecas()->create(['peca' => $item['id'], 'quantidade' => $item['quantidade']]);
-        }
-
-        $manutencao->lubrificantes()->delete();
-        foreach ($lubrificantes as $item) {
-            $manutencao->lubrificantes()->create(['lubrificante' => $item['id'], 'quantidade' => $item['quantidade']]);
-        }
+        $this->gravarPecasServicos($manutencao, $pecas, $servicos);
+        $this->trocarLinhas($manutencao->lubrificantes(), array_map(fn($i) => ['lubrificante' => $i['id'], 'quantidade' => $i['quantidade']], $lubrificantes));
     }
 }

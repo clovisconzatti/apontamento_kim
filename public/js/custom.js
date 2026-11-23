@@ -848,6 +848,7 @@ $(document).ready(function(){
                 ,'obs'                  : obs
                 ,'pecas'                : itens.pecas || []
                 ,'lubrificantes'        : itens.lubrificantes || []
+                ,'servicos'             : itens.servicos || []
 
             }
         grava(dados,route,type,origem);
@@ -958,10 +959,21 @@ $(document).ready(function(){
         $(form).find('tr.linha-item').each(function(){
             var grupo = $(this).data('grupo');
             itens[grupo] = itens[grupo] || [];
-            itens[grupo].push({
+            var item = {
                 'id'            : $(this).find('select.item-id').val()
                 ,'quantidade'   : $(this).find('input.item-quantidade').val()
+            };
+            // Peça da OS importada que ainda não está no cadastro (os-pdf.js): vai com código e descrição
+            if(item.id === 'novo'){
+                var opcao = $(this).find('select.item-id option:selected');
+                item.codigo = opcao.attr('data-codigo');
+                item.descricao = opcao.attr('data-descricao');
+            }
+            // Outros campos da linha (valores das peças, serviços); os vazios não são enviados
+            $(this).find('[data-campo]').each(function(){
+                if($(this).val() !== ''){ item[$(this).attr('data-campo')] = $(this).val(); }
             });
+            itens[grupo].push(item);
         });
         return itens;
     }
@@ -1173,6 +1185,7 @@ $(document).ready(function(){
                 ,'obs'                  : obs
                 ,'pecas'                : itens.pecas || []
                 ,'lubrificantes'        : itens.lubrificantes || []
+                ,'servicos'             : itens.servicos || []
             }
         grava(dados,route,type,origem);
         }

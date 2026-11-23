@@ -4,7 +4,7 @@
         $escalas = ['dia' => 'por dia', 'semana' => 'por semana', 'mes' => 'por mês'];
         // Mesmas cores dos outros painéis: azul = preventiva (programada), laranja = corretiva
         $cores = ['Preventiva' => '#2a78d6', 'Corretiva' => '#eb6834'];
-        $coresComponentes = ['Terceiros' => '#2a78d6', 'Mão de obra' => '#1baf7a', 'Deslocamento' => '#eda100', 'Manutenção diária' => '#6250d6'];
+        $coresComponentes = ['Peças' => '#e87ba4', 'Serviços' => '#008300', 'Terceiros' => '#2a78d6', 'Mão de obra' => '#1baf7a', 'Deslocamento' => '#eda100', 'Manutenção diária' => '#6250d6'];
     @endphp
 
     @include('partials.painel-estilo')
@@ -26,8 +26,8 @@
             <p class="viz-sub" style="margin: 0;">
                 <i class="fas fa-info-circle"></i>
                 <b>Como é calculado:</b> junta as <b>Manutenções</b> e as <b>Revisões</b>. Revisão é sempre preventiva; a manutenção segue o
-                "Tipo da Manutenção" lançado (sem tipo conta como corretiva). Custo = terceiros + mão de obra (horas trabalhadas × custo hora)
-                + deslocamento + manutenção diária (campo antigo da manutenção). <b>Peças e óleos lubrificantes ainda não entram.</b>
+                "Tipo da Manutenção" lançado (sem tipo conta como corretiva). Custo = peças + serviços executados + terceiros + mão de obra (horas trabalhadas × custo hora)
+                + deslocamento + manutenção diária (campo antigo da manutenção). <b>Tudo o que foi informado no lançamento é somado;</b> óleos lubrificantes não têm valor e não entram.
             </p>
         </div>
 
@@ -141,6 +141,8 @@
                             <th>Tipo de manutenção / revisão</th>
                             <th>OS</th>
                             <th class="text-right">Horas</th>
+                            <th class="text-right">Peças</th>
+                            <th class="text-right">Serviços</th>
                             <th class="text-right">Terceiros</th>
                             <th class="text-right">Mão de obra</th>
                             <th class="text-right">Deslocamento</th>
@@ -159,7 +161,7 @@
         $(function () {
             var u = PainelInterativo.util;
             var cores = @json($cores), coresComp = @json($coresComponentes);
-            var campos = { 'Terceiros': 'ct', 'Mão de obra': 'ch', 'Deslocamento': 'cd', 'Manutenção diária': 'cm' };
+            var campos = { 'Peças': 'cp', 'Serviços': 'cs', 'Terceiros': 'ct', 'Mão de obra': 'ch', 'Deslocamento': 'cd', 'Manutenção diária': 'cm' };
             var fatos = @json($fatos);
 
             // A composição precisa de uma dimensão própria: cada lançamento vira uma linha por parte do custo com valor
@@ -233,7 +235,7 @@
                                 num(pct(custo(k), custo(l))), num(horas(l)), num(reais2(custo(l))), { texto: '' }];
                     } }
                 }, {
-                    el: '#tLancamentos', dim: null, colunas: 12, vazio: 'Nenhum lançamento para a seleção.',
+                    el: '#tLancamentos', dim: null, colunas: 14, vazio: 'Nenhum lançamento para a seleção.',
                     // Uma linha por lançamento, mais recente primeiro
                     linhas: function (l) { return unicos(l).sort(function (a, b) { return a.d < b.d ? 1 : a.d > b.d ? -1 : 0; }); },
                     celulas: function (f) {
@@ -241,7 +243,7 @@
                         return [
                             { texto: u.data(f.d), classe: 'text-center' }, { texto: f.origem }, { html: '<i class="cor" style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:' + cores[f.tipo] + '"></i>' + u.esc(f.tipo) },
                             { texto: f.maquina }, { texto: f.motivo }, { texto: f.os }, num(f.h > 0 ? horas([f]) : ''),
-                            r(f.ct), r(f.ch), r(f.cd), r(f.cm), num(reais2(f.total), true)
+                            r(f.cp), r(f.cs), r(f.ct), r(f.ch), r(f.cd), r(f.cm), num(reais2(f.total), true)
                         ];
                     }
                 }]

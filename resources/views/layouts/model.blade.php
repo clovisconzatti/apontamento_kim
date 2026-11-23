@@ -38,7 +38,7 @@
         <script src="{{ asset('js/sweetalert2.all.min.js') }}" type="text/javascript"></script>
 
         <script src="{{ asset('js/functions.js') }}" type="text/javascript"></script>
-        <script src="{{ asset('js/custom.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('js/custom.js') }}?v={{ filemtime(public_path('js/custom.js')) }}" type="text/javascript"></script>
 
         <!-- Chosen -->
         <script src="{{ asset('js/chosen.jquery.min.js') }}" type="text/javascript"></script>

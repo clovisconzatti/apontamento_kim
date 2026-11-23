@@ -19,6 +19,7 @@
         <br/>
     @endif
     <h3 class=""><i class="fas fa-tree"></i> Alteração de Manutenção</h3>
+    @include('partials.importar-os', ['tela' => 'manutencao', 'id' => $manutencao->id])
     <form action="" id="cadastro-manutencao" nome="cadastro-manutencao" method="post">
         @csrf
         @method('patch')
@@ -129,8 +130,11 @@
         </div>
         @include('partials.estilo-formulario')
         <div class="row info-form">
-            <div class="form-group col-md-6">
-                @include('partials.itens-quadro', ['grupo' => 'pecas', 'titulo' => 'Peças utilizadas', 'rotulo' => 'Peça', 'botao' => 'Adicionar peça',
+            <div class="form-group col-md-12">
+                @include('partials.servicos-quadro', ['linhasServicos' => $linhasServicos])
+            </div>
+            <div class="form-group col-md-12">
+                @include('partials.itens-quadro', ['grupo' => 'pecas', 'titulo' => 'Peças utilizadas', 'rotulo' => 'Peça', 'botao' => 'Adicionar peça', 'comValores' => true,
                                                    'opcoes' => $opcoesPecas, 'linhas' => $linhasPecas])
             </div>
             <div class="form-group col-md-6">
