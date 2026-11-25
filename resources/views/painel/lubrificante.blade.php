@@ -40,7 +40,7 @@
             <div class="viz-tile">
                 <div class="viz-tile-label"><i class="fas fa-tachometer-alt"></i> A cada 100 h</div>
                 <div class="viz-tile-valor" id="kPor100">–</div>
-                <div class="viz-tile-nota">por 100 horas de máquina</div>
+                <div class="viz-tile-nota">por 100 horas entre abastecimentos</div>
             </div>
             <div class="viz-tile">
                 <div class="viz-tile-label"><i class="fas fa-tint"></i> Mais usado</div>
@@ -86,7 +86,7 @@
         {{-- Planilha de acompanhamento --}}
         <div class="viz-card">
             <h4>Acompanhamento por máquina</h4>
-            <p class="viz-sub">Segue a seleção dos gráficos; clique numa linha para filtrar por aquela máquina. A cada 100 h = quantidade ÷ horas de máquina do período × 100.</p>
+            <p class="viz-sub">Segue a seleção dos gráficos; clique numa linha para filtrar por aquela máquina. A cada 100 h = quantidade ÷ horas entre abastecimentos (horímetro do abastecimento de diesel) × 100. Máquina sem abastecimento medido no período fica sem a média e não entra na média geral.</p>
             <div class="viz-tabela-box">
                 <table class="viz-tabela">
                     <thead>
@@ -97,7 +97,7 @@
                             @endforeach
                             <th class="text-right">Total</th>
                             <th class="text-right">Lançamentos</th>
-                            <th class="text-right">Horas máquina</th>
+                            <th class="text-right">Horas entre abastec.</th>
                             <th class="text-right">A cada 100 h</th>
                             <th class="text-center">Último lançamento</th>
                         </tr>
@@ -116,7 +116,12 @@
             var q = function (v) { return u.numero(v) + ' L'; };
             var quantidade = function (l) { return u.soma(l, 'q'); };
             var lancamentos = function (l) { return l.filter(function (f) { return f.q > 0; }); };
-            var por100 = function (l) { var h = u.soma(l, 'hm'); return h > 0 ? quantidade(l) / h * 100 : null; };
+            // Só o lubrificante das máquinas com horas medidas: sem horas, a quantidade inflaria a média geral
+            var por100 = function (l) {
+                var h = u.soma(l, 'hm'), comHoras = {};
+                l.forEach(function (f) { if (f.hm > 0) { comHoras[f.maquina] = true; } });
+                return h > 0 ? quantidade(l.filter(function (f) { return comHoras[f.maquina]; })) / h * 100 : null;
+            };
             var porTipo = function (l) {
                 var t = {};
                 l.forEach(function (f) { if (f.q > 0) { t[f.tipo] = (t[f.tipo] || 0) + f.q; } });

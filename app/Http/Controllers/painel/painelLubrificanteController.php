@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\painel;
 
+use App\Support\ConsumoAbastecimento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\DB;
  * Painel de Operações · Consumo de Óleo Lubrificante
  *
  * Junta os lubrificantes lançados na Informação Diária, na Manutenção e na Revisão.
+ * A média a cada 100 h usa as horas entre abastecimentos de diesel (horímetro do abastecimento, ver App\Support\ConsumoAbastecimento),
+ * nunca as horas trabalhadas no dia: máquina sem intervalo medido no período fica sem a média.
  * A revisão não tem fazenda: com o filtro de fazenda ela fica de fora.
  */
 class painelLubrificanteController extends PainelBase
@@ -39,9 +42,9 @@ class painelLubrificanteController extends PainelBase
             'q' => round((float) $l->quantidade, 2), 'hm' => 0,
         ])->values()->all();
 
-        // Horas de máquina (para a média a cada 100 h) das máquinas que têm lubrificante: valem para qualquer tipo e origem
+        // Horas entre abastecimentos (para a média a cada 100 h) das máquinas que têm lubrificante: valem para qualquer tipo e origem
         $maquinas = $lancamentos->pluck('equipamento')->unique()->filter()->values()->all();
-        foreach ($this->horasPorDia($filtros, $maquinas) as $h) {
+        foreach ($this->horasAbastecimento($filtros, $maquinas) as $h) {
             $fatos[] = [
                 'd' => $h->data, 'p' => $periodos['chaveDe']($h->data), 'maquina' => $h->maquina, 'fazenda' => $h->fazenda,
                 'tipo' => '', 'origem' => '', 'q' => 0, 'hm' => round((float) $h->horas, 3), 'livre' => ['tipo' => 1, 'origem' => 1],
@@ -55,29 +58,31 @@ class painelLubrificanteController extends PainelBase
         return view('painel.lubrificante', compact('fatos', 'periodos', 'cores', 'camposFiltro', 'filtros', 'totalRegistros'));
     }
 
-    // Horas de máquina por dia, máquina e fazenda (só das máquinas informadas)
-    private function horasPorDia(array $filtros, array $maquinas)
+    // Horas de cada intervalo entre abastecimentos (na data e fazenda do abastecimento que fecha o intervalo), só das máquinas informadas
+    private function horasAbastecimento(array $filtros, array $maquinas)
     {
         if (!$maquinas) {
-            return [];
+            return collect();
         }
-        $m = $this->horasMaquinaSql();
+        $intervalos = ConsumoAbastecimento::intervalos($filtros['dtFinal'] ?: null, $maquinas)['intervalos'];
         $query = DB::table('informacao')
                     ->leftJoin('equipamento', 'equipamento.id', 'informacao.equipamento')
                     ->leftJoin('fazenda', 'fazenda.id', 'informacao.fazenda')
                     ->whereNull('informacao.deleted_at')
+                    ->where('informacao.qnt_diesel', '>', 0)
                     ->whereIn('informacao.equipamento', $maquinas);
         $this->filtrarPeriodo($query, $filtros, 'informacao.data');
         $this->filtrarIgual($query, $filtros, ['fazenda' => 'informacao.fazenda']);
 
-        return $query->groupBy('informacao.data', 'informacao.equipamento', 'informacao.fazenda', 'equipamento.equipamento', 'equipamento.placa', 'fazenda.fazenda')
-                     ->havingRaw("SUM($m) > 0")
-                     ->get([
-                         'informacao.data',
+        return $query->get([
+                         'informacao.id', 'informacao.data', 'informacao.equipamento',
                          DB::raw("COALESCE(equipamento.equipamento, equipamento.placa, 'Sem máquina') as maquina"),
                          DB::raw("COALESCE(fazenda.fazenda, 'Sem fazenda') as fazenda"),
-                         DB::raw("SUM($m) as horas"),
-                     ]);
+                     ])
+                     ->filter(fn($a) => isset($intervalos[$a->id]))
+                     ->each(function ($a) use ($intervalos) {
+                         $a->horas = $intervalos[$a->id]['horas'];
+                     })->values();
     }
 
     // Planilha por máquina e tipo de lubrificante, com os mesmos filtros da tela
@@ -96,7 +101,7 @@ class painelLubrificanteController extends PainelBase
             }
         }
         return $this->planilha('consumo_lubrificante',
-            ['Máquina', 'Lubrificante', 'Quantidade', 'Horas de máquina', 'Quantidade a cada 100 h', 'Último lançamento'], $linhas);
+            ['Máquina', 'Lubrificante', 'Quantidade', 'Horas entre abastecimentos', 'Quantidade a cada 100 h', 'Último lançamento'], $linhas);
     }
 
     private function camposFiltro()
@@ -163,14 +168,11 @@ class painelLubrificanteController extends PainelBase
         return $query;
     }
 
-    // Quantidade por máquina (com a divisão por tipo) e as horas de máquina do período para a média a cada 100 h
+    // Quantidade por máquina (com a divisão por tipo) e as horas entre abastecimentos do período para a média a cada 100 h
     private function porMaquina($lancamentos, array $filtros)
     {
-        $m = $this->horasMaquinaSql();
-        $horas = DB::table('informacao')->whereNull('deleted_at')->where('equipamento', '>', 0);
-        $this->filtrarPeriodo($horas, $filtros, 'informacao.data');
-        $this->filtrarIgual($horas, $filtros, ['fazenda' => 'informacao.fazenda', 'equipamento' => 'informacao.equipamento']);
-        $horas = $horas->groupBy('equipamento')->selectRaw("SUM($m) as total, equipamento")->pluck('total', 'equipamento');
+        $horas = $this->horasAbastecimento($filtros, $lancamentos->pluck('equipamento')->unique()->filter()->values()->all())
+                      ->groupBy('equipamento')->map(fn($g) => $g->sum('horas'));
 
         return $lancamentos->groupBy('equipamento')->map(function ($g, $id) use ($horas) {
             return (object) [

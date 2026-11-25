@@ -8,8 +8,6 @@
     <style>
         .viz-root .corr-horimetro { display: flex; gap: 6px; align-items: center; min-width: 230px; }
         .viz-root .corr-horimetro input { width: 120px; height: 38px; padding: 0 10px; border: 1px solid #cad4cc; border-radius: 6px; font: inherit; text-align: right; }
-        .viz-root .corr-sugestao { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
-        .viz-root .corr-sugestao button { font-size: 11px; padding: 1px 6px; }
         .viz-root tr.corr-salva td { background: #e3f1e7; transition: background .3s; }
     </style>
 
@@ -30,7 +28,7 @@
             <p class="viz-sub" style="margin: 0;">
                 <i class="fas fa-info-circle"></i>
                 Abastecimentos com diesel lançado mas sem <b>horímetro de abastecimento</b>: sem ele o consumo médio não pode ser calculado.
-                Digite o horímetro e clique em <b>Salvar</b> (ou Enter). Os botões "Início" e "Fim" usam o horímetro inicial ou final lançado no mesmo dia.
+                Digite o horímetro e clique em <b>Salvar</b> (ou Enter).
                 Os filtros são os mesmos do Consumo Médio.
             </p>
         </div>
@@ -68,16 +66,6 @@
                                         <input type="number" step="any" min="0" id="horimetro{{ $l->id }}" class="corr-valor">
                                         <button type="button" class="btn btn-success btn-sm corr-salvar"><i class="fas fa-save"></i> Salvar</button>
                                     </div>
-                                    @if ($l->horimetro_inicial || $l->horimetro_final)
-                                        <div class="corr-sugestao">
-                                            @if ($l->horimetro_inicial)
-                                                <button type="button" class="btn btn-outline-secondary corr-usar" data-valor="{{ $l->horimetro_inicial }}">Início {{ $n($l->horimetro_inicial, 2) }}</button>
-                                            @endif
-                                            @if ($l->horimetro_final)
-                                                <button type="button" class="btn btn-outline-secondary corr-usar" data-valor="{{ $l->horimetro_final }}">Fim {{ $n($l->horimetro_final, 2) }}</button>
-                                            @endif
-                                        </div>
-                                    @endif
                                 </td>
                                 <td class="text-center"><a class="btn btn-outline-info btn-sm" href="{{ route('informacao.formEdit', $l->id) }}"><i class="far fa-edit"></i> Editar</a></td>
                             </tr>
@@ -94,9 +82,6 @@
         $(function () {
             var rota = "{{ route('painel.consumo_medio.salvar_horimetro', '__id__') }}";
 
-            $(document).on('click', '.corr-usar', function () {
-                $(this).closest('td').find('.corr-valor').val($(this).data('valor')).focus();
-            });
             $(document).on('keydown', '.corr-valor', function (e) {
                 if (e.key === 'Enter') { e.preventDefault(); $(this).closest('tr').find('.corr-salvar').click(); }
             });

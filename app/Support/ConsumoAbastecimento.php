@@ -14,8 +14,7 @@ use Illuminate\Support\Facades\DB;
  * Horímetro menor que a referência ou mais de INTERVALO_MAXIMO acima dela vai para a conferência e fica como
  * "candidata": se o próximo seguir a referência, era erro de digitação; se seguir a candidata, o horímetro
  * mudou de patamar (troca de painel, lançamento de outra máquina) e a candidata passa a ser a referência.
- * Antes disso, o horímetro do abastecimento é comparado com o horímetro do próprio dia (inicial/final do lançamento):
- * se estiver mais de TOLERANCIA_DIA fora da faixa, vai direto para a conferência (erro de digitação, ex.: 5547 por 554,7).
+ * Só vale o horímetro do abastecimento: o horímetro inicial/final do dia e as horas trabalhadas nunca entram na conta nem na conferência.
  * Equipamentos de terceiros (placa TERCEIRO) ficam de fora: o cadastro reúne várias máquinas.
  * Equipamentos com "Controla Média" = Não no cadastro também ficam de fora (sem média, conferência nem aviso).
  */
@@ -23,9 +22,6 @@ class ConsumoAbastecimento
 {
     // Um intervalo entre abastecimentos acima disso não serve de referência (provável horímetro digitado errado)
     const INTERVALO_MAXIMO = 300;
-
-    // O horímetro do abastecimento pode ficar até isso fora da faixa inicial–final do dia (abasteceu antes de começar ou depois de parar)
-    const TOLERANCIA_DIA = 24;
 
     // Cadastros com esta placa reúnem várias máquinas de terceiros, cada uma com o seu horímetro: o consumo não é calculado
     const PLACA_TERCEIROS = 'TERCEIRO';
@@ -112,8 +108,7 @@ class ConsumoAbastecimento
      *
      * Devolve ['intervalos'    => [id do abastecimento => [litros, horas, data_ref, horimetro_ref, horimetro]],
      *          'conferir'      => [[id, data, maquina, litros, horimetro, horimetro_ref, data_ref, tipo], ...]
-     *                             tipo 'dia': longe do horímetro do dia (dia_inicial/dia_final);
-     *                             'salto': não segue o anterior (horimetro_ref); 'seguintes': os abastecimentos seguintes
+     *                             tipo 'salto': não segue o anterior (horimetro_ref); 'seguintes': os abastecimentos seguintes
      *                             não seguem este (horimetro_seg/data_seg é o seguinte; horimetro_ref pode ser nulo),
      *          'sem_intervalo' => [id => 'primeiro'|'mesmo'|'reinicio'|'conferir']  (tem horímetro, mas não fecha intervalo)]
      */
@@ -133,7 +128,7 @@ class ConsumoAbastecimento
                             ->orderByRaw('informacao.horimetro_abastecimento IS NULL, informacao.horimetro_abastecimento, informacao.id')
                             ->get([
                                 'informacao.id', 'informacao.data', 'informacao.equipamento', 'informacao.qnt_diesel',
-                                'informacao.horimetro_abastecimento', 'informacao.horimetro_inicial', 'informacao.horimetro_final',
+                                'informacao.horimetro_abastecimento',
                                 DB::raw("COALESCE(equipamento.equipamento, equipamento.placa) as maquina"),
                             ]);
 
@@ -165,18 +160,6 @@ class ConsumoAbastecimento
             $horimetro = $a->horimetro_abastecimento > 0 ? (float) $a->horimetro_abastecimento : null;
             if (is_null($horimetro)) {
                 continue; // sem horímetro: os litros seguem para o próximo intervalo
-            }
-            // Confere com o horímetro do próprio dia (inicial/final do lançamento): longe dele é erro de digitação.
-            // Não vira referência nem candidata, para não confundir a sequência; os litros seguem para o próximo intervalo.
-            $dia = array_filter([(float) $a->horimetro_inicial, (float) $a->horimetro_final], fn($h) => $h > 0);
-            if ($dia && ($horimetro < min($dia) - self::TOLERANCIA_DIA || $horimetro > max($dia) + self::TOLERANCIA_DIA)) {
-                $conferir[$a->id] = [
-                    'id' => $a->id, 'data' => $a->data, 'maquina' => $a->maquina, 'litros' => (float) $a->qnt_diesel,
-                    'horimetro' => $horimetro, 'horimetro_ref' => $referencia['horimetro'] ?? null, 'data_ref' => $referencia['data'] ?? null,
-                    'dia_inicial' => $a->horimetro_inicial, 'dia_final' => $a->horimetro_final, 'tipo' => 'dia',
-                ];
-                $semIntervalo[$a->id] = 'conferir';
-                continue;
             }
             if (!$referencia) {
                 $referencia = $leitura($a, $horimetro);

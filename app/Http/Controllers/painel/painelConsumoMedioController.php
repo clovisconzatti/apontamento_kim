@@ -41,7 +41,6 @@ class painelConsumoMedioController extends PainelBase
                             ->orderBy('maquina')
                             ->get([
                                 'informacao.id', 'informacao.data', 'informacao.qnt_diesel', 'informacao.nr_nf',
-                                'informacao.horimetro_inicial', 'informacao.horimetro_final',
                                 DB::raw("COALESCE(equipamento.equipamento, equipamento.placa) as maquina"),
                                 'fazenda.fazenda', 'colaborador.colaborador', 'comboio.tanque',
                             ]);
